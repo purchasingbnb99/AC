@@ -2224,16 +2224,44 @@ $('companyName').value=s.companyName||"";
 $('companyPhone').value=s.companyPhone||"";
 $('companyEmail').value=s.companyEmail||"";
 $('companyAddress').value=s.companyAddress||""}
+let notificationReadIds=new Set();
+try{
+  const saved=JSON.parse(localStorage.getItem("acMaintenanceReadNotifications")||"[]");
+  if(Array.isArray(saved))notificationReadIds=new Set(saved.map(String));
+}catch(err){console.warn("Read notification state load error",err)}
+function saveNotificationReadState(){
+  try{localStorage.setItem("acMaintenanceReadNotifications",JSON.stringify([...notificationReadIds]));}
+  catch(err){console.warn("Read notification state save error",err)}
+}
 function notificationData(){const s=S.settings.maintenance,n=[];
 S.units.filter(x=>x.status!=="disposed"&&x.nextRoutineMaintenanceDate).forEach(u=>{const d=days(u.nextRoutineMaintenanceDate);
 if(d<0&&s.reminderOverdue)n.push({id:`${u.id}_${u.nextRoutineMaintenanceDate}_over`,title:`${u.code} terlambat maintenance`,msg:`Jadwal ${date(u.nextRoutineMaintenanceDate)} sudah lewat ${Math.abs(d)} hari.`});
 else if(d===0&&s.reminderOnDueDate)n.push({id:`${u.id}_${u.nextRoutineMaintenanceDate}_due`,title:`${u.code} jatuh tempo maintenance`,msg:"Maintenance rutin jatuh tempo hari ini."});
 else if(d>0&&d<=s.reminderDaysSecond)n.push({id:`${u.id}_${u.nextRoutineMaintenanceDate}_h7`,title:`${u.code} mendekati jadwal`,msg:`Maintenance ${date(u.nextRoutineMaintenanceDate)} (${d} hari lagi).`});
 else if(d>s.reminderDaysSecond&&d<=s.reminderDaysFirst)n.push({id:`${u.id}_${u.nextRoutineMaintenanceDate}_h30`,title:`${u.code} memasuki reminder`,msg:`Maintenance ${date(u.nextRoutineMaintenanceDate)} (${d} hari lagi).`})});
-return n}function notifications(){const n=notificationData();
-$('notifCount').textContent=n.length;
-$('notifCount').classList.toggle('hidden',!n.length);
-$('nlist').innerHTML=n.length?n.map(x=>`<div class="nrow"><b>${esc(x.title)}</b><small>${esc(x.msg)}</small></div>`).join(""):`<div class="empty">Tidak ada notifikasi.</div>`}
+return n}
+function notifications(){
+  const n=notificationData();
+  const validIds=new Set(n.map(x=>String(x.id)));
+  [...notificationReadIds].forEach(id=>{if(!validIds.has(String(id)))notificationReadIds.delete(String(id))});
+  saveNotificationReadState();
+  const unread=n.filter(x=>!notificationReadIds.has(String(x.id)));
+  $('notifCount').textContent=unread.length;
+  $('notifCount').classList.toggle('hidden',!unread.length);
+  $('nlist').innerHTML=n.length?n.map(x=>`<div class="nrow" data-notif-id="${esc(x.id)}"><b>${esc(x.title)}</b><small>${esc(x.msg)}</small></div>`).join(""):`<div class="empty">Tidak ada notifikasi.</div>`;
+}
+function toggleNotifications(){
+  const panel=$('npanel');
+  if(!panel)return;
+  panel.classList.toggle('hidden');
+  notifications();
+}
+function markNotificationsRead(){
+  notificationData().forEach(x=>notificationReadIds.add(String(x.id)));
+  saveNotificationReadState();
+  notifications();
+  toast("Notifikasi dibaca","Semua notifikasi saat ini sudah ditandai dibaca.","success");
+}
 function renderAll(){filters();
 renderPage(S.page);
 notifications()}
@@ -2384,13 +2412,26 @@ document.addEventListener("keydown",e=>{
 
 /* MOBILE NAVIGATION */
 const mobileBtnEl=$("mobileBtn");
-if(mobileBtnEl)mobileBtnEl.addEventListener("click",()=>{
+if(mobileBtnEl)mobileBtnEl.addEventListener("click",e=>{
+  e.stopPropagation();
   $("side")?.classList.toggle("open");
+  $("npanel")?.classList.add("hidden");
+});
+const notifBtnEl=$("notifBtn");
+if(notifBtnEl)notifBtnEl.addEventListener("click",e=>{
+  e.stopPropagation();
+  toggleNotifications();
+});
+const readNotifEl=$("readNotif");
+if(readNotifEl)readNotifEl.addEventListener("click",e=>{
+  e.stopPropagation();
+  markNotificationsRead();
 });
 
 /* EVENTS */
 document.addEventListener("click",async e=>{
-const reportAction=e.target.closest("#exportUnits,#printUnits,#exportHist,#printHist,#exportReport,#printReport,#exportAssets,#printAssets,#exportCost,#printCost,#printLocations");
+  if(!e.target.closest("#notifBtn,#npanel")) $("npanel")?.classList.add("hidden");
+  const reportAction=e.target.closest("#exportUnits,#printUnits,#exportHist,#printHist,#exportReport,#printReport,#exportAssets,#printAssets,#exportCost,#printCost,#printLocations");
 if(e.target.closest("#addSpare")){addSpare();costM();return}
 if(e.target.closest("#mService,#mOther")){costM();return}
 if(e.target.closest("#mDate,#mReset,#mInterval")){previewM();return}
