@@ -2382,6 +2382,12 @@ document.addEventListener("keydown",e=>{
   closeModal();
 });
 
+/* MOBILE NAVIGATION */
+const mobileBtnEl=$("mobileBtn");
+if(mobileBtnEl)mobileBtnEl.addEventListener("click",()=>{
+  $("side")?.classList.toggle("open");
+});
+
 /* EVENTS */
 document.addEventListener("click",async e=>{
 const reportAction=e.target.closest("#exportUnits,#printUnits,#exportHist,#printHist,#exportReport,#printReport,#exportAssets,#printAssets,#exportCost,#printCost,#printLocations");
