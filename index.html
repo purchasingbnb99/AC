@@ -1043,7 +1043,9 @@ textarea {
 </div>
 <div class="actions">
 <button class="btn primary" data-action="unit">＋ Tambah Unit AC</button>
-<button class="btn" id="exportUnits">⇩ Export CSV</button>
+<button class="btn" id="importUnitsBtn">⇧ Import Excel</button>
+<input id="importUnitsFile" type="file" accept=".xlsx,.xls" class="hidden">
+<button class="btn" id="exportUnits">⇩ Export Excel</button>
 <button class="btn" id="printUnits">🖨 Print</button>
 </div>
 </div>
@@ -1390,7 +1392,7 @@ textarea {
 </div>
 <div class="actions">
 <button class="btn primary" data-action="mnt">＋ Input</button>
-<button class="btn" id="exportHist">⇩ Export CSV</button>
+<button class="btn" id="exportHist">⇩ Export Excel</button>
 <button class="btn" id="printHist">🖨 Print</button>
 </div>
 </div>
@@ -1456,7 +1458,7 @@ textarea {
 <p>Filter periode dan cetak.</p>
 </div>
 <div class="actions">
-<button class="btn" id="exportReport">⇩ Export CSV</button>
+<button class="btn" id="exportReport">⇩ Export Excel</button>
 <button class="btn primary" id="printReport">🖨 Print</button>
 </div>
 </div>
@@ -1555,7 +1557,7 @@ textarea {
 <p>Daftar aset unit AC.</p>
 </div>
 <div class="actions">
-<button class="btn" id="exportAssets">⇩ Export CSV</button>
+<button class="btn" id="exportAssets">⇩ Export Excel</button>
 <button class="btn primary" id="printAssets">🖨 Print</button>
 </div>
 </div>
@@ -1624,7 +1626,7 @@ textarea {
 <p>Ringkasan pengeluaran maintenance.</p>
 </div>
 <div class="actions">
-<button class="btn" id="exportCost">⇩ Export CSV</button>
+<button class="btn" id="exportCost">⇩ Export Excel</button>
 <button class="btn primary" id="printCost">🖨 Print</button>
 </div>
 </div>
@@ -1822,6 +1824,7 @@ textarea {
 </div>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <script type="module">
 /* ================= FIREBASE =================
    Isi config ini dengan Firebase Web App Config Anda.
@@ -2403,16 +2406,176 @@ m+=12}return`${y} Tahun ${m} Bulan`}
 function maintDetail(id){const m=S.maintenance.find(x=>x.id===id),u=unit(m?.acId);
 if(!m)return;
 modal(`Detail ${esc(m.maintenanceNumber||"")}`,`<div class="detail-info"><div class="sum"><small>Unit</small><b>${esc(u?.code||m.acId)}</b></div><div class="sum"><small>Tanggal</small><b>${date(m.date)}</b></div><div class="sum"><small>Jenis</small><b>${esc(typeName(m.type))}</b></div><div class="sum"><small>Lokasi</small><b>${esc(shortLoc(u?.locationId))}</b></div><div class="sum"><small>Vendor</small><b>${esc(ven(m.vendorId))}</b></div><div class="sum"><small>Teknisi</small><b>${esc(m.technicianName||"-")}</b></div><div class="sum"><small>Hasil</small><b>${esc(resultName(m.inspectionResult))}</b></div><div class="sum"><small>Total</small><b>${cur(m.totalCost)}</b></div></div><div class="section"><h3>Keluhan</h3>${esc(m.complaint||"-")}</div><div class="section"><h3>Tindakan</h3>${esc(m.action||"-")}</div><div class="section"><h3>Sparepart</h3>${m.spareParts?.length?m.spareParts.map(x=>`${esc(x.name)} × ${x.qty} = ${cur(x.qty*x.price)}`).join("<br>"):"Tidak ada sparepart."}</div><div class="ma"><button class="btn" data-close>Tutup</button></div>`)}
-function csvEsc(v){return`"${String(v??"").replaceAll('"','""')}"`}function dl(name,rows){if(!rows.length)return toast("Tidak ada data","Tidak ada data untuk diexport.","warning");
-const b=new Blob(["\uFEFF"+rows.map(r=>r.map(csvEsc).join(",")).join("\r\n")],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(b),a=document.createElement("a");
-a.href=u;
-a.download=name;
-a.click();
-setTimeout(()=>URL.revokeObjectURL(u),1000)}function exportUnits(){const rows=unitRows();dl("unit-ac.csv",[["ID AC","Merk","Model","Serial","Jenis","PK","Lokasi","Tanggal Pembelian","Harga","Supplier","Invoice","Instalasi","Garansi","Status","Maintenance Terakhir","Maintenance Berikutnya"],...rows.map(x=>[x.code,x.brand,x.model,x.serialNumber,x.type,x.capacityPk,loc(x.locationId),x.purchaseDate,x.purchasePrice,ven(x.supplierId),x.invoiceNumber,x.installationDate,x.warrantyUntil,statusName(x.status),x.lastRoutineMaintenanceDate,x.nextRoutineMaintenanceDate])])}function exportHistory(){dl("histori-maintenance.csv",[["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Jasa","Sparepart","Lainnya","Total","Catatan"],...historyRows().map((m,i)=>{const u=unit(m.acId);
-return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),m.serviceCost||0,m.sparePartCost||0,m.otherCost||0,m.totalCost||0,m.notes||""]})])}function exportReport(){dl("laporan-maintenance.csv",[["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Total"],...reportRows().map((m,i)=>{const u=unit(m.acId);
-return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),m.totalCost||0]})])}function exportAssets(){dl("laporan-aset-ac.csv",[["ID","Merk","Model","Serial","PK","Lokasi","Pembelian","Harga","Supplier","Status"],...assetRows().map(x=>[x.code,x.brand,x.model,x.serialNumber,x.capacityPk,loc(x.locationId),x.purchaseDate,x.purchasePrice,ven(x.supplierId),statusName(x.status)])])}function exportCost(){const r=costRows(),byUnit={},byType={};
-r.forEach(x=>{const u=unit(x.acId);byUnit[x.acId]??={code:u?.code||x.acId,brand:u?.brand||"",model:u?.model||"",location:shortLoc(u?.locationId),j:0,s:0,o:0,total:0,n:0};byUnit[x.acId].j+=+x.serviceCost||0;byUnit[x.acId].s+=+x.sparePartCost||0;byUnit[x.acId].o+=+x.otherCost||0;byUnit[x.acId].total+=+x.totalCost||0;byUnit[x.acId].n++;byType[x.type]??={n:0,c:0};byType[x.type].n++;byType[x.type].c+=+x.totalCost||0});
-const out=[["REKAP BIAYA PER UNIT AC"],["ID AC","Merk","Model","Lokasi","Transaksi","Jasa","Sparepart","Lainnya","Total"],...Object.values(byUnit).sort((a,b)=>b.total-a.total).map(v=>[v.code,v.brand,v.model,v.location,v.n,v.j,v.s,v.o,v.total]),[],["REKAP BIAYA PER JENIS"],["Jenis","Jumlah","Total"],...Object.entries(byType).sort((a,b)=>b[1].c-a[1].c).map(([k,v])=>[typeName(k),v.n,v.c])];dl("laporan-biaya.csv",out)}function print(id){
+function ensureXlsx(){
+  if(typeof XLSX==="undefined"){
+    toast("Gagal","Library Excel belum tersedia. Periksa koneksi internet lalu coba lagi.","error");
+    return false;
+  }
+  return true;
+}
+function excelColumnWidths(rows){
+  const cols=Math.max(1,...rows.map(r=>r.length));
+  return Array.from({length:cols},(_,i)=>{
+    let max=10;
+    rows.forEach(r=>{const v=String(r?.[i]??"");max=Math.max(max,Math.min(38,v.length+2))});
+    return {wch:max};
+  });
+}
+function exportExcel(name,sheets){
+  if(!ensureXlsx())return;
+  if(!sheets?.length)return toast("Tidak ada data","Tidak ada data untuk diexport.","warning");
+  try{
+    const wb=XLSX.utils.book_new();
+    sheets.forEach((sheetDef,idx)=>{
+      const rows=Array.isArray(sheetDef.rows)?sheetDef.rows:[];
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols']=excelColumnWidths(rows);
+      if(rows.length){
+        const header=rows[0].map((_,i)=>XLSX.utils.encode_cell({r:0,c:i}));
+        header.forEach(addr=>{if(ws[addr])ws[addr].s={font:{bold:true,color:{rgb:"FFFFFF"}},fill:{fgColor:{rgb:"2563EB"}},alignment:{horizontal:"center",vertical:"center"}}});
+      }
+      XLSX.utils.book_append_sheet(wb,ws,String(sheetDef.name||`Sheet${idx+1}`).slice(0,31));
+    });
+    XLSX.writeFile(wb,name,{bookType:"xlsx",cellStyles:true});
+  }catch(err){
+    console.error("Excel export error:",err);
+    toast("Gagal","File Excel tidak dapat dibuat. Silakan coba lagi.","error");
+  }
+}
+function exportUnits(){
+  const rows=unitRows();
+  exportExcel("unit-ac.xlsx",[{name:"Unit AC",rows:[
+    ["ID AC","Merk","Model","Serial","Jenis","PK","Lokasi","Tanggal Pembelian","Harga","Supplier","Invoice","Instalasi","Garansi","Status","Maintenance Terakhir","Maintenance Berikutnya"],
+    ...rows.map(x=>[x.code,x.brand,x.model,x.serialNumber,x.type,x.capacityPk,loc(x.locationId),x.purchaseDate,x.purchasePrice,ven(x.supplierId),x.invoiceNumber,x.installationDate,x.warrantyUntil,statusName(x.status),x.lastRoutineMaintenanceDate,x.nextRoutineMaintenanceDate])
+  ]}]);
+}
+function exportHistory(){
+  exportExcel("histori-maintenance.xlsx",[{name:"Histori Maintenance",rows:[
+    ["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Jasa","Sparepart","Lainnya","Total","Catatan"],
+    ...historyRows().map((m,i)=>{const u=unit(m.acId);return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),m.serviceCost||0,m.sparePartCost||0,m.otherCost||0,m.totalCost||0,m.notes||""]})
+  ]}]);
+}
+function exportReport(){
+  exportExcel("laporan-maintenance.xlsx",[{name:"Laporan Maintenance",rows:[
+    ["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Total"],
+    ...reportRows().map((m,i)=>{const u=unit(m.acId);return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),m.totalCost||0]})
+  ]}]);
+}
+function exportAssets(){
+  exportExcel("laporan-aset-ac.xlsx",[{name:"Laporan Aset AC",rows:[
+    ["ID","Merk","Model","Serial","PK","Lokasi","Pembelian","Harga","Supplier","Status"],
+    ...assetRows().map(x=>[x.code,x.brand,x.model,x.serialNumber,x.capacityPk,loc(x.locationId),x.purchaseDate,x.purchasePrice,ven(x.supplierId),statusName(x.status)])
+  ]}]);
+}
+function exportCost(){
+  const r=costRows(),byUnit={},byType={};
+  r.forEach(x=>{const u=unit(x.acId);byUnit[x.acId]??={code:u?.code||x.acId,brand:u?.brand||"",model:u?.model||"",location:shortLoc(u?.locationId),j:0,s:0,o:0,total:0,n:0};byUnit[x.acId].j+=+x.serviceCost||0;byUnit[x.acId].s+=+x.sparePartCost||0;byUnit[x.acId].o+=+x.otherCost||0;byUnit[x.acId].total+=+x.totalCost||0;byUnit[x.acId].n++;byType[x.type]??={n:0,c:0};byType[x.type].n++;byType[x.type].c+=+x.totalCost||0});
+  const out=[
+    ["REKAP BIAYA PER UNIT AC"],
+    ["ID AC","Merk","Model","Lokasi","Transaksi","Jasa","Sparepart","Lainnya","Total"],
+    ...Object.values(byUnit).sort((a,b)=>b.total-a.total).map(v=>[v.code,v.brand,v.model,v.location,v.n,v.j,v.s,v.o,v.total]),
+    [],
+    ["REKAP BIAYA PER JENIS"],
+    ["Jenis","Jumlah","Total"],
+    ...Object.entries(byType).sort((a,b)=>b[1].c-a[1].c).map(([k,v])=>[typeName(k),v.n,v.c])
+  ];
+  exportExcel("laporan-biaya.xlsx",[{name:"Laporan Biaya",rows:out}]);
+}
+async function importUnitsExcel(file){
+  if(!file)return;
+  if(!ensureXlsx())return;
+  const input=$('importUnitsFile');
+  try{
+    loading(true);
+    const buf=await file.arrayBuffer();
+    const wb=XLSX.read(buf,{type:"array",cellDates:false});
+    const first=wb.SheetNames?.[0];
+    if(!first)throw new Error("Workbook tidak memiliki sheet.");
+    const ws=wb.Sheets[first];
+    const matrix=XLSX.utils.sheet_to_json(ws,{header:1,defval:"",raw:false});
+    if(matrix.length<2)throw new Error("Sheet Excel belum berisi data.");
+    const headerRow=matrix[0].map(x=>String(x||"").trim());
+    const keyMap={};
+    headerRow.forEach((h,i)=>keyMap[normalizeImportHeader(h)]=i);
+    const pick=(row,...names)=>{
+      for(const name of names){const i=keyMap[normalizeImportHeader(name)];if(i!==undefined)return String(row[i]??"").trim()}
+      return "";
+    };
+    const codeRequired=pick(matrix[1],"ID AC","ID","Kode AC","Code");
+    const brandRequired=pick(matrix[1],"Merk","Brand");
+    if(!(keyMap[normalizeImportHeader("ID AC")]!==undefined||keyMap[normalizeImportHeader("ID")]!==undefined||keyMap[normalizeImportHeader("Kode AC")]!==undefined))throw new Error("Kolom ID AC tidak ditemukan.");
+    if(!(keyMap[normalizeImportHeader("Merk")]!==undefined||keyMap[normalizeImportHeader("Brand")]!==undefined))throw new Error("Kolom Merk tidak ditemukan.");
+    if(!(keyMap[normalizeImportHeader("Lokasi")]!==undefined||keyMap[normalizeImportHeader("Location")]!==undefined||keyMap[normalizeImportHeader("Lokasi ID")]!==undefined))throw new Error("Kolom Lokasi tidak ditemukan.");
+    const statusMap={
+      active:"active","aktif":"active","dalam perbaikan":"repair","repair":"repair","rusak":"broken","broken":"broken","tidak digunakan":"unused","unused":"unused","dipindahkan":"moved","moved":"moved","disposed":"disposed"
+    };
+    const rows=[];
+    const seenCodes=new Set();
+    const seenSerials=new Map();
+    for(let r=1;r<matrix.length;r++){
+      const row=matrix[r];
+      const code=pick(row,"ID AC","ID","Kode AC","Code");
+      const brand=pick(row,"Merk","Brand");
+      if(!code&&!brand&&!pick(row,"Model","Model / Type"))continue;
+      if(!code)throw new Error(`Baris ${r+1}: ID AC wajib diisi.`);
+      if(!brand)throw new Error(`Baris ${r+1}: Merk wajib diisi.`);
+      if(seenCodes.has(code.toUpperCase()))throw new Error(`Baris ${r+1}: ID AC ${code} duplikat di file Excel.`);
+      seenCodes.add(code.toUpperCase());
+      const locationRaw=pick(row,"Lokasi","Location","Lokasi ID");
+      const location=S.locations.find(x=>String(x.id).toLowerCase()===locationRaw.toLowerCase()||loc(x.id).toLowerCase()===locationRaw.toLowerCase());
+      if(!location)throw new Error(`Baris ${r+1}: Lokasi "${locationRaw}" tidak ditemukan di Master Lokasi.`);
+      const supplierRaw=pick(row,"Supplier","Supplier ID");
+      const supplier=supplierRaw?S.vendors.find(x=>String(x.id).toLowerCase()===supplierRaw.toLowerCase()||String(x.name||"").toLowerCase()===supplierRaw.toLowerCase()):null;
+      if(supplierRaw&&!supplier)throw new Error(`Baris ${r+1}: Supplier "${supplierRaw}" tidak ditemukan di Master Vendor.`);
+      const statusRaw=pick(row,"Status").toLowerCase();
+      const status=statusMap[statusRaw]||statusRaw||"active";
+      if(!["active","repair","broken","unused","moved","disposed"].includes(status))throw new Error(`Baris ${r+1}: Status "${statusRaw}" tidak valid.`);
+      const pkRaw=pick(row,"PK","Kapasitas PK").replace(/[^0-9.,-]/g,"").replace(",",".");
+      const pk=Number(pkRaw||0);
+      if(!Number.isFinite(pk)||pk<=0)throw new Error(`Baris ${r+1}: PK tidak valid.`);
+      const serial=pick(row,"Serial","Serial Number");
+      if(serial){
+        const serialKey=serial.toLowerCase();
+        const prior=seenSerials.get(serialKey);
+        if(prior)throw new Error(`Baris ${r+1}: Serial Number ${serial} duplikat dengan baris ${prior}.`);
+        seenSerials.set(serialKey,r+1);
+      }
+      rows.push({rowNumber:r+1,code,brand,model:pick(row,"Model","Model / Type"),serialNumber:serial,type:pick(row,"Jenis","Jenis AC","Type")||"Split Wall",capacityPk:pk,locationId:location.id,purchaseDate:pick(row,"Tanggal Pembelian","Pembelian","Purchase Date"),purchasePrice:Number(pick(row,"Harga","Harga Pembelian","Purchase Price").replace(/[^0-9.,-]/g,"").replace(/\.(?=.*\.)/g,"").replace(",","."))||0,supplierId:supplier?.id||"",invoiceNumber:pick(row,"Invoice","Invoice / PO"),installationDate:pick(row,"Instalasi","Installation Date"),warrantyUntil:pick(row,"Garansi","Warranty Until"),status,notes:pick(row,"Catatan","Notes"),lastRoutineMaintenanceDate:pick(row,"Maintenance Terakhir"),nextRoutineMaintenanceDate:pick(row,"Maintenance Berikutnya"),maintenanceIntervalMonths:Number(pick(row,"Interval Maintenance","Maintenance Interval")||3)||3});
+    }
+    if(!rows.length)throw new Error("Tidak ada baris data yang dapat diimport.");
+    for(const item of rows){
+      if(item.serialNumber){
+        const existingSerial=S.units.find(x=>x.serialNumber&&String(x.serialNumber).toLowerCase()===item.serialNumber.toLowerCase()&&x.code!==item.code&&x.id!==item.code);
+        if(existingSerial)throw new Error(`Serial Number ${item.serialNumber} pada ${item.code} sudah digunakan oleh ${existingSerial.code}.`);
+      }
+    }
+    const answer=confirm(`Ditemukan ${rows.length} data Unit AC.\n\nData dengan ID AC yang sudah ada akan diperbarui (upsert). Data baru akan ditambahkan.\n\nLanjutkan import?`);
+    if(!answer)return;
+    let added=0,updated=0;
+    for(const item of rows){
+      const existing=unit(item.code);
+      const data={code:item.code,brand:item.brand,model:item.model,serialNumber:item.serialNumber,type:item.type,capacityPk:item.capacityPk,locationId:item.locationId,purchaseDate:item.purchaseDate,purchasePrice:item.purchasePrice,supplierId:item.supplierId,invoiceNumber:item.invoiceNumber,installationDate:item.installationDate,warrantyUntil:item.warrantyUntil,status:item.status,notes:item.notes,lastRoutineMaintenanceDate:item.lastRoutineMaintenanceDate||existing?.lastRoutineMaintenanceDate||"",nextRoutineMaintenanceDate:item.nextRoutineMaintenanceDate||existing?.nextRoutineMaintenanceDate||"",maintenanceIntervalMonths:Math.max(3,item.maintenanceIntervalMonths||existing?.maintenanceIntervalMonths||3)};
+      if(demo){
+        if(existing){Object.assign(existing,data);updated++}
+        else{S.units.push({id:item.code,...data});added++}
+      }else{
+        if(existing){await save("ac_units",existing.id,data);updated++}
+        else{await setDoc(doc(db,"ac_units",item.code),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"admin"});added++}
+      }
+    }
+    toast("Import selesai",`${added} data baru ditambahkan, ${updated} data diperbarui.`,"success");
+    if(input)input.value="";
+    renderAll();
+  }catch(err){
+    console.error("Excel import error:",err);
+    if(input)input.value="";
+    toast("Import gagal",err?.message||"File Excel tidak dapat diproses.","error");
+  }finally{loading(false)}
+}
+function normalizeImportHeader(v){
+  return String(v||"").trim().toLowerCase().replace(/[\s_\-\/]+/g," ").replace(/\s+/g," ");
+}
+function print(id){
 const target=$(id);
 if(!target){toast("Gagal Print","Bagian laporan tidak ditemukan.","error");return}
 document.querySelectorAll('.page').forEach(x=>x.classList.remove('print-target'));
@@ -2447,6 +2610,17 @@ const readNotifEl=$("readNotif");
 if(readNotifEl)readNotifEl.addEventListener("click",e=>{
   e.stopPropagation();
   markNotificationsRead();
+});
+const importUnitsBtnEl=$("importUnitsBtn");
+const importUnitsFileEl=$("importUnitsFile");
+if(importUnitsBtnEl&&importUnitsFileEl)importUnitsBtnEl.addEventListener("click",e=>{
+  e.stopPropagation();
+  importUnitsFileEl.value="";
+  importUnitsFileEl.click();
+});
+if(importUnitsFileEl)importUnitsFileEl.addEventListener("change",e=>{
+  const file=e.target.files?.[0];
+  if(file)importUnitsExcel(file);
 });
 
 /* EVENTS */
