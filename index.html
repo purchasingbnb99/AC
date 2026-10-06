@@ -871,6 +871,21 @@ textarea {
   padding:5px
 }
 }
+
+/* MAINTENANCE CHECKLIST + TECHNICAL MEASUREMENTS + PHOTO EVIDENCE */
+.maint-checklist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.maint-check-item{display:grid;grid-template-columns:1fr 150px;gap:8px;align-items:center;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc}
+.maint-check-item small{display:block;color:#64748b;font-size:9.5px;margin-top:2px}
+.maint-measure-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.maint-photo-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.maint-photo-card{border:1px solid #dbe4ee;border-radius:11px;padding:12px;background:#f8fafc}
+.maint-photo-card h4{margin:0 0 7px;font-size:11px}
+.maint-file-list{margin-top:7px;font-size:10px;color:#64748b;line-height:1.5}
+.maint-evidence-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.maint-evidence-box{padding:10px;border:1px solid #dbe4ee;border-radius:9px;background:#f8fafc}
+.maint-evidence-box small{display:block;color:#64748b;font-size:9px}.maint-evidence-box b{display:block;margin-top:4px;font-size:12px}
+@media(max-width:800px){.maint-checklist{grid-template-columns:1fr}.maint-measure-grid{grid-template-columns:1fr 1fr}.maint-photo-grid{grid-template-columns:1fr}.maint-evidence-summary{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.maint-measure-grid{grid-template-columns:1fr}.maint-evidence-summary{grid-template-columns:1fr}.maint-check-item{grid-template-columns:1fr}.maint-check-item select{width:100%}}
 </style>
 </head>
 <body>
@@ -1313,85 +1328,13 @@ textarea {
 </div>
 </div>
 </div>
-<div class="section">
-<h3>3. Pemeriksaan</h3>
-<div class="formgrid">
-<div class="field">
-<label>Keluhan</label>
-<textarea id="mComplaint">
-</textarea>
-</div>
-<div class="field">
-<label>Tindakan</label>
-<textarea id="mAction">
-</textarea>
-</div>
-<div class="field full">
-<label>Catatan</label>
-<textarea id="mNotes">
-</textarea>
-</div>
-</div>
-</div>
-<div class="section">
-<h3>4. Sparepart</h3>
-<div id="spares">
-</div>
-<button type="button" class="btn" id="addSpare">＋ Tambah Sparepart</button>
-</div>
-<div class="section">
-<h3>5. Biaya</h3>
-<div class="form3">
-<div class="field">
-<label>Biaya Jasa</label>
-<input id="mService" type="number" min="0" value="0">
-</div>
-<div class="field">
-<label>Biaya Sparepart</label>
-<input id="mSpare" type="number" min="0" value="0" readonly>
-</div>
-<div class="field">
-<label>Biaya Lainnya</label>
-<input id="mOther" type="number" min="0" value="0">
-</div>
-<div class="field">
-<label>Total</label>
-<input id="mTotal" type="number" min="0" value="0" readonly>
-</div>
-</div>
-</div>
-<div class="section">
-<h3>6. Jadwal</h3>
-<div class="form3">
-<div class="field">
-<label>Reset Jadwal Rutin?</label>
-<select id="mReset">
-<option value="true">Ya</option>
-<option value="false">Tidak</option>
-</select>
-</div>
-<div class="field">
-<label>Interval</label>
-<select id="mInterval">
-<option value="3">3 Bulan</option>
-<option value="4">4 Bulan</option>
-<option value="6">6 Bulan</option>
-<option value="12">12 Bulan</option>
-</select>
-</div>
-<div class="field">
-<label>Jadwal Berikutnya</label>
-<input id="mNext" type="date" readonly>
-</div>
-</div>
-</div>
-<div class="section">
-<h3>7. Lampiran</h3>
-<div class="field">
-<label>Foto / Invoice / Nota</label>
-<input id="mFiles" type="file" multiple accept="image/*,.pdf">
-</div>
-</div>
+<div class="section"><h3>3. Pemeriksaan</h3><div class="formgrid"><div class="field"><label>Keluhan</label><textarea id="mComplaint"></textarea></div><div class="field"><label>Tindakan</label><textarea id="mAction"></textarea></div><div class="field full"><label>Catatan</label><textarea id="mNotes"></textarea></div></div></div>
+<div class="section"><h3>4. Checklist Maintenance</h3><div id="mChecklist" class="maint-checklist"></div><div class="field" style="margin-top:10px"><label>Catatan Checklist</label><textarea id="mChecklistNotes" placeholder="Catatan temuan checklist, bagian yang perlu diperbaiki, atau hal khusus."></textarea></div></div>
+<div class="section"><h3>5. Pengukuran Teknis</h3><div class="maint-measure-grid"><div class="field"><label>Tegangan (V)</label><input id="mVoltage" type="number" min="0" step="0.1" placeholder="Opsional"></div><div class="field"><label>Arus / Ampere (A)</label><input id="mAmpere" type="number" min="0" step="0.01" placeholder="Opsional"></div><div class="field"><label>Suhu Supply (°C)</label><input id="mTempSupply" type="number" step="0.1" placeholder="Opsional"></div><div class="field"><label>Suhu Return (°C)</label><input id="mTempReturn" type="number" step="0.1" placeholder="Opsional"></div><div class="field"><label>Tekanan Refrigerant (PSI)</label><input id="mPressure" type="number" min="0" step="0.1" placeholder="Opsional"></div><div class="field"><label>Refrigerant</label><input id="mRefrigerant" placeholder="Contoh: R32 / R410A / R22"></div><div class="field full"><label>Catatan Pengukuran</label><textarea id="mMeasurementNotes" placeholder="Catatan hasil pengukuran atau kondisi teknis."></textarea></div></div></div>
+<div class="section"><h3>6. Sparepart</h3><div id="spares"></div><button type="button" class="btn" id="addSpare">＋ Tambah Sparepart</button></div>
+<div class="section"><h3>7. Biaya</h3><div class="form3"><div class="field"><label>Biaya Jasa</label><input id="mService" type="number" min="0" value="0"></div><div class="field"><label>Biaya Sparepart</label><input id="mSpare" type="number" min="0" value="0" readonly></div><div class="field"><label>Biaya Lainnya</label><input id="mOther" type="number" min="0" value="0"></div><div class="field"><label>Total</label><input id="mTotal" type="number" min="0" value="0" readonly></div></div></div>
+<div class="section"><h3>8. Jadwal</h3><div class="form3"><div class="field"><label>Reset Jadwal Rutin?</label><select id="mReset"><option value="true">Ya</option><option value="false">Tidak</option></select></div><div class="field"><label>Interval</label><select id="mInterval"><option value="3">3 Bulan</option><option value="4">4 Bulan</option><option value="6">6 Bulan</option><option value="12">12 Bulan</option></select></div><div class="field"><label>Jadwal Berikutnya</label><input id="mNext" type="date" readonly></div></div></div>
+<div class="section"><h3>9. Foto & Lampiran</h3><div class="maint-photo-grid"><div class="maint-photo-card"><h4>📷 Foto Sebelum Maintenance</h4><input id="mPhotosBefore" type="file" multiple accept="image/*"><div id="mPhotosBeforeList" class="maint-file-list"></div></div><div class="maint-photo-card"><h4>📷 Foto Sesudah Maintenance</h4><input id="mPhotosAfter" type="file" multiple accept="image/*"><div id="mPhotosAfterList" class="maint-file-list"></div></div></div><div class="maint-photo-card" style="margin-top:12px"><h4>📎 Lampiran Tambahan</h4><div class="form-help">Foto akan otomatis dikompres sebelum upload. PDF maksimal 2.5 MB per file, maksimal 5 lampiran tambahan.</div><input id="mFiles" type="file" multiple accept="image/*,.pdf"><div id="mFilesList" class="maint-file-list"></div></div><div id="mExistingEvidence" style="margin-top:10px"></div></div>
 <div class="ma">
 <button type="button" class="btn" id="resetMnt">Reset</button>
 <button class="btn primary">💾 Simpan Maintenance</button>
@@ -1897,6 +1840,103 @@ return x?[x.building,x.floor,x.area,x.room].filter(Boolean).join(" • "):"-"}fu
 return x?[x.building,x.room].filter(Boolean).join(" • "):"-"}function ven(id){return S.vendors.find(x=>x.id===id)?.name||"-"}const typeMap={cuci_ac:"Cuci AC",service_rutin:"Service Rutin",pemeriksaan:"Pemeriksaan",isi_freon:"Isi Freon",tambah_freon:"Tambah Freon",perbaikan:"Perbaikan",ganti_sparepart:"Ganti Sparepart",bongkar:"Bongkar",pasang:"Pasang",bongkar_pasang:"Bongkar & Pasang",lainnya:"Lainnya"};
 const typeName=x=>typeMap[x]||x||"-";
 const resultName=x=>({normal:"Normal",perlu_perbaikan:"Perlu Perbaikan",rusak:"Rusak"}[x]||x||"-");
+const MAINT_CHECK_ITEMS=[
+  ["filter","Filter"],["evaporator","Evaporator / Sirip"],["condenser","Condenser / Outdoor"],["fan","Fan / Blower"],["drain","Drain / Pembuangan"],["leak","Kebocoran"],["electrical","Kelistrikan"],["ampere","Arus / Ampere"],["refrigerant","Refrigerant"],["temperature","Suhu Supply / Return"],["cleaning","Kebersihan Unit"]
+];
+const MAINT_CHECK_STATUS={not_checked:"Belum diperiksa",ok:"OK",attention:"Perlu Perbaikan",na:"N/A"};
+function renderMaintenanceChecklist(values={}){
+  const root=$("mChecklist"); if(!root)return;
+  root.innerHTML=MAINT_CHECK_ITEMS.map(([key,label])=>{const val=values?.[key]||"not_checked";return `<div class="maint-check-item"><div><b>${esc(label)}</b><small>Status pemeriksaan</small></div><select data-check="${key}"><option value="not_checked" ${val==="not_checked"?"selected":""}>Belum diperiksa</option><option value="ok" ${val==="ok"?"selected":""}>OK</option><option value="attention" ${val==="attention"?"selected":""}>Perlu Perbaikan</option><option value="na" ${val==="na"?"selected":""}>N/A</option></select></div>`}).join("");
+}
+function collectMaintenanceChecklist(){const out={};document.querySelectorAll("#mChecklist select[data-check]").forEach(e=>out[e.dataset.check]=e.value||"not_checked");return out}
+function checklistSummary(values={}){const vals=MAINT_CHECK_ITEMS.map(([k])=>values?.[k]||"not_checked");return `${vals.filter(v=>v==="ok").length} OK / ${vals.filter(v=>v==="attention").length} Perlu Perbaikan / ${vals.filter(v=>v==="na").length} N/A`}
+function collectMaintenanceMeasurements(){return {voltageV:+$("mVoltage")?.value||0,ampereA:+$("mAmpere")?.value||0,supplyTempC:+$("mTempSupply")?.value||0,returnTempC:+$("mTempReturn")?.value||0,pressurePsi:+$("mPressure")?.value||0,refrigerant:$("mRefrigerant")?.value.trim()||"",measurementNotes:$("mMeasurementNotes")?.value.trim()||""}}
+function populateMaintenanceMeasurements(v={}){if($("mVoltage"))$("mVoltage").value=v.voltageV??"";if($("mAmpere"))$("mAmpere").value=v.ampereA??"";if($("mTempSupply"))$("mTempSupply").value=v.supplyTempC??"";if($("mTempReturn"))$("mTempReturn").value=v.returnTempC??"";if($("mPressure"))$("mPressure").value=v.pressurePsi??"";if($("mRefrigerant"))$("mRefrigerant").value=v.refrigerant||"";if($("mMeasurementNotes"))$("mMeasurementNotes").value=v.measurementNotes||""}
+function selectedFileSummary(inputId,listId){const input=$(inputId),list=$(listId);if(!input||!list)return;const files=[...input.files];list.innerHTML=files.length?files.map(f=>`<div>• ${esc(f.name)} (${(f.size/1024/1024).toFixed(2)} MB)</div>`).join(""):""}
+function safeFileName(name){return String(name||"file").replace(/[^a-zA-Z0-9._-]+/g,"_").slice(0,120)}
+function nameWithoutExt(name){const s=String(name||"foto");return s.replace(/\.[^.]+$/i,"")||"foto"}
+async function compressImageFile(file,maxPx=1600,quality=.78){
+  if(!file?.type?.startsWith("image/"))return file;
+  const data=await new Promise((resolve,reject)=>{const fr=new FileReader();fr.onload=()=>resolve(fr.result);fr.onerror=reject;fr.readAsDataURL(file)});
+  const img=await new Promise((resolve,reject)=>{const im=new Image();im.onload=()=>resolve(im);im.onerror=reject;im.src=data});
+  const scale=Math.min(1,maxPx/Math.max(img.width,img.height));
+  const canvas=document.createElement("canvas");canvas.width=Math.max(1,Math.round(img.width*scale));canvas.height=Math.max(1,Math.round(img.height*scale));
+  const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Browser tidak mendukung pemrosesan foto");ctx.drawImage(img,0,0,canvas.width,canvas.height);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",quality));if(!blob)throw new Error("Gagal memproses foto");
+  return new File([blob],`${nameWithoutExt(file.name)}.jpg`,{type:"image/jpeg",lastModified:Date.now()});
+}
+async function fileToBase64(file){
+  if(!file)throw new Error("File tidak valid.");
+  return await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>{
+      const result=String(reader.result||"");
+      const comma=result.indexOf(",");
+      resolve(comma>=0?result.slice(comma+1):result);
+    };
+    reader.onerror=()=>reject(new Error(`Gagal membaca file ${file.name||""}.`));
+    reader.readAsDataURL(file);
+  });
+}
+async function prepareMaintenanceFile(file){
+  if(!file)throw new Error("File tidak valid.");
+  const MAX_PAYLOAD_FILE=2.5*1024*1024;
+  if(file.type?.startsWith("image/")){
+    let processed=await compressImageFile(file,1600,.78);
+    if(processed.size>MAX_PAYLOAD_FILE)processed=await compressImageFile(file,1280,.68);
+    if(processed.size>MAX_PAYLOAD_FILE)processed=await compressImageFile(file,1100,.58);
+    if(processed.size>MAX_PAYLOAD_FILE)throw new Error(`Foto ${file.name} terlalu besar setelah kompresi.`);
+    return processed;
+  }
+  if(file.type==="application/pdf"){
+    if(file.size>MAX_PAYLOAD_FILE)throw new Error(`PDF ${file.name} lebih dari 2.5 MB.`);
+    return file;
+  }
+  throw new Error(`Tipe file ${file.type||"tidak diketahui"} tidak diizinkan.`);
+}
+async function uploadMaintenanceFile(maintenanceId,file,category){
+  if(!user)throw new Error("Sesi Admin tidak ditemukan. Silakan login ulang.");
+  const processed=await prepareMaintenanceFile(file);
+  const token=await user.getIdToken(true);
+  const u=unit($("mAc")?.value);
+  const payload={
+    fileName:processed.name,
+    mimeType:processed.type||"application/octet-stream",
+    base64Data:await fileToBase64(processed),
+    maintenanceNumber:maintenanceId,
+    unitCode:u?.code||"",
+    photoType:category
+  };
+  const response=await fetch("/api/drive-upload",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+    body:JSON.stringify(payload)
+  });
+  let result={};
+  try{result=await response.json()}catch(_){throw new Error("Respons dari server upload tidak valid.")}
+  if(!response.ok||!result?.ok){throw new Error(result?.error||`Upload gagal (${response.status}).`)}
+  const fileId=String(result.fileId||"");
+  const url=fileId?`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`:"";
+  return {name:file.name,type:processed.type||file.type||"",size:Number(result.size||processed.size||0),category,url,fileId,folderName:result.folderName||"",uploadedAt:new Date().toISOString()};
+}
+async function uploadMaintenanceFiles(maintenanceId){
+  const before=[...($('mPhotosBefore')?.files||[])],after=[...($('mPhotosAfter')?.files||[])],extra=[...($('mFiles')?.files||[])];
+  if(before.length>3)throw new Error("Maksimal 3 foto sebelum maintenance");
+  if(after.length>3)throw new Error("Maksimal 3 foto sesudah maintenance");
+  if(extra.length>5)throw new Error("Maksimal 5 lampiran tambahan");
+  const tasks=[];
+  before.forEach(f=>tasks.push([f,"before"]));
+  after.forEach(f=>tasks.push([f,"after"]));
+  extra.forEach(f=>tasks.push([f,"attachments"]));
+  const uploaded=[],failed=[];
+  for(const [file,category] of tasks){
+    try{uploaded.push(await uploadMaintenanceFile(maintenanceId,file,category))}
+    catch(error){console.error("Maintenance file upload item error:",file?.name,error);failed.push({name:file?.name||"File",message:error?.message||"Gagal diunggah"})}
+  }
+  return {uploaded,failed};
+}
+function existingEvidenceHtml(m){const before=m?.photosBefore||[],after=m?.photosAfter||[],extra=m?.attachments||[];const box=(title,items,icon)=>`<div class="maint-evidence-box"><small>${esc(title)}</small><b>${items.length} file</b>${items.length?`<div class="maint-existing-files">${items.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener">${icon} ${i+1}</a>`:`<span>${esc(x.name||`File ${i+1}`)}</span>`).join("")}</div>`:""}</div>`;return `<div class="maint-evidence-summary">${box("Foto Sebelum",before,"📷")}${box("Foto Sesudah",after,"📷")}${box("Lampiran Tambahan",extra,"📎")}</div>`}
+
 const statusName=x=>({active:"Aktif",repair:"Dalam Perbaikan",broken:"Rusak",unused:"Tidak Digunakan",moved:"Dipindahkan",disposed:"Disposed"}[x]||x||"-");
 
 function mcb(id){return S.mcbs.find(x=>x.id===id||x.code===id)}
@@ -2125,25 +2165,7 @@ return`<tr><td><b>${esc(x.code)}</b><br><small>${esc(x.brand)} ${esc(x.model||""
 function scheduleModal(id){const u=unit(id);if(!u)return;
 modal("Edit / Reschedule Jadwal",`<form id="scheduleForm"><div class="formgrid"><div class="field"><label>Unit AC</label><input value="${esc(u.code)} — ${esc(u.brand||"")} ${esc(u.model||"")}" readonly></div><div class="field"><label>Jadwal Saat Ini</label><input value="${esc(date(u.nextRoutineMaintenanceDate))}" readonly></div><div class="field"><label>Jadwal Baru *</label><input id="schNewDate" type="date" value="${esc(u.nextRoutineMaintenanceDate||"")}" required></div><div class="field full"><label>Alasan Reschedule</label><textarea id="schReason" placeholder="Contoh: menyesuaikan jadwal operasional atau permintaan user.">${esc(u.scheduleRescheduleReason||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan Jadwal</button></div></form>`);
 $('scheduleForm').onsubmit=async e=>{e.preventDefault();const nd=$('schNewDate').value.trim(),reason=$('schReason').value.trim();if(!nd)return toast("Validasi","Jadwal baru wajib diisi.","warning");try{loading(true);const data={nextRoutineMaintenanceDate:nd,scheduleRescheduleReason:reason,scheduleUpdatedAt:serverTimestamp(),scheduleUpdatedBy:user?.uid||"admin"};if(demo)Object.assign(u,data);else await updateDoc(doc(db,"ac_units",u.id),data);closeModal(true);renderAll();toast("Berhasil","Jadwal maintenance berhasil diubah.","success")}catch(err){console.error(err);toast("Gagal","Jadwal maintenance gagal diubah.","error")}finally{loading(false)}}}
-function resetM(){$("mEdit").value="";
-$("mDate").value=today();
-$("mType").value="";
-$("mTech").value="";
-$("mComplaint").value="";
-$("mAction").value="";
-$("mNotes").value="";
-$("mService").value=0;
-$("mOther").value=0;
-$("mReset").value="true";
-$("mInterval").value=String(Math.max(3,S.settings.maintenance.defaultIntervalMonths||3));
-$("mNext").value="";
-$("spares").innerHTML="";
-addSpare();
-filters();
-$("mAc").value="";
-$("mVendor").value="";
-$("mResult").value="normal";
-costM()}
+function resetM(){$("mEdit").value="";$("mDate").value=today();$("mType").value="";$("mTech").value="";$("mComplaint").value="";$("mAction").value="";$("mNotes").value="";$("mChecklistNotes").value="";renderMaintenanceChecklist({});populateMaintenanceMeasurements({});$("mPhotosBefore").value="";$("mPhotosAfter").value="";$("mFiles").value="";$("mPhotosBeforeList").innerHTML="";$("mPhotosAfterList").innerHTML="";$("mFilesList").innerHTML="";$("mExistingEvidence").innerHTML="";$("mService").value=0;$("mOther").value=0;$("mReset").value="true";$("mInterval").value=String(Math.max(3,S.settings.maintenance.defaultIntervalMonths||3));$("mNext").value="";$("spares").innerHTML="";addSpare();filters();$("mAc").value="";$("mVendor").value="";$("mResult").value="normal";costM()}
 function populateMnt(edit=null){filters();
 if(!$("mDate").value)resetM();
 if(edit){const m=S.maintenance.find(x=>x.id===edit);
@@ -2157,7 +2179,7 @@ $("mTech").value=m.technicianName||"";
 $("mResult").value=m.inspectionResult||"normal";
 $("mComplaint").value=m.complaint||"";
 $("mAction").value=m.action||"";
-$("mNotes").value=m.notes||"";
+$("mNotes").value=m.notes||"";$("mChecklistNotes").value=m.checklistNotes||"";renderMaintenanceChecklist(m.checklist||{});populateMaintenanceMeasurements(m.measurements||{});$("mExistingEvidence").innerHTML=existingEvidenceHtml(m);
 $("mService").value=m.serviceCost||0;
 $("mOther").value=m.otherCost||0;
 $("mReset").value=String(!!m.resetsRoutineSchedule);
@@ -2178,21 +2200,7 @@ $('mSpare').value=sp;
 $('mTotal').value=tot;
 previewM()}function previewM(){const d=$("mDate").value,ok=$("mReset").value==="true";
 $("mNext").value=d&&ok?addM(d,Math.max(3,+$("mInterval").value||3)):""}
-async function submitM(e){e.preventDefault();
-const ac=$("mAc").value,d=$("mDate").value,t=$("mType").value;
-if(!ac||!d||!t)return toast("Validasi","Unit, tanggal, dan jenis wajib diisi.","warning");
-const reset=$("mReset").value==="true",interval=Math.max(3,+$("mInterval").value||3),sp=spareData(),svc=+$('mService').value||0,spc=sp.reduce((a,x)=>a+x.qty*x.price,0),oth=+$('mOther').value||0,total=svc+spc+oth,id=$("mEdit").value||null;
-const data={maintenanceNumber:id?(S.maintenance.find(x=>x.id===id)?.maintenanceNumber||id):nextMaintenanceNumber(),acId:ac,date:d,type:t,resetsRoutineSchedule:reset,intervalMonths:reset?interval:null,nextRoutineMaintenanceDate:reset?addM(d,interval):null,vendorId:$('mVendor').value||"",technicianName:$('mTech').value.trim(),complaint:$('mComplaint').value.trim(),inspectionResult:$('mResult').value,action:$('mAction').value.trim(),notes:$('mNotes').value.trim(),serviceCost:svc,sparePartCost:spc,otherCost:oth,totalCost:total,spareParts:sp,attachments:[],status:"active"};
-try{loading(true);
-if(id){if(demo)Object.assign(S.maintenance.find(x=>x.id===id),data);
-else await save("maintenance",id,data)}else{await add("maintenance",data,"MNT")}const u=unit(ac);
-if(reset){const ud={lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval};
-if(demo)Object.assign(u,ud);
-else await updateDoc(doc(db,"ac_units",u.id),{...ud,updatedAt:serverTimestamp()})}toast("Berhasil","Maintenance berhasil disimpan.","success");
-resetM();
-renderAll();
-nav("history")}catch(err){console.error(err);
-toast("Gagal","Maintenance gagal disimpan.","error")}finally{loading(false)}}
+async function submitM(e){e.preventDefault();const ac=$("mAc").value,d=$("mDate").value,t=$("mType").value;if(!ac||!d||!t)return toast("Validasi","Unit, tanggal, dan jenis wajib diisi.","warning");const reset=$("mReset").value==="true",interval=Math.max(3,+$("mInterval").value||3),sp=spareData(),svc=+$('mService').value||0,spc=sp.reduce((a,x)=>a+x.qty*x.price,0),oth=+$('mOther').value||0,total=svc+spc+oth,id=$("mEdit").value||null,existing=id?S.maintenance.find(x=>x.id===id):null;const data={maintenanceNumber:existing?.maintenanceNumber||nextMaintenanceNumber(),acId:ac,date:d,type:t,resetsRoutineSchedule:reset,intervalMonths:reset?interval:null,nextRoutineMaintenanceDate:reset?addM(d,interval):null,vendorId:$('mVendor').value||"",technicianName:$("mTech").value.trim(),complaint:$("mComplaint").value.trim(),inspectionResult:$("mResult").value,action:$("mAction").value.trim(),notes:$("mNotes").value.trim(),checklist:collectMaintenanceChecklist(),checklistNotes:$("mChecklistNotes").value.trim(),measurements:collectMaintenanceMeasurements(),serviceCost:svc,sparePartCost:spc,otherCost:oth,totalCost:total,spareParts:sp,photosBefore:existing?.photosBefore||[],photosAfter:existing?.photosAfter||[],attachments:existing?.attachments||[],status:existing?.status||"active"};try{loading(true);let maintenanceId=id;if(id){if(demo)Object.assign(existing,data);else await save("maintenance",id,data)}else{maintenanceId=demo?"MNT-"+Date.now():await add("maintenance",data,"MNT");if(demo)S.maintenance.push({id:maintenanceId,...data})}let uploaded=[];let failedUploads=[];const hasFiles=(($("mPhotosBefore")?.files?.length)||0)+(($("mPhotosAfter")?.files?.length)||0)+(($("mFiles")?.files?.length)||0);if(hasFiles&&!demo){try{const uploadResult=await uploadMaintenanceFiles(maintenanceId);uploaded=uploadResult.uploaded||[];failedUploads=uploadResult.failed||[];if(failedUploads.length)toast("Sebagian file gagal",`${failedUploads.length} file tidak berhasil diunggah. Data maintenance tetap tersimpan.` ,"warning")}catch(fileErr){console.error("Maintenance file upload error:",fileErr);toast("Maintenance tersimpan",fileErr.message||"Ada file yang gagal diunggah.","warning")}}if(uploaded.length){const before=[...(data.photosBefore||[])],after=[...(data.photosAfter||[])],extra=[...(data.attachments||[])];uploaded.forEach(x=>{if(x.category==="before")before.push(x);else if(x.category==="after")after.push(x);else extra.push(x)});const evidence={photosBefore:before,photosAfter:after,attachments:extra};if(demo)Object.assign(S.maintenance.find(x=>x.id===maintenanceId),evidence);else await updateDoc(doc(db,"maintenance",maintenanceId),{...evidence,updatedAt:serverTimestamp()})}const u=unit(ac);if(reset){const ud={lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval};if(demo)Object.assign(u,ud);else await updateDoc(doc(db,"ac_units",u.id),{...ud,updatedAt:serverTimestamp()})}toast("Berhasil","Maintenance berhasil disimpan.","success");resetM();renderAll();nav("history")}catch(err){console.error("Maintenance save error:",err);toast("Gagal","Maintenance gagal disimpan.","error")}finally{loading(false)}}
 
 // Bind form actions explicitly so the Maintenance form cannot fall back to a normal page submit.
 const mntFormEl=$("mntForm");
@@ -2203,6 +2211,7 @@ if(resetMntEl)resetMntEl.onclick=()=>{
   resetM();
   toast("Form direset","Form Input Maintenance dikosongkan.","info");
 };
+[["mPhotosBefore","mPhotosBeforeList"],["mPhotosAfter","mPhotosAfterList"],["mFiles","mFilesList"]].forEach(([inputId,listId])=>{const el=$(inputId);if(el)el.addEventListener("change",()=>selectedFileSummary(inputId,listId));});
 
 function historyRows(){const q=(($('hSearch')?.value)||"").toLowerCase(),a=$('hStart')?.value||"",b=$('hEnd')?.value||"",ac=$('hAc')?.value||"",t=$('hType')?.value||"";
 return S.maintenance.filter(m=>m.status!=="void").filter(m=>{const u=unit(m.acId),hay=[m.maintenanceNumber,m.technicianName,ven(m.vendorId),u?.code,u?.brand,shortLoc(u?.locationId)].join(" ").toLowerCase();
@@ -2509,9 +2518,7 @@ let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth();
 if(b.getDate()<a.getDate())m--;
 if(m<0){y--;
 m+=12}return`${y} Tahun ${m} Bulan`}
-function maintDetail(id){const m=S.maintenance.find(x=>x.id===id),u=unit(m?.acId);
-if(!m)return;
-modal(`Detail ${esc(m.maintenanceNumber||"")}`,`<div class="detail-info"><div class="sum"><small>Unit</small><b>${esc(u?.code||m.acId)}</b></div><div class="sum"><small>Tanggal</small><b>${date(m.date)}</b></div><div class="sum"><small>Jenis</small><b>${esc(typeName(m.type))}</b></div><div class="sum"><small>Lokasi</small><b>${esc(shortLoc(u?.locationId))}</b></div><div class="sum"><small>Vendor</small><b>${esc(ven(m.vendorId))}</b></div><div class="sum"><small>Teknisi</small><b>${esc(m.technicianName||"-")}</b></div><div class="sum"><small>Hasil</small><b>${esc(resultName(m.inspectionResult))}</b></div><div class="sum"><small>Total</small><b>${cur(m.totalCost)}</b></div></div><div class="section"><h3>Keluhan</h3>${esc(m.complaint||"-")}</div><div class="section"><h3>Tindakan</h3>${esc(m.action||"-")}</div><div class="section"><h3>Sparepart</h3>${m.spareParts?.length?m.spareParts.map(x=>`${esc(x.name)} × ${x.qty} = ${cur(x.qty*x.price)}`).join("<br>"):"Tidak ada sparepart."}</div><div class="ma"><button class="btn" data-close>Tutup</button></div>`)}
+function maintDetail(id){const m=S.maintenance.find(x=>x.id===id),u=unit(m?.acId);if(!m)return;const measurements=m.measurements||{},checks=m.checklist||{},before=m.photosBefore||[],after=m.photosAfter||[],extra=m.attachments||[];const val=(v,suf="")=>(v!==undefined&&v!==null&&v!==""&&Number(v)!==0)?esc(String(v))+suf:"-";const photoLinks=items=>items.length?items.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:4px 6px 4px 0"><img src="${esc(x.url)}" alt="Foto ${i+1}" loading="lazy" style="width:115px;height:85px;object-fit:cover;border-radius:8px;border:1px solid #dbe4ee"></a>`:`<span>${esc(x.name||`File ${i+1}`)}</span>`).join(""):"Tidak ada foto.";const attachmentLinks=extra.length?extra.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:4px 6px 4px 0;padding:6px 8px;border:1px solid #dbe4ee;border-radius:8px;text-decoration:none;color:#1d4ed8">📎 ${esc(x.name||`Lampiran ${i+1}`)}</a>`:`<span>${esc(x.name||`Lampiran ${i+1}`)}</span>`).join(""):"Tidak ada lampiran.";modal(`Detail ${esc(m.maintenanceNumber||"")}`,`<div class="detail-info"><div class="sum"><small>Unit</small><b>${esc(u?.code||m.acId)}</b></div><div class="sum"><small>Tanggal</small><b>${date(m.date)}</b></div><div class="sum"><small>Jenis</small><b>${esc(typeName(m.type))}</b></div><div class="sum"><small>Lokasi</small><b>${esc(shortLoc(u?.locationId))}</b></div><div class="sum"><small>Vendor</small><b>${esc(ven(m.vendorId))}</b></div><div class="sum"><small>Teknisi</small><b>${esc(m.technicianName||"-")}</b></div><div class="sum"><small>Hasil</small><b>${esc(resultName(m.inspectionResult))}</b></div><div class="sum"><small>Total</small><b>${cur(m.totalCost)}</b></div></div><div class="section"><h3>Checklist Maintenance</h3><div class="summary">${MAINT_CHECK_ITEMS.map(([k,l])=>`<div class="sum"><small>${esc(l)}</small><b>${esc(MAINT_CHECK_STATUS[checks[k]]||"Belum diperiksa")}</b></div>`).join("")}</div><div style="margin-top:8px;color:#64748b;font-size:11px">${esc(m.checklistNotes||"Tidak ada catatan checklist.")}</div></div><div class="section"><h3>Pengukuran Teknis</h3><div class="summary"><div class="sum"><small>Tegangan</small><b>${val(measurements.voltageV," V")}</b></div><div class="sum"><small>Arus / Ampere</small><b>${val(measurements.ampereA," A")}</b></div><div class="sum"><small>Suhu Supply</small><b>${val(measurements.supplyTempC," °C")}</b></div><div class="sum"><small>Suhu Return</small><b>${val(measurements.returnTempC," °C")}</b></div><div class="sum"><small>Tekanan Refrigerant</small><b>${val(measurements.pressurePsi," PSI")}</b></div><div class="sum"><small>Refrigerant</small><b>${esc(measurements.refrigerant||"-")}</b></div></div><div style="margin-top:8px;color:#64748b;font-size:11px">${esc(measurements.measurementNotes||"Tidak ada catatan pengukuran.")}</div></div><div class="section"><h3>Keluhan</h3>${esc(m.complaint||"-")}</div><div class="section"><h3>Tindakan</h3>${esc(m.action||"-")}</div><div class="section"><h3>Sparepart</h3>${m.spareParts?.length?m.spareParts.map(x=>`${esc(x.name)} × ${x.qty} = ${cur(x.qty*x.price)}`).join("<br>"):"Tidak ada sparepart."}</div><div class="section"><h3>Foto Sebelum</h3><div>${photoLinks(before)}</div><h3 style="margin-top:14px">Foto Sesudah</h3><div>${photoLinks(after)}</div><h3 style="margin-top:14px">Lampiran Tambahan</h3><div>${attachmentLinks}</div></div><div class="ma"><button class="btn" data-close>Tutup</button></div>`)}
 function ensureXlsx(){
   if(typeof XLSX==="undefined"){
     toast("Gagal","Library Excel belum tersedia. Periksa koneksi internet lalu coba lagi.","error");
@@ -2564,8 +2571,8 @@ function exportMcb(){
 }
 function exportHistory(){
   exportExcel("histori-maintenance.xlsx",[{name:"Histori Maintenance",rows:[
-    ["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Jasa","Sparepart","Lainnya","Total","Catatan"],
-    ...historyRows().map((m,i)=>{const u=unit(m.acId);return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),m.serviceCost||0,m.sparePartCost||0,m.otherCost||0,m.totalCost||0,m.notes||""]})
+    ["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Checklist","Tegangan (V)","Ampere (A)","Suhu Supply (°C)","Suhu Return (°C)","Tekanan (PSI)","Refrigerant","Jasa","Sparepart","Lainnya","Total","Catatan"],
+    ...historyRows().map((m,i)=>{const u=unit(m.acId),v=m.measurements||{};return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),checklistSummary(m.checklist||{}),v.voltageV||"",v.ampereA||"",v.supplyTempC||"",v.returnTempC||"",v.pressurePsi||"",v.refrigerant||"",m.serviceCost||0,m.sparePartCost||0,m.otherCost||0,m.totalCost||0,m.notes||""]})
   ]}]);
 }
 function exportReport(){
