@@ -611,6 +611,21 @@ textarea {
   display:grid;
   place-items:center
 }
+.loadingbox {
+  min-width:190px;
+  max-width:calc(100vw - 32px);
+  padding:16px 18px;
+  border:1px solid var(--line);
+  border-radius:12px;
+  background:#fff;
+  box-shadow:0 20px 50px #0f172a22;
+  display:grid;
+  justify-items:center;
+  gap:10px;
+  text-align:center;
+  font-weight:700;
+  color:var(--text)
+}
 .spin {
   width:32px;
   height:32px;
@@ -1337,7 +1352,7 @@ textarea {
 <div class="section"><h3>9. Foto & Lampiran</h3><div class="maint-photo-grid"><div class="maint-photo-card"><h4>📷 Foto Sebelum Maintenance</h4><input id="mPhotosBefore" type="file" multiple accept="image/*"><div id="mPhotosBeforeList" class="maint-file-list"></div></div><div class="maint-photo-card"><h4>📷 Foto Sesudah Maintenance</h4><input id="mPhotosAfter" type="file" multiple accept="image/*"><div id="mPhotosAfterList" class="maint-file-list"></div></div></div><div class="maint-photo-card" style="margin-top:12px"><h4>📎 Lampiran Tambahan</h4><div class="form-help">Foto akan otomatis dikompres sebelum upload. PDF maksimal 2.5 MB per file, maksimal 5 lampiran tambahan.</div><input id="mFiles" type="file" multiple accept="image/*,.pdf"><div id="mFilesList" class="maint-file-list"></div></div><div id="mExistingEvidence" style="margin-top:10px"></div></div>
 <div class="ma">
 <button type="button" class="btn" id="resetMnt">Reset</button>
-<button class="btn primary">💾 Simpan Maintenance</button>
+<button type="submit" class="btn primary" id="saveMntBtn">💾 Simpan Maintenance</button>
 </div>
 </form>
 </div>
@@ -1777,8 +1792,11 @@ textarea {
 </div>
 <div id="toast" class="toastbox">
 </div>
-<div id="loading" class="loading hidden">
+<div id="loading" class="loading hidden" aria-live="polite">
+<div class="loadingbox">
 <div class="spin">
+</div>
+<div id="loadingText">Memproses...</div>
 </div>
 </div>
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
@@ -1957,7 +1975,7 @@ return`<span class="badge ${s.cls}">${esc(s.label)}</span>`}function dayText(d){
 x.className="toast";
 x.innerHTML=`<b>${esc(t)}</b><div style="color:#64748b;margin-top:3px">${esc(m)}</div>`;
 $("toast").appendChild(x);
-setTimeout(()=>x.remove(),4200)}function loading(v){$("loading").classList.toggle("hidden",!v)}
+setTimeout(()=>x.remove(),4200)}function loading(v,msg="Memproses..."){const el=$("loading"),txt=$("loadingText");if(txt)txt.textContent=msg;el.classList.toggle("hidden",!v)}
 async function verifyAdmin(firebaseUser) {
   if (!firebaseUser || !db) return false;
 
@@ -2200,7 +2218,9 @@ $('mSpare').value=sp;
 $('mTotal').value=tot;
 previewM()}function previewM(){const d=$("mDate").value,ok=$("mReset").value==="true";
 $("mNext").value=d&&ok?addM(d,Math.max(3,+$("mInterval").value||3)):""}
-async function submitM(e){e.preventDefault();const ac=$("mAc").value,d=$("mDate").value,t=$("mType").value;if(!ac||!d||!t)return toast("Validasi","Unit, tanggal, dan jenis wajib diisi.","warning");const reset=$("mReset").value==="true",interval=Math.max(3,+$("mInterval").value||3),sp=spareData(),svc=+$('mService').value||0,spc=sp.reduce((a,x)=>a+x.qty*x.price,0),oth=+$('mOther').value||0,total=svc+spc+oth,id=$("mEdit").value||null,existing=id?S.maintenance.find(x=>x.id===id):null;const data={maintenanceNumber:existing?.maintenanceNumber||nextMaintenanceNumber(),acId:ac,date:d,type:t,resetsRoutineSchedule:reset,intervalMonths:reset?interval:null,nextRoutineMaintenanceDate:reset?addM(d,interval):null,vendorId:$('mVendor').value||"",technicianName:$("mTech").value.trim(),complaint:$("mComplaint").value.trim(),inspectionResult:$("mResult").value,action:$("mAction").value.trim(),notes:$("mNotes").value.trim(),checklist:collectMaintenanceChecklist(),checklistNotes:$("mChecklistNotes").value.trim(),measurements:collectMaintenanceMeasurements(),serviceCost:svc,sparePartCost:spc,otherCost:oth,totalCost:total,spareParts:sp,photosBefore:existing?.photosBefore||[],photosAfter:existing?.photosAfter||[],attachments:existing?.attachments||[],status:existing?.status||"active"};try{loading(true);let maintenanceId=id;if(id){if(demo)Object.assign(existing,data);else await save("maintenance",id,data)}else{maintenanceId=demo?"MNT-"+Date.now():await add("maintenance",data,"MNT");if(demo)S.maintenance.push({id:maintenanceId,...data})}let uploaded=[];let failedUploads=[];const hasFiles=(($("mPhotosBefore")?.files?.length)||0)+(($("mPhotosAfter")?.files?.length)||0)+(($("mFiles")?.files?.length)||0);if(hasFiles&&!demo){try{const uploadResult=await uploadMaintenanceFiles(maintenanceId);uploaded=uploadResult.uploaded||[];failedUploads=uploadResult.failed||[];if(failedUploads.length)toast("Sebagian file gagal",`${failedUploads.length} file tidak berhasil diunggah. Data maintenance tetap tersimpan.` ,"warning")}catch(fileErr){console.error("Maintenance file upload error:",fileErr);toast("Maintenance tersimpan",fileErr.message||"Ada file yang gagal diunggah.","warning")}}if(uploaded.length){const before=[...(data.photosBefore||[])],after=[...(data.photosAfter||[])],extra=[...(data.attachments||[])];uploaded.forEach(x=>{if(x.category==="before")before.push(x);else if(x.category==="after")after.push(x);else extra.push(x)});const evidence={photosBefore:before,photosAfter:after,attachments:extra};if(demo)Object.assign(S.maintenance.find(x=>x.id===maintenanceId),evidence);else await updateDoc(doc(db,"maintenance",maintenanceId),{...evidence,updatedAt:serverTimestamp()})}const u=unit(ac);if(reset){const ud={lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval};if(demo)Object.assign(u,ud);else await updateDoc(doc(db,"ac_units",u.id),{...ud,updatedAt:serverTimestamp()})}toast("Berhasil","Maintenance berhasil disimpan.","success");resetM();renderAll();nav("history")}catch(err){console.error("Maintenance save error:",err);toast("Gagal","Maintenance gagal disimpan.","error")}finally{loading(false)}}
+let maintenanceSubmitInProgress=false;
+
+async function submitM(e){e.preventDefault();if(maintenanceSubmitInProgress){toast("Sedang diproses","Maintenance ini sedang disimpan. Mohon tunggu sampai proses selesai.","info");return}const ac=$("mAc").value,d=$("mDate").value,t=$("mType").value;if(!ac||!d||!t)return toast("Validasi","Unit, tanggal, dan jenis wajib diisi.","warning");maintenanceSubmitInProgress=true;const submitBtn=$("saveMntBtn");if(submitBtn){submitBtn.disabled=true;submitBtn.dataset.originalText=submitBtn.textContent;submitBtn.textContent="⏳ Menyimpan...";submitBtn.setAttribute("aria-busy","true")}const reset=$("mReset").value==="true",interval=Math.max(3,+$("mInterval").value||3),sp=spareData(),svc=+$('mService').value||0,spc=sp.reduce((a,x)=>a+x.qty*x.price,0),oth=+$('mOther').value||0,total=svc+spc+oth,id=$("mEdit").value||null,existing=id?S.maintenance.find(x=>x.id===id):null;const data={maintenanceNumber:existing?.maintenanceNumber||nextMaintenanceNumber(),acId:ac,date:d,type:t,resetsRoutineSchedule:reset,intervalMonths:reset?interval:null,nextRoutineMaintenanceDate:reset?addM(d,interval):null,vendorId:$('mVendor').value||"",technicianName:$("mTech").value.trim(),complaint:$("mComplaint").value.trim(),inspectionResult:$("mResult").value,action:$("mAction").value.trim(),notes:$("mNotes").value.trim(),checklist:collectMaintenanceChecklist(),checklistNotes:$("mChecklistNotes").value.trim(),measurements:collectMaintenanceMeasurements(),serviceCost:svc,sparePartCost:spc,otherCost:oth,totalCost:total,spareParts:sp,photosBefore:existing?.photosBefore||[],photosAfter:existing?.photosAfter||[],attachments:existing?.attachments||[],status:existing?.status||"active"};try{loading(true,id?"Menyimpan perubahan maintenance...":"Menyimpan maintenance...");let maintenanceId=id;if(id){if(demo)Object.assign(existing,data);else await save("maintenance",id,data)}else{maintenanceId=demo?"MNT-"+Date.now():await add("maintenance",data,"MNT");if(demo)S.maintenance.push({id:maintenanceId,...data})}let uploaded=[];let failedUploads=[];const hasFiles=(($("mPhotosBefore")?.files?.length)||0)+(($("mPhotosAfter")?.files?.length)||0)+(($("mFiles")?.files?.length)||0);if(hasFiles&&!demo){loading(true,"Mengunggah foto/lampiran...");try{const uploadResult=await uploadMaintenanceFiles(maintenanceId);uploaded=uploadResult.uploaded||[];failedUploads=uploadResult.failed||[];if(failedUploads.length)toast("Sebagian file gagal",`${failedUploads.length} file tidak berhasil diunggah. Data maintenance tetap tersimpan.` ,"warning")}catch(fileErr){console.error("Maintenance file upload error:",fileErr);toast("Maintenance tersimpan",fileErr.message||"Ada file yang gagal diunggah.","warning")}}if(uploaded.length){const before=[...(data.photosBefore||[])],after=[...(data.photosAfter||[])],extra=[...(data.attachments||[])];uploaded.forEach(x=>{if(x.category==="before")before.push(x);else if(x.category==="after")after.push(x);else extra.push(x)});const evidence={photosBefore:before,photosAfter:after,attachments:extra};if(demo)Object.assign(S.maintenance.find(x=>x.id===maintenanceId),evidence);else await updateDoc(doc(db,"maintenance",maintenanceId),{...evidence,updatedAt:serverTimestamp()})}const u=unit(ac);if(reset){const ud={lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval};if(demo)Object.assign(u,ud);else await updateDoc(doc(db,"ac_units",u.id),{...ud,updatedAt:serverTimestamp()})}toast("Berhasil","Maintenance berhasil disimpan.","success");resetM();renderAll();nav("history")}catch(err){console.error("Maintenance save error:",err);toast("Gagal","Maintenance gagal disimpan.","error")}finally{maintenanceSubmitInProgress=false;const submitBtn=$("saveMntBtn");if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=submitBtn.dataset.originalText||"💾 Simpan Maintenance";submitBtn.removeAttribute("aria-busy");delete submitBtn.dataset.originalText}loading(false)}}
 
 // Bind form actions explicitly so the Maintenance form cannot fall back to a normal page submit.
 const mntFormEl=$("mntForm");
