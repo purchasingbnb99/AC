@@ -1,13 +1,17 @@
-import { cert, getApp, getApps, initializeApp } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+const { cert, getApp, getApps, initializeApp } = require('firebase-admin/app');
+const { getAuth } = require('firebase-admin/auth');
+const { getFirestore } = require('firebase-admin/firestore');
 
 function getAdminApp() {
   if (getApps().length) return getApp();
 
   const privateKey = String(process.env.FIREBASE_PRIVATE_KEY || '').replace(/\\n/g, '\n');
 
-  if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !privateKey) {
+  if (
+    !process.env.FIREBASE_PROJECT_ID ||
+    !process.env.FIREBASE_CLIENT_EMAIL ||
+    !privateKey
+  ) {
     throw new Error('Konfigurasi Firebase Admin di Vercel belum lengkap.');
   }
 
@@ -63,7 +67,7 @@ function validatePayload(payload) {
   }
 }
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Allow', 'POST, OPTIONS');
     return json(res, 204, {});
@@ -159,4 +163,4 @@ export default async function handler(req, res) {
         : 'Terjadi kesalahan pada proxy upload.'
     });
   }
-}
+};
