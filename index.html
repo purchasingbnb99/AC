@@ -901,6 +901,13 @@ textarea {
 .maint-evidence-box small{display:block;color:#64748b;font-size:9px}.maint-evidence-box b{display:block;margin-top:4px;font-size:12px}
 @media(max-width:800px){.maint-checklist{grid-template-columns:1fr}.maint-measure-grid{grid-template-columns:1fr 1fr}.maint-photo-grid{grid-template-columns:1fr}.maint-evidence-summary{grid-template-columns:1fr 1fr}}
 @media(max-width:560px){.maint-measure-grid{grid-template-columns:1fr}.maint-evidence-summary{grid-template-columns:1fr}.maint-check-item{grid-template-columns:1fr}.maint-check-item select{width:100%}}
+/* MAINTENANCE MOBILE / SIMPLE FORM UX */
+#p-mntform{min-width:0;overflow-x:hidden}
+#p-mntform .card,#p-mntform .cb,#p-mntform .field,#p-mntform form{min-width:0;max-width:100%}
+#p-mntform input,#p-mntform select,#p-mntform textarea,#p-mntform input[type=file]{box-sizing:border-box;max-width:100%;width:100%}
+#p-mntform .maint-photo-card{min-width:0;overflow:hidden}
+#p-mntform .maint-file-list{overflow-wrap:anywhere;word-break:break-word}
+.maintenance-form-card{overflow:visible}.maint-quick-note{display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid #d9e6f5;border-radius:10px;background:#f7fbff;color:#475569;font-size:11px;margin-bottom:12px}.maint-main-grid{grid-template-columns:repeat(3,1fr)}.maint-work-grid{grid-template-columns:1fr 1fr}.maint-result-wrap{display:flex;flex-direction:column;gap:7px}.maint-inline-label{font-size:10px;font-weight:800;color:#475569}.maint-result-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.maint-choice{border:1px solid #dbe4ee;background:#fff;border-radius:9px;padding:10px 8px;font-size:11px;font-weight:800;cursor:pointer}.maint-choice.selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}.maint-hidden-control{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}.maint-section-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.maint-section-help,.maint-optional{font-size:9px;color:#64748b;font-weight:500}.maint-checklist-compact{display:grid;grid-template-columns:1fr 1fr;gap:8px}.maint-check-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;min-width:0}.maint-check-title{min-width:0}.maint-check-title b{display:block;font-size:10.5px}.maint-check-title small{display:block;color:#64748b;font-size:9px;margin-top:2px}.maint-check-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.maint-check-btn{border:1px solid #dbe4ee;background:#fff;border-radius:7px;padding:6px 7px;font-size:9px;font-weight:800;cursor:pointer}.maint-check-btn.selected.ok{background:#ecfdf3;border-color:#86efac;color:#166534}.maint-check-btn.selected.attention{background:#fff7ed;border-color:#fdba74;color:#9a3412}.maint-check-btn.selected.na{background:#f1f5f9;border-color:#cbd5e1;color:#475569}.maint-collapse{margin-top:10px;border:1px solid #dbe4ee;border-radius:11px;background:#fff;overflow:hidden}.maint-collapse summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center;font-weight:800;font-size:11px}.maint-collapse summary::-webkit-details-marker{display:none}.maint-collapse summary:after{content:'＋';font-size:17px;color:#64748b}.maint-collapse[open] summary:after{content:'−'}.maint-collapse summary small{margin-left:auto;font-size:9px;color:#64748b;font-weight:500}.maint-collapse-body{padding:0 14px 14px;border-top:1px solid #edf2f7}.maint-subheading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0 8px}.maint-cost-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.maint-schedule-grid{grid-template-columns:repeat(3,1fr)}.maint-notes-final{margin-top:12px}.maint-form-actions{position:sticky;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);padding-top:10px;margin-top:8px;border-top:1px solid #e2e8f0;z-index:4}.maint-form-actions .btn{min-height:42px}.maint-form-actions .btn.primary{min-width:210px}@media(max-width:900px){.maint-main-grid{grid-template-columns:1fr 1fr}.maint-work-grid{grid-template-columns:1fr}.maint-schedule-grid{grid-template-columns:1fr 1fr}.maint-cost-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.maint-main-grid{grid-template-columns:1fr}.maint-result-buttons{grid-template-columns:1fr}.maint-checklist-compact{grid-template-columns:1fr}.maint-check-item{align-items:stretch;flex-direction:column}.maint-check-actions{justify-content:flex-start}.maint-check-btn{flex:1 1 auto;min-width:82px}.maint-collapse summary{align-items:flex-start;flex-direction:column}.maint-collapse summary small{margin-left:0}.maint-cost-grid{grid-template-columns:1fr 1fr}.maint-schedule-grid{grid-template-columns:1fr}.maint-form-actions{margin-left:-14px;margin-right:-14px;padding:10px 14px}.maint-form-actions .btn{flex:1}.maint-form-actions .btn.primary{min-width:0}}@media(max-width:420px){.maint-cost-grid{grid-template-columns:1fr}.maint-quick-note{align-items:flex-start;flex-direction:column}.maint-check-btn{font-size:8.5px;padding:7px 6px}}
 </style>
 </head>
 <body>
@@ -1283,29 +1290,34 @@ textarea {
 <div class="head">
 <div>
 <h1>Input Maintenance</h1>
-<p>Catat pekerjaan, hasil, sparepart, dan biaya.</p>
+<p>Isi data utama saja. Pemeriksaan teknis, sparepart, biaya, dan foto dapat dibuka saat diperlukan.</p>
 </div>
 </div>
-<div class="card">
+<div class="card maintenance-form-card">
 <div class="cb">
 <form id="mntForm">
 <input type="hidden" id="mEdit">
-<div class="section">
-<h3>1. Identitas</h3>
-<div class="form3">
+
+<div class="maint-quick-note">
+  <span class="badge info">Ringkas</span>
+  <span>Minimal isi <b>Unit, Tanggal, Jenis, dan Hasil pekerjaan</b>. Data lainnya bersifat opsional sesuai kebutuhan.</span>
+</div>
+
+<div class="section maint-section">
+<h3>1. Data Utama</h3>
+<div class="formgrid maint-main-grid">
 <div class="field">
 <label>Unit AC *</label>
-<select id="mAc" required>
-</select>
+<select id="mAc" required></select>
 </div>
 <div class="field">
 <label>Tanggal *</label>
 <input id="mDate" type="date" required>
 </div>
 <div class="field">
-<label>Jenis *</label>
+<label>Jenis Maintenance *</label>
 <select id="mType" required>
-<option value="">Pilih</option>
+<option value="">Pilih jenis</option>
 <option value="cuci_ac">Cuci AC</option>
 <option value="service_rutin">Service Rutin</option>
 <option value="pemeriksaan">Pemeriksaan</option>
@@ -1315,42 +1327,116 @@ textarea {
 <option value="ganti_sparepart">Ganti Sparepart</option>
 <option value="bongkar">Bongkar</option>
 <option value="pasang">Pasang</option>
-<option value="bongkar_pasang">Bongkar & Pasang</option>
+<option value="bongkar_pasang">Bongkar &amp; Pasang</option>
 <option value="lainnya">Lainnya</option>
-</select>
-</div>
-</div>
-</div>
-<div class="section">
-<h3>2. Vendor & Hasil</h3>
-<div class="form3">
-<div class="field">
-<label>Vendor</label>
-<select id="mVendor">
 </select>
 </div>
 <div class="field">
 <label>Teknisi</label>
-<input id="mTech">
+<input id="mTech" placeholder="Nama teknisi">
 </div>
 <div class="field">
-<label>Hasil</label>
-<select id="mResult">
+<label>Vendor</label>
+<select id="mVendor"></select>
+</div>
+</div>
+</div>
+
+<div class="section maint-section">
+<h3>2. Hasil Pekerjaan</h3>
+<div class="maint-result-wrap">
+<label class="maint-inline-label">Kondisi hasil</label>
+<div class="maint-result-buttons" id="mResultButtons" role="group" aria-label="Kondisi hasil">
+<button type="button" class="maint-choice" data-result-value="normal">🟢 Normal</button>
+<button type="button" class="maint-choice" data-result-value="perlu_perbaikan">🟡 Perlu Perbaikan</button>
+<button type="button" class="maint-choice" data-result-value="rusak">🔴 Rusak</button>
+</div>
+<select id="mResult" class="maint-hidden-control" aria-hidden="true" tabindex="-1">
 <option value="normal">Normal</option>
 <option value="perlu_perbaikan">Perlu Perbaikan</option>
 <option value="rusak">Rusak</option>
 </select>
 </div>
+<div class="formgrid maint-work-grid">
+<div class="field">
+<label>Keluhan</label>
+<textarea id="mComplaint" rows="3" placeholder="Contoh: AC kurang dingin, berisik, bocor."></textarea>
+</div>
+<div class="field">
+<label>Tindakan</label>
+<textarea id="mAction" rows="3" placeholder="Contoh: Cleaning indoor/outdoor, perbaikan drain."></textarea>
 </div>
 </div>
-<div class="section"><h3>3. Pemeriksaan</h3><div class="formgrid"><div class="field"><label>Keluhan</label><textarea id="mComplaint"></textarea></div><div class="field"><label>Tindakan</label><textarea id="mAction"></textarea></div><div class="field full"><label>Catatan</label><textarea id="mNotes"></textarea></div></div></div>
-<div class="section"><h3>4. Checklist Maintenance</h3><div id="mChecklist" class="maint-checklist"></div><div class="field" style="margin-top:10px"><label>Catatan Checklist</label><textarea id="mChecklistNotes" placeholder="Catatan temuan checklist, bagian yang perlu diperbaiki, atau hal khusus."></textarea></div></div>
-<div class="section"><h3>5. Pengukuran Teknis</h3><div class="maint-measure-grid"><div class="field"><label>Tegangan (V)</label><input id="mVoltage" type="number" min="0" step="0.1" placeholder="Opsional"></div><div class="field"><label>Arus / Ampere (A)</label><input id="mAmpere" type="number" min="0" step="0.01" placeholder="Opsional"></div><div class="field"><label>Suhu Supply (°C)</label><input id="mTempSupply" type="number" step="0.1" placeholder="Opsional"></div><div class="field"><label>Suhu Return (°C)</label><input id="mTempReturn" type="number" step="0.1" placeholder="Opsional"></div><div class="field"><label>Tekanan Refrigerant (PSI)</label><input id="mPressure" type="number" min="0" step="0.1" placeholder="Opsional"></div><div class="field"><label>Refrigerant</label><input id="mRefrigerant" placeholder="Contoh: R32 / R410A / R22"></div><div class="field full"><label>Catatan Pengukuran</label><textarea id="mMeasurementNotes" placeholder="Catatan hasil pengukuran atau kondisi teknis."></textarea></div></div></div>
-<div class="section"><h3>6. Sparepart</h3><div id="spares"></div><button type="button" class="btn" id="addSpare">＋ Tambah Sparepart</button></div>
-<div class="section"><h3>7. Biaya</h3><div class="form3"><div class="field"><label>Biaya Jasa</label><input id="mService" type="number" min="0" value="0"></div><div class="field"><label>Biaya Sparepart</label><input id="mSpare" type="number" min="0" value="0" readonly></div><div class="field"><label>Biaya Lainnya</label><input id="mOther" type="number" min="0" value="0"></div><div class="field"><label>Total</label><input id="mTotal" type="number" min="0" value="0" readonly></div></div></div>
-<div class="section"><h3>8. Jadwal</h3><div class="form3"><div class="field"><label>Reset Jadwal Rutin?</label><select id="mReset"><option value="true">Ya</option><option value="false">Tidak</option></select></div><div class="field"><label>Interval</label><select id="mInterval"><option value="3">3 Bulan</option><option value="4">4 Bulan</option><option value="6">6 Bulan</option><option value="12">12 Bulan</option></select></div><div class="field"><label>Jadwal Berikutnya</label><input id="mNext" type="date" readonly></div></div></div>
-<div class="section"><h3>9. Foto & Lampiran</h3><div class="maint-photo-grid"><div class="maint-photo-card"><h4>📷 Foto Sebelum Maintenance</h4><input id="mPhotosBefore" type="file" multiple accept="image/*"><div id="mPhotosBeforeList" class="maint-file-list"></div></div><div class="maint-photo-card"><h4>📷 Foto Sesudah Maintenance</h4><input id="mPhotosAfter" type="file" multiple accept="image/*"><div id="mPhotosAfterList" class="maint-file-list"></div></div></div><div class="maint-photo-card" style="margin-top:12px"><h4>📎 Lampiran Tambahan</h4><div class="form-help">Foto akan otomatis dikompres sebelum upload. PDF maksimal 2.5 MB per file, maksimal 5 lampiran tambahan.</div><input id="mFiles" type="file" multiple accept="image/*,.pdf"><div id="mFilesList" class="maint-file-list"></div></div><div id="mExistingEvidence" style="margin-top:10px"></div></div>
-<div class="ma">
+</div>
+
+<div class="section maint-section">
+<div class="maint-section-heading">
+<div><h3 style="margin-bottom:2px">3. Checklist Maintenance</h3><small class="maint-section-help">Pilih status pemeriksaan. Hanya 6 kelompok agar lebih cepat di HP.</small></div>
+<span id="mChecklistSummary" class="badge neutral">Belum diperiksa</span>
+</div>
+<div id="mChecklist" class="maint-checklist maint-checklist-compact"></div>
+<div class="field" style="margin-top:10px">
+<label>Catatan Checklist <span class="maint-optional">Opsional</span></label>
+<textarea id="mChecklistNotes" rows="2" placeholder="Temuan penting atau bagian yang perlu diperbaiki."></textarea>
+</div>
+</div>
+
+<details class="maint-collapse" id="measurementPanel">
+<summary><span>4. Pengukuran Teknis</span><small>Opsional • isi hanya bila diperlukan</small></summary>
+<div class="maint-collapse-body">
+<div class="maint-measure-grid">
+<div class="field"><label>Tegangan (V)</label><input id="mVoltage" type="number" min="0" step="0.1" placeholder="Opsional"></div>
+<div class="field"><label>Arus / Ampere (A)</label><input id="mAmpere" type="number" min="0" step="0.01" placeholder="Opsional"></div>
+<div class="field"><label>Suhu Supply (°C)</label><input id="mTempSupply" type="number" step="0.1" placeholder="Opsional"></div>
+<div class="field"><label>Suhu Return (°C)</label><input id="mTempReturn" type="number" step="0.1" placeholder="Opsional"></div>
+<div class="field"><label>Tekanan Refrigerant (PSI)</label><input id="mPressure" type="number" min="0" step="0.1" placeholder="Opsional"></div>
+<div class="field"><label>Refrigerant</label><input id="mRefrigerant" placeholder="Contoh: R32 / R410A / R22"></div>
+<div class="field full"><label>Catatan Pengukuran</label><textarea id="mMeasurementNotes" rows="2" placeholder="Hasil pengukuran atau kondisi teknis."></textarea></div>
+</div>
+</div>
+</details>
+
+<details class="maint-collapse" id="spareCostPanel">
+<summary><span>5. Sparepart &amp; Biaya</span><small>Opsional • tidak perlu dibuka jika tidak ada biaya/sparepart</small></summary>
+<div class="maint-collapse-body">
+<div class="maint-subheading"><b>Sparepart</b><button type="button" class="btn" id="addSpare">＋ Tambah Sparepart</button></div>
+<div id="spares"></div>
+<div class="maint-cost-grid">
+<div class="field"><label>Biaya Jasa</label><input id="mService" type="number" min="0" value="0"></div>
+<div class="field"><label>Biaya Sparepart</label><input id="mSpare" type="number" min="0" value="0" readonly></div>
+<div class="field"><label>Biaya Lainnya</label><input id="mOther" type="number" min="0" value="0"></div>
+<div class="field"><label>Total</label><input id="mTotal" type="number" min="0" value="0" readonly></div>
+</div>
+</div>
+</details>
+
+<details class="maint-collapse" id="evidencePanel">
+<summary><span>6. Bukti Pekerjaan</span><small>Opsional • Foto sebelum/sesudah &amp; lampiran</small></summary>
+<div class="maint-collapse-body">
+<div class="maint-photo-grid">
+<div class="maint-photo-card"><h4>📷 Foto Sebelum</h4><input id="mPhotosBefore" type="file" multiple accept="image/*"><div id="mPhotosBeforeList" class="maint-file-list"></div></div>
+<div class="maint-photo-card"><h4>📷 Foto Sesudah</h4><input id="mPhotosAfter" type="file" multiple accept="image/*"><div id="mPhotosAfterList" class="maint-file-list"></div></div>
+</div>
+<div class="maint-photo-card" style="margin-top:12px"><h4>📎 Lampiran Tambahan</h4><div class="form-help">Foto dikompres otomatis. PDF maksimal 2.5 MB per file, maksimal 5 lampiran tambahan.</div><input id="mFiles" type="file" multiple accept="image/*,.pdf"><div id="mFilesList" class="maint-file-list"></div></div>
+<div id="mExistingEvidence" style="margin-top:10px"></div>
+</div>
+</details>
+
+<div class="section maint-section maint-schedule-section">
+<h3>7. Jadwal Berikutnya</h3>
+<div class="formgrid maint-schedule-grid">
+<div class="field"><label>Reset Jadwal Rutin?</label><select id="mReset"><option value="true">Ya</option><option value="false">Tidak</option></select></div>
+<div class="field"><label>Interval</label><select id="mInterval"><option value="3">3 Bulan</option><option value="4">4 Bulan</option><option value="6">6 Bulan</option><option value="12">12 Bulan</option></select></div>
+<div class="field"><label>Jadwal Berikutnya</label><input id="mNext" type="date" readonly></div>
+</div>
+</div>
+
+<div class="field maint-notes-final">
+<label>Catatan Umum <span class="maint-optional">Opsional</span></label>
+<textarea id="mNotes" rows="2" placeholder="Catatan tambahan yang tidak masuk checklist. "></textarea>
+</div>
+
+<div class="ma maint-form-actions">
 <button type="button" class="btn" id="resetMnt">Reset</button>
 <button type="submit" class="btn primary" id="saveMntBtn">💾 Simpan Maintenance</button>
 </div>
@@ -1861,12 +1947,19 @@ const resultName=x=>({normal:"Normal",perlu_perbaikan:"Perlu Perbaikan",rusak:"R
 const MAINT_CHECK_ITEMS=[
   ["filter","Filter"],["evaporator","Evaporator / Sirip"],["condenser","Condenser / Outdoor"],["fan","Fan / Blower"],["drain","Drain / Pembuangan"],["leak","Kebocoran"],["electrical","Kelistrikan"],["ampere","Arus / Ampere"],["refrigerant","Refrigerant"],["temperature","Suhu Supply / Return"],["cleaning","Kebersihan Unit"]
 ];
+const MAINT_CHECK_GROUPS=[
+  {id:"indoor",label:"Indoor / Filter",keys:["filter","evaporator","cleaning"]},
+  {id:"outdoor",label:"Outdoor / Condenser",keys:["condenser","fan"]},
+  {id:"drain",label:"Drain / Kebocoran",keys:["drain","leak"]},
+  {id:"electrical",label:"Kelistrikan",keys:["electrical","ampere"]},
+  {id:"refrigerant",label:"Refrigerant",keys:["refrigerant"]},
+  {id:"temperature",label:"Suhu Supply / Return",keys:["temperature"]}
+];
 const MAINT_CHECK_STATUS={not_checked:"Belum diperiksa",ok:"OK",attention:"Perlu Perbaikan",na:"N/A"};
-function renderMaintenanceChecklist(values={}){
-  const root=$("mChecklist"); if(!root)return;
-  root.innerHTML=MAINT_CHECK_ITEMS.map(([key,label])=>{const val=values?.[key]||"not_checked";return `<div class="maint-check-item"><div><b>${esc(label)}</b><small>Status pemeriksaan</small></div><select data-check="${key}"><option value="not_checked" ${val==="not_checked"?"selected":""}>Belum diperiksa</option><option value="ok" ${val==="ok"?"selected":""}>OK</option><option value="attention" ${val==="attention"?"selected":""}>Perlu Perbaikan</option><option value="na" ${val==="na"?"selected":""}>N/A</option></select></div>`}).join("");
-}
-function collectMaintenanceChecklist(){const out={};document.querySelectorAll("#mChecklist select[data-check]").forEach(e=>out[e.dataset.check]=e.value||"not_checked");return out}
+function groupCheckStatus(values,keys){const vals=keys.map(k=>values?.[k]||"not_checked");if(vals.some(v=>v==="attention"))return"attention";if(vals.every(v=>v==="na"))return"na";if(vals.every(v=>v==="ok"||v==="na"))return"ok";return"not_checked"}
+function updateChecklistSummary(values={}){const el=$("mChecklistSummary");if(!el)return;const all=MAINT_CHECK_GROUPS.map(g=>groupCheckStatus(values,g.keys));const ok=all.filter(v=>v==="ok").length,attention=all.filter(v=>v==="attention").length,done=all.filter(v=>v!=="not_checked").length;el.textContent=attention?`${attention} perlu diperbaiki / ${done} diperiksa`:done===all.length?`${ok} OK / ${attention} perlu diperbaiki`:`${done} dari ${all.length} diperiksa`;el.className=`badge ${attention?"bad":done===all.length?"ok":"neutral"}`}
+function renderMaintenanceChecklist(values={}){const root=$("mChecklist");if(!root)return;const safe=JSON.parse(JSON.stringify(values||{}));root.dataset.values=JSON.stringify(safe);const labels={not_checked:"Belum diperiksa",ok:"OK",attention:"Perlu Perbaikan",na:"N/A"};root.innerHTML=MAINT_CHECK_GROUPS.map(g=>{const current=groupCheckStatus(safe,g.keys);return `<div class="maint-check-item"><div class="maint-check-title"><b>${esc(g.label)}</b><small>Status pemeriksaan</small></div><div class="maint-check-actions">${["ok","attention","na"].map(v=>`<button type="button" class="maint-check-btn ${current===v?`selected ${v}`:""}" data-check-group="${g.id}" data-value="${v}" aria-pressed="${current===v}">${labels[v]}</button>`).join("")}</div></div>`}).join("");root.querySelectorAll("[data-check-group][data-value]").forEach(btn=>btn.onclick=()=>{const vals=JSON.parse(root.dataset.values||"{}");const g=MAINT_CHECK_GROUPS.find(x=>x.id===btn.dataset.checkGroup);if(!g)return;g.keys.forEach(k=>vals[k]=btn.dataset.value);renderMaintenanceChecklist(vals)});updateChecklistSummary(safe)}
+function collectMaintenanceChecklist(){const root=$("mChecklist");if(!root)return{};try{return JSON.parse(root.dataset.values||"{}")}catch(e){return{}}}
 function checklistSummary(values={}){const vals=MAINT_CHECK_ITEMS.map(([k])=>values?.[k]||"not_checked");return `${vals.filter(v=>v==="ok").length} OK / ${vals.filter(v=>v==="attention").length} Perlu Perbaikan / ${vals.filter(v=>v==="na").length} N/A`}
 function collectMaintenanceMeasurements(){return {voltageV:+$("mVoltage")?.value||0,ampereA:+$("mAmpere")?.value||0,supplyTempC:+$("mTempSupply")?.value||0,returnTempC:+$("mTempReturn")?.value||0,pressurePsi:+$("mPressure")?.value||0,refrigerant:$("mRefrigerant")?.value.trim()||"",measurementNotes:$("mMeasurementNotes")?.value.trim()||""}}
 function populateMaintenanceMeasurements(v={}){if($("mVoltage"))$("mVoltage").value=v.voltageV??"";if($("mAmpere"))$("mAmpere").value=v.ampereA??"";if($("mTempSupply"))$("mTempSupply").value=v.supplyTempC??"";if($("mTempReturn"))$("mTempReturn").value=v.returnTempC??"";if($("mPressure"))$("mPressure").value=v.pressurePsi??"";if($("mRefrigerant"))$("mRefrigerant").value=v.refrigerant||"";if($("mMeasurementNotes"))$("mMeasurementNotes").value=v.measurementNotes||""}
@@ -2183,30 +2276,9 @@ return`<tr><td><b>${esc(x.code)}</b><br><small>${esc(x.brand)} ${esc(x.model||""
 function scheduleModal(id){const u=unit(id);if(!u)return;
 modal("Edit / Reschedule Jadwal",`<form id="scheduleForm"><div class="formgrid"><div class="field"><label>Unit AC</label><input value="${esc(u.code)} — ${esc(u.brand||"")} ${esc(u.model||"")}" readonly></div><div class="field"><label>Jadwal Saat Ini</label><input value="${esc(date(u.nextRoutineMaintenanceDate))}" readonly></div><div class="field"><label>Jadwal Baru *</label><input id="schNewDate" type="date" value="${esc(u.nextRoutineMaintenanceDate||"")}" required></div><div class="field full"><label>Alasan Reschedule</label><textarea id="schReason" placeholder="Contoh: menyesuaikan jadwal operasional atau permintaan user.">${esc(u.scheduleRescheduleReason||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan Jadwal</button></div></form>`);
 $('scheduleForm').onsubmit=async e=>{e.preventDefault();const nd=$('schNewDate').value.trim(),reason=$('schReason').value.trim();if(!nd)return toast("Validasi","Jadwal baru wajib diisi.","warning");try{loading(true);const data={nextRoutineMaintenanceDate:nd,scheduleRescheduleReason:reason,scheduleUpdatedAt:serverTimestamp(),scheduleUpdatedBy:user?.uid||"admin"};if(demo)Object.assign(u,data);else await updateDoc(doc(db,"ac_units",u.id),data);closeModal(true);renderAll();toast("Berhasil","Jadwal maintenance berhasil diubah.","success")}catch(err){console.error(err);toast("Gagal","Jadwal maintenance gagal diubah.","error")}finally{loading(false)}}}
-function resetM(){$("mEdit").value="";$("mDate").value=today();$("mType").value="";$("mTech").value="";$("mComplaint").value="";$("mAction").value="";$("mNotes").value="";$("mChecklistNotes").value="";renderMaintenanceChecklist({});populateMaintenanceMeasurements({});$("mPhotosBefore").value="";$("mPhotosAfter").value="";$("mFiles").value="";$("mPhotosBeforeList").innerHTML="";$("mPhotosAfterList").innerHTML="";$("mFilesList").innerHTML="";$("mExistingEvidence").innerHTML="";$("mService").value=0;$("mOther").value=0;$("mReset").value="true";$("mInterval").value=String(Math.max(3,S.settings.maintenance.defaultIntervalMonths||3));$("mNext").value="";$("spares").innerHTML="";addSpare();filters();$("mAc").value="";$("mVendor").value="";$("mResult").value="normal";costM()}
-function populateMnt(edit=null){filters();
-if(!$("mDate").value)resetM();
-if(edit){const m=S.maintenance.find(x=>x.id===edit);
-if(!m)return;
-$("mEdit").value=m.id;
-$("mAc").value=m.acId;
-$("mDate").value=m.date;
-$("mType").value=m.type;
-$("mVendor").value=m.vendorId||"";
-$("mTech").value=m.technicianName||"";
-$("mResult").value=m.inspectionResult||"normal";
-$("mComplaint").value=m.complaint||"";
-$("mAction").value=m.action||"";
-$("mNotes").value=m.notes||"";$("mChecklistNotes").value=m.checklistNotes||"";renderMaintenanceChecklist(m.checklist||{});populateMaintenanceMeasurements(m.measurements||{});$("mExistingEvidence").innerHTML=existingEvidenceHtml(m);
-$("mService").value=m.serviceCost||0;
-$("mOther").value=m.otherCost||0;
-$("mReset").value=String(!!m.resetsRoutineSchedule);
-$("mInterval").value=String(Math.max(3,m.intervalMonths||3));
-$("spares").innerHTML="";
-(m.spareParts||[]).forEach(addSpare);
-if(!m.spareParts?.length)addSpare();
-previewM();
-}}
+function resetM(){$("mEdit").value="";$("mDate").value=today();$("mType").value="";$("mTech").value="";$("mComplaint").value="";$("mAction").value="";$("mNotes").value="";$("mChecklistNotes").value="";renderMaintenanceChecklist({});populateMaintenanceMeasurements({});["mPhotosBefore","mPhotosAfter","mFiles"].forEach(id=>{if($(id))$(id).value=""});["mPhotosBeforeList","mPhotosAfterList","mFilesList","mExistingEvidence"].forEach(id=>{if($(id))$(id).innerHTML=""});$("mService").value=0;$("mOther").value=0;$("mReset").value="true";$("mInterval").value=String(Math.max(3,S.settings.maintenance.defaultIntervalMonths||3));$("mNext").value="";$("spares").innerHTML="";filters();$("mAc").value="";$("mVendor").value="";$("mResult").value="normal";updateResultButtons();$("measurementPanel")?.removeAttribute("open");$("spareCostPanel")?.removeAttribute("open");$("evidencePanel")?.removeAttribute("open");costM()}
+function updateResultButtons(){const v=$("mResult")?.value||"normal";document.querySelectorAll("#mResultButtons [data-result-value]").forEach(b=>{const on=b.dataset.resultValue===v;b.classList.toggle("selected",on);b.setAttribute("aria-pressed",String(on))})}
+function populateMnt(edit=null){filters();if(!edit){if(!$('mType').value||$('mEdit').value)resetM();else{renderMaintenanceChecklist({});populateMaintenanceMeasurements({});updateResultButtons()}return}const m=S.maintenance.find(x=>x.id===edit);if(!m)return;$("mEdit").value=m.id;$("mAc").value=m.acId;$("mDate").value=m.date;$("mType").value=m.type;$("mVendor").value=m.vendorId||"";$("mTech").value=m.technicianName||"";$("mResult").value=m.inspectionResult||"normal";updateResultButtons();$("mComplaint").value=m.complaint||"";$("mAction").value=m.action||"";$("mNotes").value=m.notes||"";$("mChecklistNotes").value=m.checklistNotes||"";renderMaintenanceChecklist(m.checklist||{});populateMaintenanceMeasurements(m.measurements||{});$("mExistingEvidence").innerHTML=existingEvidenceHtml(m);$("mService").value=m.serviceCost||0;$("mOther").value=m.otherCost||0;$("mReset").value=String(!!m.resetsRoutineSchedule);$("mInterval").value=String(Math.max(3,m.intervalMonths||3));$("spares").innerHTML="";(m.spareParts||[]).forEach(addSpare);if(m.spareParts?.length)$("spareCostPanel").open=true;else $("spareCostPanel").removeAttribute("open");previewM();const meas=m.measurements||{};const hasMeas=Object.values(meas).some(v=>v!==null&&v!==undefined&&v!==""&&v!==0);if(hasMeas)$("measurementPanel").open=true;const hasEv=(m.photosBefore?.length||0)+(m.photosAfter?.length||0)+(m.attachments?.length||0);if(hasEv)$("evidencePanel").open=true}
 function addSpare(x={name:"",qty:1,price:0}){const d=document.createElement("div");
 d.className="spare";
 d.innerHTML=`<div class="field sp-name"><label>Nama</label><input value="${esc(x.name||"")}"></div><div class="field"><label>Qty</label><input class="sq" type="number" min="0" value="${x.qty??1}"></div><div class="field"><label>Harga</label><input class="sp" type="number" min="0" value="${x.price||0}"></div><button type="button" class="btn danger">×</button>`;
@@ -2225,6 +2297,9 @@ async function submitM(e){e.preventDefault();if(maintenanceSubmitInProgress){toa
 // Bind form actions explicitly so the Maintenance form cannot fall back to a normal page submit.
 const mntFormEl=$("mntForm");
 if(mntFormEl)mntFormEl.onsubmit=submitM;
+if($("mResult"))$("mResult").addEventListener("change",updateResultButtons);
+if($("mType"))$("mType").addEventListener("change",()=>previewM());
+updateResultButtons();
 const resetMntEl=$("resetMnt");
 if(resetMntEl)resetMntEl.onclick=()=>{
   if(typeof modalDirty!=="undefined")modalDirty=false;
@@ -2772,6 +2847,7 @@ if(importUnitsFileEl)importUnitsFileEl.addEventListener("change",e=>{
 
 /* EVENTS */
 document.addEventListener("click",async e=>{
+const resultChoice=e.target.closest("[data-result-value]");if(resultChoice){$("mResult").value=resultChoice.dataset.resultValue;updateResultButtons();return}
   if(!e.target.closest("#notifBtn,#npanel")) $("npanel")?.classList.add("hidden");
   const reportAction=e.target.closest("#exportUnits,#printUnits,#exportHist,#printHist,#exportReport,#printReport,#exportAssets,#printAssets,#exportCost,#printCost,#printLocations,#exportMcb");
 if(e.target.closest("#addSpare")){addSpare();costM();return}
