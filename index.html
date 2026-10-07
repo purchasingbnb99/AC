@@ -908,6 +908,40 @@ textarea {
 #p-mntform .maint-photo-card{min-width:0;overflow:hidden}
 #p-mntform .maint-file-list{overflow-wrap:anywhere;word-break:break-word}
 .maintenance-form-card{overflow:visible}.maint-quick-note{display:flex;gap:8px;align-items:center;padding:10px 12px;border:1px solid #d9e6f5;border-radius:10px;background:#f7fbff;color:#475569;font-size:11px;margin-bottom:12px}.maint-main-grid{grid-template-columns:repeat(3,1fr)}.maint-work-grid{grid-template-columns:1fr 1fr}.maint-result-wrap{display:flex;flex-direction:column;gap:7px}.maint-inline-label{font-size:10px;font-weight:800;color:#475569}.maint-result-buttons{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.maint-choice{border:1px solid #dbe4ee;background:#fff;border-radius:9px;padding:10px 8px;font-size:11px;font-weight:800;cursor:pointer}.maint-choice.selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}.maint-hidden-control{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}.maint-section-heading{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.maint-section-help,.maint-optional{font-size:9px;color:#64748b;font-weight:500}.maint-checklist-compact{display:grid;grid-template-columns:1fr 1fr;gap:8px}.maint-check-item{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;min-width:0}.maint-check-title{min-width:0}.maint-check-title b{display:block;font-size:10.5px}.maint-check-title small{display:block;color:#64748b;font-size:9px;margin-top:2px}.maint-check-actions{display:flex;gap:5px;flex-wrap:wrap;justify-content:flex-end}.maint-check-btn{border:1px solid #dbe4ee;background:#fff;border-radius:7px;padding:6px 7px;font-size:9px;font-weight:800;cursor:pointer}.maint-check-btn.selected.ok{background:#ecfdf3;border-color:#86efac;color:#166534}.maint-check-btn.selected.attention{background:#fff7ed;border-color:#fdba74;color:#9a3412}.maint-check-btn.selected.na{background:#f1f5f9;border-color:#cbd5e1;color:#475569}.maint-collapse{margin-top:10px;border:1px solid #dbe4ee;border-radius:11px;background:#fff;overflow:hidden}.maint-collapse summary{list-style:none;cursor:pointer;padding:13px 14px;display:flex;justify-content:space-between;gap:12px;align-items:center;font-weight:800;font-size:11px}.maint-collapse summary::-webkit-details-marker{display:none}.maint-collapse summary:after{content:'＋';font-size:17px;color:#64748b}.maint-collapse[open] summary:after{content:'−'}.maint-collapse summary small{margin-left:auto;font-size:9px;color:#64748b;font-weight:500}.maint-collapse-body{padding:0 14px 14px;border-top:1px solid #edf2f7}.maint-subheading{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:12px 0 8px}.maint-cost-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}.maint-schedule-grid{grid-template-columns:repeat(3,1fr)}.maint-notes-final{margin-top:12px}.maint-form-actions{position:sticky;bottom:0;background:rgba(255,255,255,.96);backdrop-filter:blur(8px);padding-top:10px;margin-top:8px;border-top:1px solid #e2e8f0;z-index:4}.maint-form-actions .btn{min-height:42px}.maint-form-actions .btn.primary{min-width:210px}@media(max-width:900px){.maint-main-grid{grid-template-columns:1fr 1fr}.maint-work-grid{grid-template-columns:1fr}.maint-schedule-grid{grid-template-columns:1fr 1fr}.maint-cost-grid{grid-template-columns:1fr 1fr}}@media(max-width:620px){.maint-main-grid{grid-template-columns:1fr}.maint-result-buttons{grid-template-columns:1fr}.maint-checklist-compact{grid-template-columns:1fr}.maint-check-item{align-items:stretch;flex-direction:column}.maint-check-actions{justify-content:flex-start}.maint-check-btn{flex:1 1 auto;min-width:82px}.maint-collapse summary{align-items:flex-start;flex-direction:column}.maint-collapse summary small{margin-left:0}.maint-cost-grid{grid-template-columns:1fr 1fr}.maint-schedule-grid{grid-template-columns:1fr}.maint-form-actions{margin-left:-14px;margin-right:-14px;padding:10px 14px}.maint-form-actions .btn{flex:1}.maint-form-actions .btn.primary{min-width:0}}@media(max-width:420px){.maint-cost-grid{grid-template-columns:1fr}.maint-quick-note{align-items:flex-start;flex-direction:column}.maint-check-btn{font-size:8.5px;padding:7px 6px}}
+
+/* STEP 1 — READABILITY IMPROVEMENT (modest size increase; excludes print) */
+body{font-size:14px}
+button,input,select,textarea{font-size:14px}
+.field label{font-size:12px}
+.nav button{font-size:13px}
+.navlabel{font-size:10px}
+.brand b{font-size:14px}
+.brand small{font-size:10px}
+.top h2{font-size:18px}
+.top small{font-size:12px}
+.head h1{font-size:23px}
+.head p{font-size:13px}
+.btn{font-size:13px}
+.table th,.table td{font-size:10px}
+.table th{font-size:9.5px}
+.badge{font-size:10px}
+.minirow b{font-size:11.5px}
+.minirow small{font-size:10.5px}
+.alert b{font-size:11.5px}
+.alert small{font-size:10.5px}
+.summary .sum small{font-size:10px}
+.summary .sum b{font-size:18px}
+.stat strong{font-size:24px}
+.stat small{font-size:11px}
+.stat span{font-size:11px}
+@media(max-width:600px){
+  body{font-size:14px}
+  input,select,textarea{font-size:15px}
+  .btn{font-size:14px;min-height:40px}
+  .table th,.table td{font-size:10.5px}
+  .field label{font-size:12px}
+}
+
 </style>
 </head>
 <body>
