@@ -957,6 +957,21 @@ button,input,select,textarea{font-size:14px}
 }
 
 
+/* QUICK TECHNICIAN ACCESS */
+.tech-quick-panel{margin-top:8px;padding:14px;border:1px solid #cfe0f8;border-radius:13px;background:linear-gradient(135deg,#f8fbff,#edf5ff)}
+.tech-quick-panel h3{margin:0 0 5px;font-size:14px}
+.tech-quick-panel p{margin:0 0 12px;color:#475569;font-size:11px;line-height:1.5}
+.tech-quick-panel .btn{width:100%;margin-top:8px}
+.tech-camera-overlay{position:fixed;inset:0;z-index:6000;background:#0f172acc;display:grid;place-items:center;padding:16px}
+.tech-camera-card{width:min(430px,100%);background:#fff;border-radius:16px;padding:14px;box-shadow:0 25px 70px #0005}
+.tech-camera-card h3{margin:0 0 5px;font-size:16px}
+.tech-camera-card p{margin:0 0 10px;color:#64748b;font-size:11px}
+.tech-camera-video{display:block;width:100%;max-height:58vh;object-fit:cover;border-radius:12px;background:#0f172a;transform:scaleX(-1)}
+.tech-camera-status{margin-top:10px;text-align:center;font-size:12px;font-weight:700;color:#334155}
+.tech-camera-count{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;background:#ffffffdd;display:grid;place-items:center;font-size:28px;font-weight:900;color:#1d4ed8}
+.tech-camera-stage{position:relative}
+@media(max-width:600px){.tech-camera-card{padding:12px}.tech-camera-video{max-height:52vh}}
+
 /* ROLE-BASED ACCESS / TECHNICIAN UX */
 .login-access{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
 .login-access button{min-height:62px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-weight:800;text-align:left}
@@ -982,20 +997,41 @@ button,input,select,textarea{font-size:14px}
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
 </div>
 <form id="loginForm">
-<div class="field">
-<label id="loginEmailLabel">Email</label>
-<input id="loginEmail" placeholder="Pilih akses terlebih dahulu">
+<div class="field" id="adminEmailField">
+<label id="loginEmailLabel">Email Admin</label>
+<input id="loginEmail" placeholder="Email admin" autocomplete="username">
 </div>
-<div class="field">
+<div class="field" id="adminPasswordField">
 <label>Password *</label>
-<input id="loginPass" type="password" placeholder="Password">
+<input id="loginPass" type="password" placeholder="Password" autocomplete="current-password">
 </div>
-<button class="btn primary" style="width:100%;height:42px">🔐 Login</button>
+<button class="btn primary" id="adminLoginBtn" style="width:100%;height:42px">🔐 Login Admin</button>
 </form>
+<div id="techQuickPanel" class="tech-quick-panel hidden">
+<h3>👨‍🔧 Akses Teknisi Cepat</h3>
+<p>Pilih akses Teknisi, masukkan nama yang akan dicatat, lalu kamera depan akan mengambil foto otomatis sebagai bukti akses.</p>
+<div class="field">
+<label>Nama Teknisi *</label>
+<input id="techQuickName" autocomplete="name" placeholder="Masukkan nama teknisi">
+</div>
+<button type="button" class="btn primary" id="techQuickLogin">📷 Masuk sebagai Teknisi</button>
+</div>
 <div id="loginErr" class="note hidden">
 </div>
 </div>
 </section>
+<div id="techCameraOverlay" class="tech-camera-overlay hidden" aria-hidden="true">
+<div class="tech-camera-card">
+<h3>Verifikasi Foto Akses Teknisi</h3>
+<p>Pastikan wajah terlihat jelas. Foto ini disimpan sebagai bukti akses teknisi.</p>
+<div class="tech-camera-stage">
+<video id="techCameraVideo" class="tech-camera-video" autoplay playsinline muted></video>
+<div id="techCameraCount" class="tech-camera-count hidden">2</div>
+</div>
+<div id="techCameraStatus" class="tech-camera-status">Menyiapkan kamera...</div>
+<div class="ma" style="margin-top:12px"><button type="button" class="btn" id="techCameraCancel">Batal</button></div>
+</div>
+</div>
 <section id="app" class="app hidden">
 <aside id="side" class="side">
 <div class="brand">
@@ -1970,7 +2006,7 @@ button,input,select,textarea{font-size:14px}
 </section>
 <section id="p-users" class="page" data-admin-only>
 <div class="head"><div><h1>Pengguna</h1><p>Kelola akun Admin dan Teknisi.</p></div><div class="actions"><button class="btn primary" data-action="user">＋ Tambah Teknisi</button></div></div>
-<div class="card users-card"><div class="cb"><div class="alert"><span class="badge info">Akses</span><b style="margin-left:6px">Teknisi tidak melihat informasi biaya dan pengaturan sistem.</b><small>Menu dan data operasional dibatasi sesuai role.</small></div></div><div class="table users-table"><table><thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="usersBody"></tbody></table></div></div>
+<div class="card users-card"><div class="cb"><div class="alert"><span class="badge info">Akses</span><b style="margin-left:6px">Teknisi tidak melihat informasi biaya dan pengaturan sistem.</b><small>Menu dan data operasional dibatasi sesuai role.</small></div></div><div class="table users-table"><table><thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="usersBody"></tbody></table></div></div><div class="card users-card" style="margin-top:14px"><div class="ch"><b>Aktivitas Akses Teknisi</b><small>30 akses terakhir</small></div><div class="table users-table"><table><thead><tr><th>Waktu</th><th>Nama</th><th>Foto</th><th>Bukti</th></tr></thead><tbody id="techAccessLogBody"></tbody></table></div></div>
 </section>
 </div>
 </main>
@@ -1995,7 +2031,7 @@ button,input,select,textarea{font-size:14px}
    Jika kosong, aplikasi otomatis menggunakan Preview/Demo Mode.
 */
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import{getAuth,signInWithEmailAndPassword,signInAnonymously,createUserWithEmailAndPassword,signOut,onAuthStateChanged,setPersistence,browserSessionPersistence}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 import{getFirestore,collection,getDocs,doc,setDoc,updateDoc,deleteDoc,getDoc,onSnapshot,serverTimestamp,writeBatch}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const FIREBASE_CONFIG = {
@@ -2021,25 +2057,29 @@ try {
   fb = initializeApp(FIREBASE_CONFIG);
   auth = getAuth(fb);
   db = getFirestore(fb);
+  setPersistence(auth,browserSessionPersistence).catch(e=>console.warn("Auth session persistence warning:",e));
   const creatorApp = initializeApp(FIREBASE_CONFIG, "technicianCreator");
   secondaryAuth = getAuth(creatorApp);
 } catch (e) {
   console.error("Firebase initialization error:", e);
   throw e;
 }
-const S={units:[],locations:[],vendors:[],mcbs:[],maintenance:[],notifications:[],users:[],settings:{maintenance:{defaultIntervalMonths:3,minimumIntervalMonths:1,reminderDaysFirst:30,reminderDaysSecond:7,reminderOnDueDate:true,reminderOverdue:true},system:{companyName:"NAMA PERUSAHAAN",companyAddress:"",companyPhone:"",companyEmail:"",timezone:"Asia/Jakarta"}},page:"dashboard"};
+const S={units:[],locations:[],vendors:[],mcbs:[],maintenance:[],notifications:[],users:[],techAccessLogs:[],settings:{maintenance:{defaultIntervalMonths:3,minimumIntervalMonths:1,reminderDaysFirst:30,reminderDaysSecond:7,reminderOnDueDate:true,reminderOverdue:true},system:{companyName:"NAMA PERUSAHAAN",companyAddress:"",companyPhone:"",companyEmail:"",timezone:"Asia/Jakarta"}},page:"dashboard"};
 let userProfile=null;
 let userRole="";
 let selectedLoginRole="";
 let publicCacheSyncStarted=false;
+let techCameraStream=null;
+let techQuickInProgress=false;
+let techQuickName="";
+let techQuickPhoto=null;
+
 
 const DEMO={locations:[{id:"LOC-001",building:"Office",floor:"Lantai 1",area:"Purchasing",room:"Ruang Purchasing",active:true},{id:"LOC-002",building:"Office",floor:"Lantai 2",area:"Accounting",room:"Ruang Accounting",active:true},{id:"LOC-003",building:"Warehouse",floor:"Lantai 1",area:"Warehouse",room:"Gudang Utama",active:true}],vendors:[{id:"VEN-001",name:"PT Sejuk Teknik",type:"vendor",phone:"081234567890",email:"",active:true},{id:"VEN-002",name:"Teknisi Internal",type:"internal",phone:"",email:"",active:true}],mcbs:[{id:"MCB-001",code:"MCB-001",panelName:"DB-01",number:"01",locationId:"LOC-001",point:"Panel Electrical Lantai 1",ratingA:16,pole:"1P",circuit:"AC-001",status:"active",mapX:78,mapY:28,notes:""}],units:[{id:"AC-001",code:"AC-001",brand:"Daikin",model:"FTKC25",serialNumber:"SN-DAI-001",type:"Split Wall",capacityPk:1,locationId:"LOC-001",purchaseDate:"2024-02-15",purchasePrice:6500000,supplierId:"VEN-001",invoiceNumber:"INV-2024-0021",installationDate:"2024-02-20",warrantyUntil:"2025-02-20",status:"active",lastRoutineMaintenanceDate:"2026-06-10",nextRoutineMaintenanceDate:"2026-09-10",maintenanceIntervalMonths:3,notes:""},{id:"AC-002",code:"AC-002",brand:"Panasonic",model:"CS-PN9",serialNumber:"SN-PAN-002",type:"Split Wall",capacityPk:1,locationId:"LOC-002",purchaseDate:"2023-08-10",purchasePrice:5800000,supplierId:"VEN-001",invoiceNumber:"INV-2023-0088",installationDate:"2023-08-12",warrantyUntil:"2024-08-12",status:"active",lastRoutineMaintenanceDate:"2026-05-20",nextRoutineMaintenanceDate:"2026-08-20",maintenanceIntervalMonths:3,notes:""},{id:"AC-003",code:"AC-003",brand:"LG",model:"T10EV4",serialNumber:"SN-LG-003",type:"Split Wall",capacityPk:1,locationId:"LOC-003",purchaseDate:"2025-01-15",purchasePrice:6100000,supplierId:"VEN-001",invoiceNumber:"INV-2025-0012",installationDate:"2025-01-17",warrantyUntil:"2026-01-17",status:"repair",lastRoutineMaintenanceDate:"2026-07-05",nextRoutineMaintenanceDate:"2026-10-05",maintenanceIntervalMonths:3,notes:"Menunggu sparepart"}],maintenance:[{id:"MNT-00001",maintenanceNumber:"MNT-00001",acId:"AC-001",date:"2026-06-10",type:"cuci_ac",resetsRoutineSchedule:true,intervalMonths:3,nextRoutineMaintenanceDate:"2026-09-10",vendorId:"VEN-001",technicianName:"Budi",complaint:"AC kurang dingin",inspectionResult:"normal",action:"Cleaning indoor dan outdoor",serviceCost:150000,sparePartCost:0,otherCost:0,totalCost:150000,spareParts:[],notes:"",status:"active"},{id:"MNT-00002",maintenanceNumber:"MNT-00002",acId:"AC-002",date:"2026-05-20",type:"cuci_ac",resetsRoutineSchedule:true,intervalMonths:3,nextRoutineMaintenanceDate:"2026-08-20",vendorId:"VEN-001",technicianName:"Budi",complaint:"Filter kotor",inspectionResult:"normal",action:"Cleaning",serviceCost:150000,sparePartCost:0,otherCost:0,totalCost:150000,spareParts:[],notes:"",status:"active"},{id:"MNT-00003",maintenanceNumber:"MNT-00003",acId:"AC-003",date:"2026-07-05",type:"service_rutin",resetsRoutineSchedule:true,intervalMonths:3,nextRoutineMaintenanceDate:"2026-10-05",vendorId:"VEN-001",technicianName:"Andi",complaint:"",inspectionResult:"perlu_perbaikan",action:"Pemeriksaan unit",serviceCost:200000,sparePartCost:0,otherCost:0,totalCost:200000,spareParts:[],notes:"Perlu sparepart",status:"active"}]};
 
 const $=id=>document.getElementById(id),esc=v=>String(v??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;"),cur=v=>new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(v||0));
 
-function today(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date())}function month(){return today().slice(0,7)}function date(v){if(!v)return"-";
-const d=new Date(String(v).includes("T")?v:`${v}T00:00:00`);
-return isNaN(d)?"-":new Intl.DateTimeFormat("id-ID",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Jakarta"}).format(d)}function pd(v){if(!v)return null;
+function today(){return new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date())}function month(){return today().slice(0,7)}function asDateObject(v){if(!v)return null;if(typeof v?.toDate==="function")return v.toDate();if(typeof v?.seconds==="number")return new Date(v.seconds*1000);const d=new Date(String(v).includes("T")?v:`${v}T00:00:00`);return isNaN(d)?null:d}function date(v){const d=asDateObject(v);return !d?"-":new Intl.DateTimeFormat("id-ID",{day:"2-digit",month:"short",year:"numeric",timeZone:"Asia/Jakarta"}).format(d)}function dateTime(v){const d=asDateObject(v);return !d?"-":new Intl.DateTimeFormat("id-ID",{day:"2-digit",month:"short",year:"numeric",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:"Asia/Jakarta"}).format(d)}function pd(v){if(!v)return null;
 const a=String(v).slice(0,10).split("-").map(Number);
 return new Date(a[0],a[1]-1,a[2])}function addM(v,n){const d=pd(v);
 if(!d)return"";
@@ -2191,7 +2231,17 @@ async function syncAllPublicCaches(){if(!isAdmin()||demo)return;const [uSnap,mSn
 async function migratePublicCachesOnce(){if(!isAdmin()||demo||publicCacheSyncStarted)return;publicCacheSyncStarted=true;try{const [up,mp,vp,upv,mpv,vpv]=await Promise.all([getDocs(collection(db,"ac_units_public")),getDocs(collection(db,"maintenance_public")),getDocs(collection(db,"vendors_public")),getDocs(collection(db,"ac_units")),getDocs(collection(db,"maintenance")),getDocs(collection(db,"vendors"))]);const needsSync=up.size<upv.size||mp.size<mpv.size||vp.size<vpv.size;if(needsSync){const count=await syncAllPublicCaches();if(count)toast("Akses Teknisi disiapkan",`${count} data operasional disinkronkan.` ,"success")}}catch(err){console.error("Public cache migration error:",err);toast("Sinkronisasi gagal","Data akses Teknisi belum sepenuhnya disiapkan.","warning")}}
 async function getCurrentProfile(firebaseUser){const snap=await getDoc(doc(db,"users",firebaseUser.uid));return snap.exists()?{id:snap.id,...snap.data()}:null}
 function roleAwareCollection(col){if(isTechnician()){if(col==="ac_units")return"ac_units_public";if(col==="maintenance")return"maintenance_public";if(col==="vendors")return"vendors_public";}return col}
-async function handleAuthenticatedUser(firebaseUser){if(!firebaseUser)return;try{loading(true,"Memverifikasi akses...");const p=await getCurrentProfile(firebaseUser);if(!p||p.active!==true||!['admin','technician'].includes(p.role)){await signOut(auth);user=null;userProfile=null;userRole="";$('loginErr').textContent="Akun tidak memiliki akses aktif ke aplikasi.";$('loginErr').classList.remove('hidden');return}if(selectedLoginRole&&p.role!==selectedLoginRole){await signOut(auth);user=null;userProfile=null;userRole="";$('loginErr').textContent=`Akun ini terdaftar sebagai ${p.role==="admin"?"Admin":"Teknisi"}. Pilih akses yang sesuai.`;$('loginErr').classList.remove('hidden');return}user=firebaseUser;userProfile=p;userRole=p.role;applyRoleUI();if(isAdmin())await migratePublicCachesOnce();enter();nav(isTechnician()?"techdashboard":"dashboard")}catch(e){console.error("Role verification error:",e);$('loginErr').textContent="Tidak dapat memverifikasi hak akses akun.";$('loginErr').classList.remove('hidden')}finally{loading(false)}}
+function isAnonymousFirebaseUser(firebaseUser=user){return !!firebaseUser?.isAnonymous;}
+function setLoginMode(role){const tech=role==="technician";if($("adminEmailField"))$("adminEmailField").classList.toggle("hidden",tech);if($("adminPasswordField"))$("adminPasswordField").classList.toggle("hidden",tech);if($("adminLoginBtn"))$("adminLoginBtn").classList.toggle("hidden",tech);if($("techQuickPanel"))$("techQuickPanel").classList.toggle("hidden",!tech);if($("loginEmail"))$("loginEmail").required=!tech;if($("loginPass"))$("loginPass").required=!tech;if($('loginEmailLabel'))$('loginEmailLabel').textContent=tech?"Nama Teknisi":"Email Admin";}
+function waitMs(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+function stopTechCamera(){if(techCameraStream){techCameraStream.getTracks().forEach(t=>{try{t.stop()}catch(_){}});techCameraStream=null}const v=$("techCameraVideo");if(v)v.srcObject=null;const o=$("techCameraOverlay");if(o){o.classList.add("hidden");o.setAttribute("aria-hidden","true")}}
+async function captureTechnicianSelfie(technicianName){if(!navigator.mediaDevices?.getUserMedia)throw new Error("Perangkat atau browser tidak mendukung akses kamera.");const overlay=$("techCameraOverlay"),video=$("techCameraVideo"),count=$("techCameraCount"),status=$("techCameraStatus");if(!overlay||!video)throw new Error("Komponen kamera tidak tersedia.");overlay.classList.remove("hidden");overlay.setAttribute("aria-hidden","false");status.textContent="Meminta izin kamera...";try{techCameraStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:"user"},width:{ideal:1280},height:{ideal:720}},audio:false});video.srcObject=techCameraStream;await video.play();status.textContent="Posisikan wajah di tengah kamera.";await waitMs(900);for(const n of [2,1]){count.textContent=String(n);count.classList.remove("hidden");status.textContent=`Foto otomatis dalam ${n}...`;await waitMs(900)}count.classList.add("hidden");status.textContent="Mengambil foto...";await waitMs(150);const w=video.videoWidth,h=video.videoHeight;if(!w||!h)throw new Error("Kamera aktif tetapi ukuran gambar belum tersedia.");const canvas=document.createElement("canvas");const max=1280;const scale=Math.min(1,max/Math.max(w,h));canvas.width=Math.max(1,Math.round(w*scale));canvas.height=Math.max(1,Math.round(h*scale));const ctx=canvas.getContext("2d");if(!ctx)throw new Error("Browser tidak mendukung pengambilan foto.");ctx.translate(canvas.width,0);ctx.scale(-1,1);ctx.drawImage(video,0,0,canvas.width,canvas.height);const blob=await new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.82));if(!blob)throw new Error("Gagal membuat file foto.");const safe=String(technicianName||"Teknisi").trim().replace(/[^a-zA-Z0-9_-]+/g,"-").slice(0,60)||"Teknisi";return new File([blob],`TECH-${safe}-${Date.now()}.jpg`,{type:"image/jpeg",lastModified:Date.now()});}finally{stopTechCamera()}}
+async function uploadTechnicianAccessPhoto(file,technicianName){if(!user)throw new Error("Sesi teknisi belum tersedia.");const processed=await prepareMaintenanceFile(file);const token=await user.getIdToken(true);const payload={fileName:processed.name,mimeType:processed.type,base64Data:await fileToBase64(processed),maintenanceNumber:"TECH-ACCESS",unitCode:"",photoType:"technician_access",technicianName:String(technicianName||"").trim()};const response=await fetch("/api/drive-upload",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},body:JSON.stringify(payload)});let result={};try{result=await response.json()}catch(_){throw new Error("Respons upload foto akses tidak valid.")}if(!response.ok||!result?.ok)throw new Error(result?.error||`Upload foto akses gagal (${response.status}).`);const fileId=String(result.fileId||"");return{name:file.name,type:processed.type,size:Number(result.size||processed.size||0),fileId,url:fileId?`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`:"",folderName:result.folderName||"",uploadedAt:new Date().toISOString()}}
+async function beginQuickTechnicianAccess(name){if(techQuickInProgress)return;const techName=String(name||"").trim();if(techName.length<2)return toast("Nama belum lengkap","Masukkan nama teknisi minimal 2 karakter.","warning");techQuickInProgress=true;techQuickName=techName;$("loginErr").classList.add("hidden");try{loading(true,"Menyiapkan akses Teknisi...");if(auth.currentUser&&!auth.currentUser.isAnonymous)await signOut(auth);if(!auth.currentUser||!auth.currentUser.isAnonymous){await signInAnonymously(auth)}user=auth.currentUser;if(!user?.isAnonymous)throw new Error("Sesi Teknisi cepat tidak berhasil dibuat.");loading(false);const photo=await captureTechnicianSelfie(techName);techQuickPhoto=photo;loading(true,"Menyimpan foto akses ke Google Drive...");const uploaded=await uploadTechnicianAccessPhoto(photo,techName);const sid=user.uid;const session={uid:sid,name:techName,displayName:techName,role:"technician",active:true,quickAccess:true,photoFileId:uploaded.fileId||"",photoUrl:uploaded.url||"",photoFileName:uploaded.name||photo.name,createdAt:serverTimestamp(),updatedAt:serverTimestamp()};await setDoc(doc(db,"technician_sessions",sid),session,{merge:true});const logId=`TAL-${Date.now().toString().slice(-10)}-${Math.random().toString(36).slice(2,7)}`;await setDoc(doc(db,"technician_access_logs",logId),{uid:sid,name:techName,accessType:"quick",photoFileId:uploaded.fileId||"",photoUrl:uploaded.url||"",photoFileName:uploaded.name||photo.name,photoStatus:"success",createdAt:serverTimestamp()});userProfile={id:sid,uid:sid,name:techName,displayName:techName,role:"technician",active:true,quickAccess:true};userRole="technician";sessionStorage.setItem("acMaintenanceQuickTech",JSON.stringify({uid:sid,name:techName}));applyRoleUI();enter();nav("techdashboard");toast("Akses Teknisi berhasil",`Selamat datang, ${techName}. Foto akses tersimpan.` ,"success")}catch(err){console.error("Quick technician access error:",err);if(isAnonymousFirebaseUser()&&(!userProfile||userRole!=="technician")){try{await signOut(auth)}catch(_){}}user=null;userProfile=null;userRole="";sessionStorage.removeItem("acMaintenanceQuickTech");$("loginErr").textContent=err?.message||"Akses Teknisi gagal.";$("loginErr").classList.remove("hidden")}finally{loading(false);techQuickInProgress=false}}
+async function restoreAnonymousTechnician(firebaseUser){const raw=sessionStorage.getItem("acMaintenanceQuickTech");if(!raw){try{await signOut(auth)}catch(_){}}let saved=null;try{saved=JSON.parse(raw)}catch(_){}if(!saved||saved.uid!==firebaseUser.uid||!saved.name){try{await signOut(auth)}catch(_){}return false}const snap=await getDoc(doc(db,"technician_sessions",firebaseUser.uid));if(!snap.exists()||snap.data().active!==true){try{await signOut(auth)}catch(_){}sessionStorage.removeItem("acMaintenanceQuickTech");return false}const d=snap.data()||{};user=firebaseUser;userProfile={id:firebaseUser.uid,uid:firebaseUser.uid,name:d.name||saved.name,displayName:d.displayName||d.name||saved.name,role:"technician",active:true,quickAccess:true,photoFileId:d.photoFileId||"",photoUrl:d.photoUrl||"",photoFileName:d.photoFileName||""};userRole="technician";applyRoleUI();enter();nav("techdashboard");return true}
+
+
+async function handleAuthenticatedUser(firebaseUser){if(!firebaseUser)return;if(firebaseUser.isAnonymous){if(techQuickInProgress)return;const restored=await restoreAnonymousTechnician(firebaseUser);if(restored)return;return}try{loading(true,"Memverifikasi akses...");const p=await getCurrentProfile(firebaseUser);if(!p||p.active!==true||!['admin','technician'].includes(p.role)){await signOut(auth);user=null;userProfile=null;userRole="";$('loginErr').textContent="Akun tidak memiliki akses aktif ke aplikasi.";$('loginErr').classList.remove('hidden');return}if(selectedLoginRole&&p.role!==selectedLoginRole){await signOut(auth);user=null;userProfile=null;userRole="";$('loginErr').textContent=`Akun ini terdaftar sebagai ${p.role==="admin"?"Admin":"Teknisi"}. Pilih akses yang sesuai.`;$('loginErr').classList.remove('hidden');return}user=firebaseUser;userProfile=p;userRole=p.role;applyRoleUI();if(isAdmin())await migratePublicCachesOnce();enter();nav(isTechnician()?"techdashboard":"dashboard")}catch(e){console.error("Role verification error:",e);$('loginErr').textContent="Tidak dapat memverifikasi hak akses akun.";$('loginErr').classList.remove('hidden')}finally{loading(false)}}
 let realtimeUnsubscribers=[];
 
 function stopRealtime(){
@@ -2208,12 +2258,12 @@ const sources=[
   [unitCol,d=>{S.units=d.docs.map(x=>({id:x.id,...x.data()}))}],
   [mntCol,d=>{S.maintenance=d.docs.map(x=>({id:x.id,...x.data()}))}]
 ];
-let remaining=sources.length+2+(isAdmin()?1:0)+(isTechnician()?1:0);loading(true);
+let remaining=sources.length+2+(isAdmin()?2:0)+((isTechnician()&&!userProfile?.quickAccess)?1:0);loading(true);
 const ready=()=>{remaining--;renderAll();if(remaining<=0)loading(false)};
 sources.forEach(([name,apply])=>{const unsub=onSnapshot(collection(db,name),snap=>{apply(snap);renderAll();ready()},err=>{console.error(`Realtime ${name} error:`,err);toast("Gagal sinkronisasi",`Data ${name} tidak dapat diperbarui realtime.` ,"error");ready()});realtimeUnsubscribers.push(unsub)});
 const us=onSnapshot(doc(db,"settings","maintenance"),snap=>{if(snap.exists())S.settings.maintenance={...S.settings.maintenance,...snap.data()};renderAll();ready()},err=>{console.error(err);ready()});realtimeUnsubscribers.push(us);
 const ss=onSnapshot(doc(db,"settings","system"),snap=>{if(snap.exists())S.settings.system={...S.settings.system,...snap.data()};renderAll();ready()},err=>{console.error(err);ready()});realtimeUnsubscribers.push(ss);
-if(isAdmin()){const pus=onSnapshot(collection(db,"users"),snap=>{S.users=snap.docs.map(x=>({id:x.id,...x.data()}));renderAll();ready()},err=>{console.error("Realtime users error:",err);ready()});realtimeUnsubscribers.push(pus)}else if(isTechnician()&&user?.uid){const own=onSnapshot(doc(db,"users",user.uid),snap=>{const p=snap.exists()?snap.data():null;if(!p||p.active!==true||p.role!=="technician"){signOut(auth);return}userProfile={id:user.uid,...p};userRole="technician";applyRoleUI();ready()},err=>{console.error("Realtime profile error:",err);ready()});realtimeUnsubscribers.push(own)}
+if(isAdmin()){const pus=onSnapshot(collection(db,"users"),snap=>{S.users=snap.docs.map(x=>({id:x.id,...x.data()}));renderAll();ready()},err=>{console.error("Realtime users error:",err);ready()});realtimeUnsubscribers.push(pus);const pals=onSnapshot(collection(db,"technician_access_logs"),snap=>{S.techAccessLogs=snap.docs.map(x=>({id:x.id,...x.data()}));renderUsers();ready()},err=>{console.error("Realtime technician access log error:",err);S.techAccessLogs=[];renderUsers();ready()});realtimeUnsubscribers.push(pals)}else if(isTechnician()&&!userProfile?.quickAccess&&user?.uid){const own=onSnapshot(doc(db,"users",user.uid),snap=>{const p=snap.exists()?snap.data():null;if(!p||p.active!==true||p.role!=="technician"){signOut(auth);return}userProfile={id:user.uid,...p};userRole="technician";applyRoleUI();ready()},err=>{console.error("Realtime profile error:",err);ready()});realtimeUnsubscribers.push(own)}
 }
 async function save(col,id,data){
   await setDoc(doc(db,col,id),{
@@ -2504,7 +2554,7 @@ function routePath(a,b){return getRoutePolyline(a,b,[])}
 const mapState={you:null};
 function syncMapControls(){const unitId=$('mapUnit')?.value||'',mm=$('mapMcb');if(!mm)return;const linked=unitId?unit(unitId)?.mcbId:'';if(linked&&mcb(linked))mm.value=linked;drawMcbMap()}
 
-function renderUsers(){if(!requireAdmin())return;const rows=S.users.filter(x=>x.role==="technician"||x.role==="admin").sort((a,b)=>String(a.name||a.displayName||a.email||"").localeCompare(String(b.name||b.displayName||b.email||"")));const body=$("usersBody");if(!body)return;const html=rows.map(x=>{const name=x.displayName||x.name||x.email||"-";const role=x.role==="technician"?"Teknisi":"Admin";const active=x.active!==false;const status=active?'<span class="badge ok">Aktif</span>':'<span class="badge neutral">Nonaktif</span>';const roleBadge=`<span class="badge ${x.role==="admin"?"info":"neutral"}">${role}</span>`;const action=x.role==="technician"?`<button class="btn ${active?"danger":"success"}" data-user-toggle="${esc(x.id)}">${active?"Nonaktifkan":"Aktifkan"}</button>`:'<span class="badge info">Akun Utama</span>';return`<tr><td><b>${esc(name)}</b></td><td>${esc(x.email||"-")}</td><td>${roleBadge}</td><td>${status}</td><td>${action}</td></tr>`}).join("");body.innerHTML=html||'<tr><td colspan="5"><div class="empty">Belum ada pengguna.</div></td></tr>'}
+function renderUsers(){if(!requireAdmin())return;const rows=S.users.filter(x=>x.role==="technician"||x.role==="admin").sort((a,b)=>String(a.name||a.displayName||a.email||"").localeCompare(String(b.name||b.displayName||b.email||"")));const body=$("usersBody");if(!body)return;const html=rows.map(x=>{const name=x.displayName||x.name||x.email||"-";const role=x.role==="technician"?"Teknisi":"Admin";const active=x.active!==false;const status=active?'<span class="badge ok">Aktif</span>':'<span class="badge neutral">Nonaktif</span>';const roleBadge=`<span class="badge ${x.role==="admin"?"info":"neutral"}">${role}</span>`;const action=x.role==="technician"?`<button class="btn ${active?"danger":"success"}" data-user-toggle="${esc(x.id)}">${active?"Nonaktifkan":"Aktifkan"}</button>`:'<span class="badge info">Akun Utama</span>';return`<tr><td><b>${esc(name)}</b></td><td>${esc(x.email||"-")}</td><td>${roleBadge}</td><td>${status}</td><td>${action}</td></tr>`}).join("");body.innerHTML=html||'<tr><td colspan="5"><div class="empty">Belum ada pengguna.</div></td></tr>';const lb=$("techAccessLogBody");if(lb){const logs=[...S.techAccessLogs].sort((a,b)=>String(b.createdAt?.seconds||b.createdAt||"").localeCompare(String(a.createdAt?.seconds||a.createdAt||""))).slice(0,30);lb.innerHTML=logs.length?logs.map(x=>`<tr><td>${dateTime(x.createdAt)}</td><td><b>${esc(x.name||"-")}</b></td><td>${x.photoStatus==="success"?'<span class="badge ok">Foto tersimpan</span>':'<span class="badge warning">Foto gagal</span>'}</td><td>${x.photoUrl?`<a class="btn" href="${esc(x.photoUrl)}" target="_blank" rel="noopener">📷 Lihat</a>`:'-'}</td></tr>`).join(""): '<tr><td colspan="4"><div class="empty">Belum ada aktivitas akses Teknisi.</div></td></tr>'}}
 function userModal(){if(!requireAdmin())return;modal("Tambah Teknisi",`<form id="userForm"><div class="formgrid"><div class="field full"><label>Nama Teknisi *</label><input id="usrName" required placeholder="Contoh: Andi"></div><div class="field full"><label>Email *</label><input id="usrEmail" type="email" required placeholder="teknisi@perusahaan.com"></div><div class="field"><label>Password *</label><input id="usrPassword" type="password" minlength="8" required placeholder="Minimal 8 karakter"></div><div class="field"><label>Konfirmasi Password *</label><input id="usrPassword2" type="password" minlength="8" required placeholder="Ulangi password"></div></div><div class="alert"><span class="badge info">Akses</span><b style="margin-left:6px">Teknisi tidak memiliki akses biaya, pengaturan, atau master data.</b><small>Gunakan satu akun untuk satu teknisi dan jangan berbagi password.</small></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">👨‍🔧 Buat Akun Teknisi</button></div></form>`);$("userForm").onsubmit=async e=>{e.preventDefault();const name=$("usrName").value.trim(),email=$("usrEmail").value.trim().toLowerCase(),p1=$("usrPassword").value,p2=$("usrPassword2").value;if(!name||!email||!p1)return toast("Validasi","Nama, email, dan password wajib diisi.","warning");if(p1.length<8)return toast("Validasi","Password minimal 8 karakter.","warning");if(p1!==p2)return toast("Validasi","Konfirmasi password tidak sama.","warning");try{loading(true,"Membuat akun teknisi...");if(!secondaryAuth)throw new Error("Layanan pembuatan akun belum siap.");const cred=await createUserWithEmailAndPassword(secondaryAuth,email,p1);await setDoc(doc(db,"users",cred.user.uid),{name,displayName:name,email,role:"technician",active:true,createdAt:serverTimestamp(),createdBy:user?.uid||""});await signOut(secondaryAuth);closeModal(true);toast("Berhasil","Akun Teknisi berhasil dibuat.","success");renderUsers()}catch(err){console.error("Create technician error:",err);const msg=err?.code==="auth/email-already-in-use"?"Email sudah digunakan oleh akun Firebase.":err?.message||"Akun Teknisi gagal dibuat.";toast("Gagal",msg,"error")}finally{loading(false)}}}
 async function toggleTechnicianUser(id){if(!requireAdmin())return;const u=S.users.find(x=>x.id===id);if(!u||u.role!=="technician")return;const next=u.active===false;if(!confirm(`${next?"Aktifkan":"Nonaktifkan"} akun ${u.displayName||u.name||u.email||id}?`))return;try{loading(true,"Memperbarui akun...");await updateDoc(doc(db,"users",id),{active:next,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});toast("Berhasil",`Akun Teknisi ${next?"diaktifkan":"dinonaktifkan"}.`,"success")}catch(err){console.error("Toggle technician error:",err);toast("Gagal","Status akun Teknisi gagal diubah.","error")}finally{loading(false)}}
 
@@ -2977,15 +3027,19 @@ if(mntSettingsEl)mntSettingsEl.onsubmit=async e=>{e.preventDefault();const defRa
 const sysSettingsEl=$("sysSettings");
 if(sysSettingsEl)sysSettingsEl.onsubmit=async e=>{e.preventDefault();const data={companyName:$('companyName').value.trim(),companyPhone:$('companyPhone').value.trim(),companyEmail:$('companyEmail').value.trim(),companyAddress:$('companyAddress').value.trim(),timezone:"Asia/Jakarta"};try{loading(true);if(demo)S.settings.system={...S.settings.system,...data};else await setDoc(doc(db,"settings","system"),{...data,updatedAt:serverTimestamp(),updatedBy:user?.uid||"admin"},{merge:true});S.settings.system={...S.settings.system,...data};renderAll();toast("Berhasil","Pengaturan sistem disimpan.","success")}catch(err){console.error(err);toast("Gagal","Pengaturan sistem gagal disimpan.","error")}finally{loading(false)}};
 
-document.querySelectorAll("[data-login-role]").forEach(btn=>btn.addEventListener("click",()=>{selectedLoginRole=btn.dataset.loginRole||"";document.querySelectorAll("[data-login-role]").forEach(x=>x.classList.toggle("selected",x.dataset.loginRole===selectedLoginRole));if($("loginEmailLabel"))$("loginEmailLabel").textContent=selectedLoginRole==="technician"?"Email Teknisi":"Email Admin";$("loginEmail").placeholder=selectedLoginRole==="technician"?"Email teknisi":"Email admin";$("loginErr").classList.add("hidden");}));
-$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginErr").classList.add("hidden");const email=$("loginEmail").value.trim(),password=$("loginPass").value;if(!selectedLoginRole)return toast("Pilih akses","Pilih Teknisi atau Admin terlebih dahulu.","warning");if(!email||!password){$("loginErr").textContent="Email dan password wajib diisi.";$("loginErr").classList.remove("hidden");return}try{loading(true,"Login...");await signInWithEmailAndPassword(auth,email,password)}catch(err){console.error("Login error:",err);$("loginErr").textContent="Login gagal. Periksa email/password dan pastikan akses yang dipilih sesuai akun.";$("loginErr").classList.remove("hidden")}finally{loading(false)}};
+document.querySelectorAll("[data-login-role]").forEach(btn=>btn.addEventListener("click",()=>{selectedLoginRole=btn.dataset.loginRole||"";document.querySelectorAll("[data-login-role]").forEach(x=>x.classList.toggle("selected",x.dataset.loginRole===selectedLoginRole));setLoginMode(selectedLoginRole);$("loginErr").classList.add("hidden");}));
+setLoginMode("");
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginErr").classList.add("hidden");if(selectedLoginRole==="technician"){beginQuickTechnicianAccess($("techQuickName")?.value||"");return}const email=$("loginEmail").value.trim(),password=$("loginPass").value;if(!selectedLoginRole)return toast("Pilih akses","Pilih Teknisi atau Admin terlebih dahulu.","warning");if(!email||!password){$("loginErr").textContent="Email Admin dan password wajib diisi.";$("loginErr").classList.remove("hidden");return}try{loading(true,"Login Admin...");await signInWithEmailAndPassword(auth,email,password)}catch(err){console.error("Login error:",err);$("loginErr").textContent="Login gagal. Periksa email/password Admin.";$("loginErr").classList.remove("hidden")}finally{loading(false)}};
+if($("techQuickLogin"))$("techQuickLogin").onclick=()=>beginQuickTechnicianAccess($("techQuickName")?.value||"");
+if($("techCameraCancel"))$("techCameraCancel").onclick=()=>{if(techQuickInProgress){stopTechCamera();$("loginErr").textContent="Akses Teknisi dibatalkan. Silakan ulangi jika diperlukan.";$("loginErr").classList.remove("hidden")} };
+
 function enter(){
   $("login").classList.add("hidden");
   $("app").classList.remove("hidden");
   startRealtime();
 }
 
-$("logout").onclick=async()=>{try{await signOut(auth)}finally{stopRealtime();user=null;userProfile=null;userRole="";selectedLoginRole="";publicCacheSyncStarted=false;S.users=[];S.units=[];S.maintenance=[];applyRoleUI();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("loginPass").value="";document.querySelectorAll("[data-login-role]").forEach(x=>x.classList.remove("selected"));$("loginEmail").value="";$("loginEmail").placeholder="Pilih akses terlebih dahulu";$("loginErr").classList.add("hidden")}};
+$("logout").onclick=async()=>{try{await signOut(auth)}finally{stopTechCamera();stopRealtime();user=null;userProfile=null;userRole="";selectedLoginRole="";publicCacheSyncStarted=false;S.users=[];S.techAccessLogs=[];S.units=[];S.maintenance=[];sessionStorage.removeItem("acMaintenanceQuickTech");applyRoleUI();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("loginPass").value="";$("techQuickName").value="";document.querySelectorAll("[data-login-role]").forEach(x=>x.classList.remove("selected"));$("loginEmail").value="";$("loginEmail").placeholder="Email admin";$("loginErr").classList.add("hidden");setLoginMode("")}};
 
 onAuthStateChanged(auth,firebaseUser=>{if(firebaseUser){handleAuthenticatedUser(firebaseUser)}else{user=null;userProfile=null;userRole="";applyRoleUI();$("app").classList.add("hidden");$("login").classList.remove("hidden")}});
 $('mDate').value=today();
