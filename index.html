@@ -942,6 +942,19 @@ button,input,select,textarea{font-size:14px}
   .field label{font-size:12px}
 }
 
+
+/* ROLE-BASED ACCESS / TECHNICIAN UX */
+.login-access{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 16px}
+.login-access button{min-height:62px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px;font-weight:800;text-align:left}
+.login-access button.selected{border-color:#2563eb;background:#eff6ff;box-shadow:0 0 0 2px rgba(37,99,235,.08)}
+.login-access button span{display:block;color:var(--muted);font-size:10px;font-weight:600;margin-top:3px}
+.tech-welcome{padding:14px 16px;border:1px solid #cfe0f8;border-radius:13px;background:linear-gradient(135deg,#eff6ff,#e5f0ff);margin-bottom:15px}
+.tech-welcome b{display:block;font-size:16px}.tech-welcome small{display:block;color:#475569;margin-top:4px}
+.tech-quick-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.tech-quick{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid #dbe4ee;border-radius:11px;background:#fff;text-align:left}
+.tech-quick b{font-size:16px;display:block}.tech-quick small{display:block;color:#64748b;font-size:10px;margin-top:2px}
+[data-role-hidden="true"]{display:none!important}
+@media(max-width:600px){.login-access{grid-template-columns:1fr}.tech-quick-grid{grid-template-columns:1fr}.tech-welcome{padding:13px}.login-card{padding:24px 18px}}
 </style>
 </head>
 <body>
@@ -950,10 +963,14 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
+<div class="login-access" id="loginAccessChooser">
+<button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
+<button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
+</div>
 <form id="loginForm">
 <div class="field">
-<label>Email Admin</label>
-<input id="loginEmail" placeholder="Email admin">
+<label id="loginEmailLabel">Email</label>
+<input id="loginEmail" placeholder="Pilih akses terlebih dahulu">
 </div>
 <div class="field">
 <label>Password *</label>
@@ -976,31 +993,33 @@ button,input,select,textarea{font-size:14px}
 </div>
 <nav class="nav">
 <div class="navlabel">Menu Utama</div>
-<button data-page="dashboard">▣ Dashboard</button>
+<button data-page="dashboard" data-admin-only>▣ Dashboard Admin</button>
+<button data-page="techdashboard" data-tech-only>▣ Dashboard Teknisi</button>
 <button data-page="scan">▣ Scan Unit AC</button>
 <div class="navlabel">Master Data</div>
 <button data-page="units">❄ Unit AC</button>
-<button data-page="locations">⌖ Lokasi</button>
-<button data-page="vendors">♙ Vendor / Teknisi</button>
+<button data-page="locations" data-admin-only>⌖ Lokasi</button>
+<button data-page="vendors" data-admin-only>♙ Vendor / Teknisi</button>
 <button data-page="mcb">⚡ MCB & Peta</button>
 <div class="navlabel">Maintenance</div>
 <button data-page="mntform">＋ Input Maintenance</button>
 <button data-page="schedule">◷ Jadwal Maintenance</button>
 <button data-page="history">▤ Histori Maintenance</button>
-<div class="navlabel">Laporan</div>
-<button data-page="report">▥ Laporan Maintenance</button>
-<button data-page="assetsreport">▦ Laporan Aset AC</button>
-<button data-page="costreport">Rp Laporan Biaya</button>
-<div class="navlabel">Pengaturan</div>
-<button data-page="mntsettings">⚙ Maintenance</button>
-<button data-page="systemsettings">◉ Sistem</button>
+<div class="navlabel" data-admin-only>Laporan</div>
+<button data-page="report" data-admin-only>▥ Laporan Maintenance</button>
+<button data-page="assetsreport" data-admin-only>▦ Laporan Aset AC</button>
+<button data-page="costreport" data-admin-only>Rp Laporan Biaya</button>
+<div class="navlabel" data-admin-only>Pengaturan</div>
+<button data-page="mntsettings" data-admin-only>⚙ Maintenance</button>
+<button data-page="systemsettings" data-admin-only>◉ Sistem</button>
+<button data-page="users" data-admin-only>👥 Pengguna</button>
 </nav>
 <div class="sidefoot">
 <div class="user">
 <div class="avatar">A</div>
 <div style="flex:1">
-<b>Administrator</b>
-<small>Admin</small>
+<b id="userNameLabel">Administrator</b>
+<small id="userRoleLabel">Admin</small>
 </div>
 <button id="logout" class="btn" style="padding:5px 8px">↪</button>
 </div>
@@ -1029,6 +1048,25 @@ button,input,select,textarea{font-size:14px}
 </div>
 </header>
 <div class="content">
+<section id="p-techdashboard" class="page">
+<div class="head"><div><h1>Dashboard Teknisi</h1><p>Ringkasan pekerjaan maintenance dan jadwal lapangan.</p></div></div>
+<div class="tech-welcome"><b id="techWelcomeName">Halo</b><small>Gunakan menu untuk scan unit, melihat jadwal, dan mencatat pekerjaan.</small></div>
+<div class="stats">
+<div class="card stat"><small>AC Terlambat</small><strong id="tOverdue">0</strong><span>Perlu perhatian</span></div>
+<div class="card stat"><small>Jadwal 7 Hari</small><strong id="tSoon">0</strong><span>Segera dikerjakan</span></div>
+<div class="card stat"><small>Jadwal Hari Ini</small><strong id="tToday">0</strong><span>Prioritas hari ini</span></div>
+<div class="card stat"><small>Maintenance Bulan Ini</small><strong id="tDoneMonth">0</strong><span>Catatan pekerjaan</span></div>
+</div>
+<div class="two">
+<div class="card"><div class="ch"><b>📅 Jadwal Terdekat</b><button class="btn" data-page="schedule">Lihat Jadwal</button></div><div class="cb" id="techUpcoming"></div></div>
+<div class="card"><div class="ch"><b>🚀 Akses Cepat</b></div><div class="cb"><div class="tech-quick-grid">
+<button type="button" class="tech-quick" data-page="scan"><div>📷<b>Scan AC</b><small>Cari Unit & MCB</small></div><span>›</span></button>
+<button type="button" class="tech-quick" data-page="mntform"><div>🛠<b>Input Maintenance</b><small>Catat pekerjaan</small></div><span>›</span></button>
+<button type="button" class="tech-quick" data-page="history"><div>▤<b>Histori</b><small>Lihat riwayat</small></div><span>›</span></button>
+<button type="button" class="tech-quick" data-page="mcb"><div>⚡<b>MCB & Peta</b><small>Cari titik MCB</small></div><span>›</span></button>
+</div></div></div>
+</div>
+</section>
 <section id="p-dashboard" class="page active">
 <div class="head">
 <div>
@@ -1057,7 +1095,7 @@ button,input,select,textarea{font-size:14px}
 <strong id="sMonth">0</strong>
 <span>Semua maintenance</span>
 </div>
-<div class="card stat">
+<div class="card stat" data-admin-only>
 <small>Biaya Bulan Ini</small>
 <strong id="sCost">Rp 0</strong>
 <span>Maintenance</span>
@@ -1124,10 +1162,10 @@ button,input,select,textarea{font-size:14px}
 <p>Master seluruh aset unit AC.</p>
 </div>
 <div class="actions">
-<button class="btn primary" data-action="unit">＋ Tambah Unit AC</button>
-<button class="btn" id="importUnitsBtn">⇧ Import Excel</button>
+<button class="btn primary" data-action="unit" data-admin-only>＋ Tambah Unit AC</button>
+<button class="btn" id="importUnitsBtn" data-admin-only>⇧ Import Excel</button>
 <input id="importUnitsFile" type="file" accept=".xlsx,.xls" class="hidden">
-<button class="btn" id="exportUnits">⇩ Export Excel</button>
+<button class="btn" id="exportUnits" data-admin-only>⇩ Export Excel</button>
 <button class="btn" id="printUnits">🖨 Print</button>
 </div>
 </div>
@@ -1190,13 +1228,13 @@ button,input,select,textarea{font-size:14px}
 </div>
 </div>
 </section>
-<section id="p-locations" class="page">
+<section id="p-locations" class="page" data-admin-only>
 <div class="head">
 <div>
 <h1>Master Lokasi</h1>
 <p>Gedung, lantai, area, dan ruangan.</p>
 </div>
-<div class="actions no-print"><button class="btn primary" data-action="location">＋ Tambah Lokasi</button><button class="btn" id="printLocations">🖨 Print</button></div>
+<div class="actions no-print"><button class="btn primary" data-action="location" data-admin-only>＋ Tambah Lokasi</button><button class="btn" id="printLocations">🖨 Print</button></div>
 </div>
 <div class="card">
 <div class="cb no-print">
@@ -1220,13 +1258,13 @@ button,input,select,textarea{font-size:14px}
 </div>
 </div>
 </section>
-<section id="p-vendors" class="page">
+<section id="p-vendors" class="page" data-admin-only>
 <div class="head">
 <div>
 <h1>Vendor / Teknisi</h1>
 <p>Master vendor dan teknisi.</p>
 </div>
-<button class="btn primary" data-action="vendor">＋ Tambah</button>
+<button class="btn primary" data-action="vendor" data-admin-only>＋ Tambah</button>
 </div>
 <div class="card">
 <div class="cb">
@@ -1316,7 +1354,7 @@ button,input,select,textarea{font-size:14px}
 </div>
 </section>
 <section id="p-mcb" class="page">
-<div class="head"><div><h1>MCB & Peta</h1><p>Kelola titik MCB yang terhubung dengan Unit AC dan gunakan peta sederhana untuk menuju MCB.</p></div><div class="actions"><button class="btn primary" data-action="mcb">＋ Tambah MCB</button><button class="btn" id="exportMcb">⇩ Export Excel</button></div></div>
+<div class="head"><div><h1>MCB & Peta</h1><p>Kelola titik MCB yang terhubung dengan Unit AC dan gunakan peta sederhana untuk menuju MCB.</p></div><div class="actions"><button class="btn primary" data-action="mcb" data-admin-only>＋ Tambah MCB</button><button class="btn" id="exportMcb" data-admin-only>⇩ Export Excel</button></div></div>
 <div class="card mcb-table-card"><div class="cb"><div class="filter"><div class="field"><label>Pencarian</label><input id="mcbSearch" placeholder="Kode, panel, nomor, sirkuit, unit AC"></div><div class="field"><label>Lokasi</label><select id="mcbLoc"><option value="">Semua Lokasi</option></select></div><div class="field"><label>Status</label><select id="mcbStatus"><option value="">Semua Status</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field"><label>Unit AC</label><select id="mcbUnit"><option value="">Semua Unit AC</option></select></div><div class="field"><label>Panel</label><input id="mcbPanelFilter" placeholder="Contoh: DB-02"></div></div></div>
 <div class="table"><table><thead><tr><th>MCB</th><th>Panel</th><th>Nomor</th><th>Rating</th><th>Lokasi / Titik</th><th>Unit AC</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="mcbBody"></tbody></table></div></div>
 <div class="two" style="margin-top:17px"><div class="card"><div class="ch"><b>🗺 Peta Titik MCB</b><span id="mcbMapSelected" class="badge info">Pilih MCB / Unit AC</span></div><div class="cb"><div class="mcb-map-toolbar"><div class="field"><label>Lokasi / Lantai</label><select id="mapLoc"><option value="">Pilih lokasi</option></select></div><div class="field"><label>Unit AC</label><select id="mapUnit"><option value="">Pilih Unit AC</option></select></div><div class="field"><label>MCB</label><select id="mapMcb"><option value="">Pilih MCB</option></select></div></div><div id="mcbMapWrap" style="margin-top:12px"><svg id="mcbMapSvg" viewBox="0 0 1000 600" role="img" aria-label="Peta MCB indoor"></svg></div><div class="mcb-route-info"><div class="mcb-route-card"><small>Posisi Anda</small><b id="mapYouInfo">Belum ditentukan</b></div><div class="mcb-route-card"><small>Tujuan</small><b id="mapTargetInfo">Belum dipilih</b></div><div class="mcb-route-card"><small>Rute</small><b id="mapDistanceInfo">-</b></div></div><div class="mcb-map-legend"><span class="mcb-legend-item"><span class="mcb-dot you"></span> Posisi Anda</span><span class="mcb-legend-item"><span class="mcb-dot ac"></span> Unit AC</span><span class="mcb-legend-item"><span class="mcb-dot mcb"></span> MCB</span></div><div class="mcb-map-note">Peta ini bersifat skematik. Rute memakai titik-titik navigasi yang disimpan pada MCB, sehingga dapat mengikuti koridor, belokan, ruangan, tangga, lift, dan perpindahan lantai. Tap peta di posisi Anda untuk menentukan titik awal.</div><div class="section" style="margin-top:14px;padding-top:14px"><h3>Petunjuk Langkah</h3><div id="mapRouteSteps"><div class="empty">Pilih MCB untuk melihat petunjuk rute.</div></div></div></div></div><div class="card"><div class="ch"><b>Petunjuk Navigasi</b></div><div class="cb"><div class="alert"><span class="badge info">1</span><b style="margin-left:6px">Pilih lokasi / lantai.</b><small>Filter hanya menampilkan Unit AC dan MCB pada lokasi tersebut.</small></div><div class="alert"><span class="badge info">2</span><b style="margin-left:6px">Pilih Unit AC atau MCB.</b><small>Unit AC akan otomatis mengarahkan ke MCB yang terhubung jika tersedia.</small></div><div class="alert"><span class="badge warning">3</span><b style="margin-left:6px">Tap peta di posisi Anda berdiri.</b><small>Marker biru menjadi titik awal. Rute akan mengikuti titik navigasi yang sudah disimpan.</small></div><div class="alert"><span class="badge ok">4</span><b style="margin-left:6px">Ikuti petunjuk langkah.</b><small>Petunjuk dapat mencakup belok kanan/kiri, melewati ruangan, naik/turun tangga, lift, hingga tiba di MCB.</small></div></div></div></div></section>
@@ -1367,7 +1405,7 @@ button,input,select,textarea{font-size:14px}
 </div>
 <div class="field">
 <label>Teknisi</label>
-<input id="mTech" placeholder="Nama teknisi">
+<input id="mTech" placeholder="Nama teknisi" autocomplete="off">
 </div>
 <div class="field">
 <label>Vendor</label>
@@ -1440,15 +1478,15 @@ button,input,select,textarea{font-size:14px}
 </details>
 
 <details class="maint-collapse" id="spareCostPanel">
-<summary><span>7. Sparepart &amp; Biaya</span><small>Opsional • buka hanya jika ada sparepart atau biaya</small></summary>
+<summary><span>7. Sparepart <span data-admin-only>&amp; Biaya</span></span><small>Opsional • buka hanya jika ada sparepart atau biaya</small></summary>
 <div class="maint-collapse-body">
 <div class="maint-subheading"><b>Sparepart</b><button type="button" class="btn" id="addSpare">＋ Tambah Sparepart</button></div>
 <div id="spares"></div>
 <div class="maint-cost-grid">
-<div class="field"><label>Biaya Jasa</label><input id="mService" type="number" min="0" value="0"></div>
-<div class="field"><label>Biaya Sparepart</label><input id="mSpare" type="number" min="0" value="0" readonly></div>
-<div class="field"><label>Biaya Lainnya</label><input id="mOther" type="number" min="0" value="0"></div>
-<div class="field"><label>Total</label><input id="mTotal" type="number" min="0" value="0" readonly></div>
+<div class="field" data-admin-only><label>Biaya Jasa</label><input id="mService" type="number" min="0" value="0"></div>
+<div class="field" data-admin-only><label>Biaya Sparepart</label><input id="mSpare" type="number" min="0" value="0" readonly></div>
+<div class="field" data-admin-only><label>Biaya Lainnya</label><input id="mOther" type="number" min="0" value="0"></div>
+<div class="field" data-admin-only><label>Total</label><input id="mTotal" type="number" min="0" value="0" readonly></div>
 </div>
 </div>
 </details>
@@ -1469,7 +1507,7 @@ button,input,select,textarea{font-size:14px}
 <h3>9. Jadwal Berikutnya</h3>
 <div class="formgrid maint-schedule-grid">
 <div class="field"><label>Reset Jadwal Rutin?</label><select id="mReset"><option value="true">Ya</option><option value="false">Tidak</option></select></div>
-<div class="field"><label>Interval</label><select id="mInterval"><option value="3">3 Bulan</option><option value="4">4 Bulan</option><option value="6">6 Bulan</option><option value="12">12 Bulan</option></select></div>
+<div class="field"><label>Interval</label><select id="mInterval"><option value="1">1 Bulan</option><option value="2">2 Bulan</option><option value="3">3 Bulan</option><option value="4">4 Bulan</option><option value="6">6 Bulan</option><option value="12">12 Bulan</option></select></div>
 <div class="field"><label>Jadwal Berikutnya</label><input id="mNext" type="date" readonly></div>
 </div>
 </div>
@@ -1495,8 +1533,8 @@ button,input,select,textarea{font-size:14px}
 </div>
 <div class="actions">
 <button class="btn primary" data-action="mnt">＋ Input</button>
-<button class="btn" id="exportHist">⇩ Export Excel</button>
-<button class="btn" id="printHist">🖨 Print</button>
+<button class="btn" id="exportHist" data-admin-only>⇩ Export Excel</button>
+<button class="btn" id="printHist" data-admin-only>🖨 Print</button>
 </div>
 </div>
 <div class="card">
@@ -1544,7 +1582,7 @@ button,input,select,textarea{font-size:14px}
 <th>Jenis</th>
 <th>Teknisi</th>
 <th>Hasil</th>
-<th>Total</th>
+<th class="history-cost-col" data-admin-only>Total</th>
 <th class="history-action-col">Aksi</th>
 </tr>
 </thead>
@@ -1554,15 +1592,15 @@ button,input,select,textarea{font-size:14px}
 </div>
 </div>
 </section>
-<section id="p-report" class="page">
+<section id="p-report" class="page" data-admin-only>
 <div class="head no-print">
 <div>
 <h1>Laporan Maintenance</h1>
 <p>Filter periode dan cetak.</p>
 </div>
 <div class="actions">
-<button class="btn" id="exportReport">⇩ Export Excel</button>
-<button class="btn primary" id="printReport">🖨 Print</button>
+<button class="btn" id="exportReport" data-admin-only>⇩ Export Excel</button>
+<button class="btn primary" id="printReport" data-admin-only>🖨 Print</button>
 </div>
 </div>
 <div class="card no-print">
@@ -1636,7 +1674,7 @@ button,input,select,textarea{font-size:14px}
 <th>Vendor</th>
 <th>Teknisi</th>
 <th>Hasil</th>
-<th>Biaya</th>
+<th data-admin-only>Biaya</th>
 </tr>
 </thead>
 <tbody id="rBody">
@@ -1653,15 +1691,15 @@ button,input,select,textarea{font-size:14px}
 <br>________________</div>
 </div>
 </section>
-<section id="p-assetsreport" class="page">
+<section id="p-assetsreport" class="page" data-admin-only>
 <div class="head">
 <div>
 <h1>Laporan Aset AC</h1>
 <p>Daftar aset unit AC.</p>
 </div>
 <div class="actions">
-<button class="btn" id="exportAssets">⇩ Export Excel</button>
-<button class="btn primary" id="printAssets">🖨 Print</button>
+<button class="btn" id="exportAssets" data-admin-only>⇩ Export Excel</button>
+<button class="btn primary" id="printAssets" data-admin-only>🖨 Print</button>
 </div>
 </div>
 <div class="card">
@@ -1712,7 +1750,7 @@ button,input,select,textarea{font-size:14px}
 <th>PK</th>
 <th>Lokasi</th>
 <th>Pembelian</th>
-<th>Harga</th>
+<th data-admin-only>Harga</th>
 <th>Status</th>
 </tr>
 </thead>
@@ -1722,15 +1760,15 @@ button,input,select,textarea{font-size:14px}
 </div>
 </div>
 </section>
-<section id="p-costreport" class="page">
+<section id="p-costreport" class="page" data-admin-only>
 <div class="head">
 <div>
 <h1>Laporan Biaya</h1>
 <p>Ringkasan pengeluaran maintenance.</p>
 </div>
 <div class="actions">
-<button class="btn" id="exportCost">⇩ Export Excel</button>
-<button class="btn primary" id="printCost">🖨 Print</button>
+<button class="btn" id="exportCost" data-admin-only>⇩ Export Excel</button>
+<button class="btn primary" id="printCost" data-admin-only>🖨 Print</button>
 </div>
 </div>
 <div class="card">
@@ -1792,7 +1830,7 @@ button,input,select,textarea{font-size:14px}
 <th>Jasa</th>
 <th>Sparepart</th>
 <th>Lainnya</th>
-<th>Total</th>
+<th class="history-cost-col" data-admin-only>Total</th>
 </tr>
 </thead>
 <tbody id="cAcBody">
@@ -1811,7 +1849,7 @@ button,input,select,textarea{font-size:14px}
 <tr>
 <th>Jenis</th>
 <th>Jumlah</th>
-<th>Total</th>
+<th class="history-cost-col" data-admin-only>Total</th>
 </tr>
 </thead>
 <tbody id="cBody">
@@ -1820,7 +1858,7 @@ button,input,select,textarea{font-size:14px}
 </div>
 </div>
 </section>
-<section id="p-mntsettings" class="page">
+<section id="p-mntsettings" class="page" data-admin-only>
 <div class="head">
 <div>
 <h1>Pengaturan Maintenance</h1>
@@ -1834,6 +1872,8 @@ button,input,select,textarea{font-size:14px}
 <div class="field">
 <label>Interval Default</label>
 <select id="setInterval">
+<option value="1">1 Bulan</option>
+<option value="2">2 Bulan</option>
 <option value="3">3 Bulan</option>
 <option value="4">4 Bulan</option>
 <option value="6">6 Bulan</option>
@@ -1842,7 +1882,7 @@ button,input,select,textarea{font-size:14px}
 </div>
 <div class="field">
 <label>Minimum Interval</label>
-<input value="3" readonly>
+<input value="1" readonly>
 </div>
 <div class="field">
 <label>Reminder Pertama (hari)</label>
@@ -1874,7 +1914,7 @@ button,input,select,textarea{font-size:14px}
 </div>
 </div>
 </section>
-<section id="p-systemsettings" class="page">
+<section id="p-systemsettings" class="page" data-admin-only>
 <div class="head">
 <div>
 <h1>Pengaturan Sistem</h1>
@@ -1917,6 +1957,10 @@ button,input,select,textarea{font-size:14px}
 </div>
 </main>
 </section>
+<section id="p-users" class="page" data-admin-only>
+<div class="head"><div><h1>Pengguna</h1><p>Kelola akun Admin dan Teknisi.</p></div><div class="actions"><button class="btn primary" data-action="user">＋ Tambah Teknisi</button></div></div>
+<div class="card"><div class="cb"><div class="alert"><span class="badge info">Akses</span><b style="margin-left:6px">Teknisi tidak melihat informasi biaya dan pengaturan sistem.</b><small>Menu dan data operasional dibatasi sesuai role.</small></div></div><div class="table"><table><thead><tr><th>Nama</th><th>Email</th><th>Role</th><th>Status</th><th>Aksi</th></tr></thead><tbody id="usersBody"></tbody></table></div></div>
+</section>
 <div id="modal">
 </div>
 <div id="toast" class="toastbox">
@@ -1937,8 +1981,8 @@ button,input,select,textarea{font-size:14px}
    Jika kosong, aplikasi otomatis menggunakan Preview/Demo Mode.
 */
 import{initializeApp}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-import{getAuth,signInWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-import{getFirestore,collection,getDocs,doc,setDoc,updateDoc,deleteDoc,getDoc,onSnapshot,serverTimestamp}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,signOut,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+import{getFirestore,collection,getDocs,doc,setDoc,updateDoc,deleteDoc,getDoc,onSnapshot,serverTimestamp,writeBatch}from"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyCkKgbJLXRqlFmMdTdargyXzz0cd_ix6uI",
@@ -1952,7 +1996,7 @@ const FIREBASE_CONFIG = {
 const READY = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.authDomain && FIREBASE_CONFIG.projectId && FIREBASE_CONFIG.appId);
 
 let fb = null, auth = null, db = null, user = null;
-
+let secondaryAuth = null;
 const demo = false;
 
 if (!READY) {
@@ -1963,11 +2007,17 @@ try {
   fb = initializeApp(FIREBASE_CONFIG);
   auth = getAuth(fb);
   db = getFirestore(fb);
+  const creatorApp = initializeApp(FIREBASE_CONFIG, "technicianCreator");
+  secondaryAuth = getAuth(creatorApp);
 } catch (e) {
   console.error("Firebase initialization error:", e);
   throw e;
 }
-const S={units:[],locations:[],vendors:[],mcbs:[],maintenance:[],notifications:[],settings:{maintenance:{defaultIntervalMonths:3,minimumIntervalMonths:3,reminderDaysFirst:30,reminderDaysSecond:7,reminderOnDueDate:true,reminderOverdue:true},system:{companyName:"NAMA PERUSAHAAN",companyAddress:"",companyPhone:"",companyEmail:"",timezone:"Asia/Jakarta"}},page:"dashboard"};
+const S={units:[],locations:[],vendors:[],mcbs:[],maintenance:[],notifications:[],users:[],settings:{maintenance:{defaultIntervalMonths:3,minimumIntervalMonths:1,reminderDaysFirst:30,reminderDaysSecond:7,reminderOnDueDate:true,reminderOverdue:true},system:{companyName:"NAMA PERUSAHAAN",companyAddress:"",companyPhone:"",companyEmail:"",timezone:"Asia/Jakarta"}},page:"dashboard"};
+let userProfile=null;
+let userRole="";
+let selectedLoginRole="";
+let publicCacheSyncStarted=false;
 
 const DEMO={locations:[{id:"LOC-001",building:"Office",floor:"Lantai 1",area:"Purchasing",room:"Ruang Purchasing",active:true},{id:"LOC-002",building:"Office",floor:"Lantai 2",area:"Accounting",room:"Ruang Accounting",active:true},{id:"LOC-003",building:"Warehouse",floor:"Lantai 1",area:"Warehouse",room:"Gudang Utama",active:true}],vendors:[{id:"VEN-001",name:"PT Sejuk Teknik",type:"vendor",phone:"081234567890",email:"",active:true},{id:"VEN-002",name:"Teknisi Internal",type:"internal",phone:"",email:"",active:true}],mcbs:[{id:"MCB-001",code:"MCB-001",panelName:"DB-01",number:"01",locationId:"LOC-001",point:"Panel Electrical Lantai 1",ratingA:16,pole:"1P",circuit:"AC-001",status:"active",mapX:78,mapY:28,notes:""}],units:[{id:"AC-001",code:"AC-001",brand:"Daikin",model:"FTKC25",serialNumber:"SN-DAI-001",type:"Split Wall",capacityPk:1,locationId:"LOC-001",purchaseDate:"2024-02-15",purchasePrice:6500000,supplierId:"VEN-001",invoiceNumber:"INV-2024-0021",installationDate:"2024-02-20",warrantyUntil:"2025-02-20",status:"active",lastRoutineMaintenanceDate:"2026-06-10",nextRoutineMaintenanceDate:"2026-09-10",maintenanceIntervalMonths:3,notes:""},{id:"AC-002",code:"AC-002",brand:"Panasonic",model:"CS-PN9",serialNumber:"SN-PAN-002",type:"Split Wall",capacityPk:1,locationId:"LOC-002",purchaseDate:"2023-08-10",purchasePrice:5800000,supplierId:"VEN-001",invoiceNumber:"INV-2023-0088",installationDate:"2023-08-12",warrantyUntil:"2024-08-12",status:"active",lastRoutineMaintenanceDate:"2026-05-20",nextRoutineMaintenanceDate:"2026-08-20",maintenanceIntervalMonths:3,notes:""},{id:"AC-003",code:"AC-003",brand:"LG",model:"T10EV4",serialNumber:"SN-LG-003",type:"Split Wall",capacityPk:1,locationId:"LOC-003",purchaseDate:"2025-01-15",purchasePrice:6100000,supplierId:"VEN-001",invoiceNumber:"INV-2025-0012",installationDate:"2025-01-17",warrantyUntil:"2026-01-17",status:"repair",lastRoutineMaintenanceDate:"2026-07-05",nextRoutineMaintenanceDate:"2026-10-05",maintenanceIntervalMonths:3,notes:"Menunggu sparepart"}],maintenance:[{id:"MNT-00001",maintenanceNumber:"MNT-00001",acId:"AC-001",date:"2026-06-10",type:"cuci_ac",resetsRoutineSchedule:true,intervalMonths:3,nextRoutineMaintenanceDate:"2026-09-10",vendorId:"VEN-001",technicianName:"Budi",complaint:"AC kurang dingin",inspectionResult:"normal",action:"Cleaning indoor dan outdoor",serviceCost:150000,sparePartCost:0,otherCost:0,totalCost:150000,spareParts:[],notes:"",status:"active"},{id:"MNT-00002",maintenanceNumber:"MNT-00002",acId:"AC-002",date:"2026-05-20",type:"cuci_ac",resetsRoutineSchedule:true,intervalMonths:3,nextRoutineMaintenanceDate:"2026-08-20",vendorId:"VEN-001",technicianName:"Budi",complaint:"Filter kotor",inspectionResult:"normal",action:"Cleaning",serviceCost:150000,sparePartCost:0,otherCost:0,totalCost:150000,spareParts:[],notes:"",status:"active"},{id:"MNT-00003",maintenanceNumber:"MNT-00003",acId:"AC-003",date:"2026-07-05",type:"service_rutin",resetsRoutineSchedule:true,intervalMonths:3,nextRoutineMaintenanceDate:"2026-10-05",vendorId:"VEN-001",technicianName:"Andi",complaint:"",inspectionResult:"perlu_perbaikan",action:"Pemeriksaan unit",serviceCost:200000,sparePartCost:0,otherCost:0,totalCost:200000,spareParts:[],notes:"Perlu sparepart",status:"active"}]};
 
@@ -2049,7 +2099,7 @@ async function prepareMaintenanceFile(file){
   throw new Error(`Tipe file ${file.type||"tidak diketahui"} tidak diizinkan.`);
 }
 async function uploadMaintenanceFile(maintenanceId,file,category){
-  if(!user)throw new Error("Sesi Admin tidak ditemukan. Silakan login ulang.");
+  if(!user)throw new Error("Sesi pengguna tidak ditemukan. Silakan login ulang.");
   const processed=await prepareMaintenanceFile(file);
   const token=await user.getIdToken(true);
   const u=unit($("mAc")?.value);
@@ -2112,49 +2162,22 @@ x.className="toast";
 x.innerHTML=`<b>${esc(t)}</b><div style="color:#64748b;margin-top:3px">${esc(m)}</div>`;
 $("toast").appendChild(x);
 setTimeout(()=>x.remove(),4200)}function loading(v,msg="Memproses..."){const el=$("loading"),txt=$("loadingText");if(txt)txt.textContent=msg;el.classList.toggle("hidden",!v)}
-async function verifyAdmin(firebaseUser) {
-  if (!firebaseUser || !db) return false;
-
-  const ref = doc(db, "users", firebaseUser.uid);
-
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) return false;
-
-  const profile = snap.data();
-  return profile.role === "admin" && profile.active === true;
-}
-
-async function handleAuthenticatedUser(firebaseUser) {
-  if (!firebaseUser) return;
-  try {
-    loading(true);
-
-    const allowed = await verifyAdmin(firebaseUser);
-
-    if (!allowed) {
-      await stopScanCamera();
-    await signOut(auth);
-      user = null;
-
-      $("loginErr").textContent = "Akun berhasil login, tetapi tidak memiliki akses Admin.";
-
-      $("loginErr").classList.remove("hidden");
-      return;
-    }
-    user = firebaseUser;
-    enter();
-  } catch (e) {
-    console.error("Admin verification error:", e);
-
-    $("loginErr").textContent = "Tidak dapat memverifikasi hak akses Admin.";
-
-    $("loginErr").classList.remove("hidden");
-  } finally {
-    loading(false);
-  }
-}
-
+function isAdmin(){return userRole==="admin";}
+function isTechnician(){return userRole==="technician";}
+function requireAdmin(message="Fitur ini hanya untuk Admin."){if(!isAdmin()){toast("Akses terbatas",message,"warning");return false}return true}
+function profileName(){return userProfile?.displayName||userProfile?.name||user?.email||"Pengguna"}
+function applyRoleUI(){const tech=isTechnician();document.querySelectorAll("[data-admin-only]").forEach(el=>el.setAttribute("data-role-hidden",tech?"true":"false"));document.querySelectorAll("[data-tech-only]").forEach(el=>el.setAttribute("data-role-hidden",tech?"false":"true"));if($("userNameLabel"))$("userNameLabel").textContent=profileName();if($("userRoleLabel"))$("userRoleLabel").textContent=tech?"Teknisi":"Admin";if($("techWelcomeName"))$("techWelcomeName").textContent=`Halo, ${profileName()}`;}
+function publicVendorData(v){if(!v)return null;return {name:v.name||"",type:v.type||"vendor",active:v.active!==false,updatedAt:serverTimestamp()};}
+function publicUnitData(u){if(!u)return null;return {code:u.code||"",brand:u.brand||"",model:u.model||"",serialNumber:u.serialNumber||"",type:u.type||"",capacityPk:Number(u.capacityPk)||0,locationId:u.locationId||"",mcbId:u.mcbId||"",mapX:u.mapX??30,mapY:u.mapY??55,status:u.status||"active",lastRoutineMaintenanceDate:u.lastRoutineMaintenanceDate||"",nextRoutineMaintenanceDate:u.nextRoutineMaintenanceDate||"",maintenanceIntervalMonths:Number(u.maintenanceIntervalMonths)||3,notes:u.notes||"",updatedAt:serverTimestamp()};}
+function publicMaintenanceData(m,idOverride=""){if(!m)return null;return {maintenanceNumber:m.maintenanceNumber||idOverride||"",acId:m.acId||"",date:m.date||"",type:m.type||"",resetsRoutineSchedule:!!m.resetsRoutineSchedule,intervalMonths:m.intervalMonths??null,nextRoutineMaintenanceDate:m.nextRoutineMaintenanceDate||null,vendorId:m.vendorId||"",technicianName:m.technicianName||"",complaint:m.complaint||"",inspectionResult:m.inspectionResult||"",action:m.action||"",notes:m.notes||"",checklist:m.checklist||{},checklistNotes:m.checklistNotes||"",measurements:m.measurements||{},spareParts:(m.spareParts||m.usedSpareParts||[]).map(x=>({name:x.name||"",qty:Number(x.qty)||0})),photosBefore:m.photosBefore||[],photosAfter:m.photosAfter||[],attachments:m.attachments||[],status:m.status||"active",createdAt:m.createdAt||serverTimestamp(),createdBy:m.createdBy||user?.uid||"",updatedAt:serverTimestamp(),updatedBy:user?.uid||""};}
+async function syncPublicUnit(u){if(!u||demo||!isAdmin())return;await setDoc(doc(db,"ac_units_public",u.id),publicUnitData(u),{merge:true});}
+async function syncPublicVendor(v){if(!v||demo||!isAdmin())return;await setDoc(doc(db,"vendors_public",v.id),publicVendorData(v),{merge:true});}
+async function syncPublicMaintenance(m,idOverride=""){if(!m||demo||!isAdmin())return;const id=m.id||idOverride||m.maintenanceNumber;if(!id)return;await setDoc(doc(db,"maintenance_public",id),publicMaintenanceData(m,id),{merge:true});}
+async function syncAllPublicCaches(){if(!isAdmin()||demo)return;const [uSnap,mSnap,vSnap]=await Promise.all([getDocs(collection(db,"ac_units")),getDocs(collection(db,"maintenance")),getDocs(collection(db,"vendors"))]);const writes=[];uSnap.docs.forEach(d=>writes.push(["ac_units_public",d.id,publicUnitData({id:d.id,...d.data()})]));mSnap.docs.forEach(d=>writes.push(["maintenance_public",d.id,publicMaintenanceData({id:d.id,...d.data()},d.id)]));vSnap.docs.forEach(d=>writes.push(["vendors_public",d.id,publicVendorData({id:d.id,...d.data()})]));for(let i=0;i<writes.length;i+=400){const batch=writeBatch(db);writes.slice(i,i+400).forEach(([c,id,data])=>batch.set(doc(db,c,id),data,{merge:true}));await batch.commit()}return writes.length;}
+async function migratePublicCachesOnce(){if(!isAdmin()||demo||publicCacheSyncStarted)return;publicCacheSyncStarted=true;try{const [up,mp,vp,upv,mpv,vpv]=await Promise.all([getDocs(collection(db,"ac_units_public")),getDocs(collection(db,"maintenance_public")),getDocs(collection(db,"vendors_public")),getDocs(collection(db,"ac_units")),getDocs(collection(db,"maintenance")),getDocs(collection(db,"vendors"))]);const needsSync=up.size<upv.size||mp.size<mpv.size||vp.size<vpv.size;if(needsSync){const count=await syncAllPublicCaches();if(count)toast("Akses Teknisi disiapkan",`${count} data operasional disinkronkan.` ,"success")}}catch(err){console.error("Public cache migration error:",err);toast("Sinkronisasi gagal","Data akses Teknisi belum sepenuhnya disiapkan.","warning")}}
+async function getCurrentProfile(firebaseUser){const snap=await getDoc(doc(db,"users",firebaseUser.uid));return snap.exists()?{id:snap.id,...snap.data()}:null}
+function roleAwareCollection(col){if(isTechnician()){if(col==="ac_units")return"ac_units_public";if(col==="maintenance")return"maintenance_public";if(col==="vendors")return"vendors_public";}return col}
+async function handleAuthenticatedUser(firebaseUser){if(!firebaseUser)return;try{loading(true,"Memverifikasi akses...");const p=await getCurrentProfile(firebaseUser);if(!p||p.active!==true||!['admin','technician'].includes(p.role)){await signOut(auth);user=null;userProfile=null;userRole="";$('loginErr').textContent="Akun tidak memiliki akses aktif ke aplikasi.";$('loginErr').classList.remove('hidden');return}if(selectedLoginRole&&p.role!==selectedLoginRole){await signOut(auth);user=null;userProfile=null;userRole="";$('loginErr').textContent=`Akun ini terdaftar sebagai ${p.role==="admin"?"Admin":"Teknisi"}. Pilih akses yang sesuai.`;$('loginErr').classList.remove('hidden');return}user=firebaseUser;userProfile=p;userRole=p.role;applyRoleUI();if(isAdmin())await migratePublicCachesOnce();enter();nav(isTechnician()?"techdashboard":"dashboard")}catch(e){console.error("Role verification error:",e);$('loginErr').textContent="Tidak dapat memverifikasi hak akses akun.";$('loginErr').classList.remove('hidden')}finally{loading(false)}}
 let realtimeUnsubscribers=[];
 
 function stopRealtime(){
@@ -2162,47 +2185,22 @@ function stopRealtime(){
   realtimeUnsubscribers=[];
 }
 
-function startRealtime(){
-  stopRealtime();
-  if(demo){
-    S.locations=structuredClone(DEMO.locations);
-    S.vendors=structuredClone(DEMO.vendors);
-    S.mcbs=structuredClone(DEMO.mcbs||[]);
-    S.units=structuredClone(DEMO.units);
-    S.maintenance=structuredClone(DEMO.maintenance);
-    renderAll();
-    return;
-  }
-  const sources=[
-    ["locations",docs=>{S.locations=docs.docs.map(x=>({id:x.id,...x.data()}))}],
-    ["vendors",docs=>{S.vendors=docs.docs.map(x=>({id:x.id,...x.data()}))}],
-    ["mcbs",docs=>{S.mcbs=docs.docs.map(x=>({id:x.id,...x.data()}))}],
-    ["ac_units",docs=>{S.units=docs.docs.map(x=>({id:x.id,...x.data()}))}],
-    ["maintenance",docs=>{S.maintenance=docs.docs.map(x=>({id:x.id,...x.data()}))}]
-  ];
-  let initialSnapshots=sources.length+2;
-  loading(true);
-  const markReady=()=>{initialSnapshots--; renderAll(); if(initialSnapshots<=0)loading(false)};
-  sources.forEach(([name,apply])=>{
-    const unsub=onSnapshot(collection(db,name),snap=>{apply(snap); renderAll(); markReady()},err=>{
-      console.error(`Realtime ${name} error:`,err);
-      toast("Gagal sinkronisasi",`Data ${name} tidak dapat diperbarui realtime.`,"error");
-      markReady();
-    });
-    realtimeUnsubscribers.push(unsub);
-  });
-  const unsubMaintenanceSettings=onSnapshot(doc(db,"settings","maintenance"),snap=>{
-    if(snap.exists())S.settings.maintenance={...S.settings.maintenance,...snap.data()};
-    renderAll(); markReady();
-  },err=>{console.error("Realtime maintenance settings error:",err); markReady()});
-  realtimeUnsubscribers.push(unsubMaintenanceSettings);
-  const unsubSystemSettings=onSnapshot(doc(db,"settings","system"),snap=>{
-    if(snap.exists())S.settings.system={...S.settings.system,...snap.data()};
-    renderAll(); markReady();
-  },err=>{console.error("Realtime system settings error:",err); markReady()});
-  realtimeUnsubscribers.push(unsubSystemSettings);
+function startRealtime(){stopRealtime();if(demo){S.locations=structuredClone(DEMO.locations);S.vendors=structuredClone(DEMO.vendors);S.mcbs=structuredClone(DEMO.mcbs||[]);S.units=structuredClone(DEMO.units);S.maintenance=structuredClone(DEMO.maintenance);renderAll();return}
+const unitCol=roleAwareCollection("ac_units"),mntCol=roleAwareCollection("maintenance"),vendorCol=roleAwareCollection("vendors");
+const sources=[
+  ["locations",d=>{S.locations=d.docs.map(x=>({id:x.id,...x.data()}))}],
+  [vendorCol,d=>{S.vendors=d.docs.map(x=>({id:x.id,...x.data()}))}],
+  ["mcbs",d=>{S.mcbs=d.docs.map(x=>({id:x.id,...x.data()}))}],
+  [unitCol,d=>{S.units=d.docs.map(x=>({id:x.id,...x.data()}))}],
+  [mntCol,d=>{S.maintenance=d.docs.map(x=>({id:x.id,...x.data()}))}]
+];
+let remaining=sources.length+2+(isAdmin()?1:0)+(isTechnician()?1:0);loading(true);
+const ready=()=>{remaining--;renderAll();if(remaining<=0)loading(false)};
+sources.forEach(([name,apply])=>{const unsub=onSnapshot(collection(db,name),snap=>{apply(snap);renderAll();ready()},err=>{console.error(`Realtime ${name} error:`,err);toast("Gagal sinkronisasi",`Data ${name} tidak dapat diperbarui realtime.` ,"error");ready()});realtimeUnsubscribers.push(unsub)});
+const us=onSnapshot(doc(db,"settings","maintenance"),snap=>{if(snap.exists())S.settings.maintenance={...S.settings.maintenance,...snap.data()};renderAll();ready()},err=>{console.error(err);ready()});realtimeUnsubscribers.push(us);
+const ss=onSnapshot(doc(db,"settings","system"),snap=>{if(snap.exists())S.settings.system={...S.settings.system,...snap.data()};renderAll();ready()},err=>{console.error(err);ready()});realtimeUnsubscribers.push(ss);
+if(isAdmin()){const pus=onSnapshot(collection(db,"users"),snap=>{S.users=snap.docs.map(x=>({id:x.id,...x.data()}));renderAll();ready()},err=>{console.error("Realtime users error:",err);ready()});realtimeUnsubscribers.push(pus)}else if(isTechnician()&&user?.uid){const own=onSnapshot(doc(db,"users",user.uid),snap=>{const p=snap.exists()?snap.data():null;if(!p||p.active!==true||p.role!=="technician"){signOut(auth);return}userProfile={id:user.uid,...p};userRole="technician";applyRoleUI();ready()},err=>{console.error("Realtime profile error:",err);ready()});realtimeUnsubscribers.push(own)}
 }
-
 async function save(col,id,data){
   await setDoc(doc(db,col,id),{
     ...data,
@@ -2232,29 +2230,10 @@ function nextMaintenanceNumber(){
   const next = (nums.length ? Math.max(...nums) : 0) + 1;
   return `MNT-${String(next).padStart(5,"0")}`;
 }
-const titles={scan:["Scan Unit AC","Unit AC / Scan"],dashboard:["Dashboard","AC Maintenance & Logbook System"],units:["Unit AC","Master Data / Unit AC"],locations:["Lokasi","Master Data / Lokasi"],vendors:["Vendor / Teknisi","Master Data / Vendor"],mcb:["MCB & Peta","Kelistrikan / MCB & Peta"],schedule:["Jadwal Maintenance","Maintenance / Jadwal"],mntform:["Input Maintenance","Maintenance / Input"],history:["Histori Maintenance","Maintenance / Histori"],report:["Laporan Maintenance","Laporan / Maintenance"],assetsreport:["Laporan Aset AC","Laporan / Aset"],costreport:["Laporan Biaya","Laporan / Biaya"],mntsettings:["Pengaturan Maintenance","Pengaturan"],systemsettings:["Pengaturan Sistem","Pengaturan"]};
+const titles={techdashboard:["Dashboard Teknisi","Teknisi / Dashboard"],users:["Pengguna","Pengaturan / Pengguna"],scan:["Scan Unit AC","Unit AC / Scan"],dashboard:["Dashboard","AC Maintenance & Logbook System"],units:["Unit AC","Master Data / Unit AC"],locations:["Lokasi","Master Data / Lokasi"],vendors:["Vendor / Teknisi","Master Data / Vendor"],mcb:["MCB & Peta","Kelistrikan / MCB & Peta"],schedule:["Jadwal Maintenance","Maintenance / Jadwal"],mntform:["Input Maintenance","Maintenance / Input"],history:["Histori Maintenance","Maintenance / Histori"],report:["Laporan Maintenance","Laporan / Maintenance"],assetsreport:["Laporan Aset AC","Laporan / Aset"],costreport:["Laporan Biaya","Laporan / Biaya"],mntsettings:["Pengaturan Maintenance","Pengaturan"],systemsettings:["Pengaturan Sistem","Pengaturan"]};
 
-function nav(p){if(p!=="scan")stopScanCamera();S.page=p;
-document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));
-$("p-"+p)?.classList.add("active");
-document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===p));
-$("title").textContent=titles[p]?.[0]||p;
-$("crumb").textContent=titles[p]?.[1]||"";
-$("side").classList.remove("open");
-renderPage(p);
-scrollTo(0,0)}function renderPage(p){if(p==="scan"){renderScanPage();setScanCameraButtonState();return}if(p==="dashboard")dash();
-if(p==="units")renderUnits();
-if(p==="locations")renderLocations();
-if(p==="vendors")renderVendors();
-if(p==="mcb")renderMcbPage();
-if(p==="schedule")renderSchedule();
-if(p==="mntform")populateMnt();
-if(p==="history")renderHistory();
-if(p==="report")renderReport();
-if(p==="assetsreport")renderAssets();
-if(p==="costreport")renderCost();
-if(p==="mntsettings")renderMntSettings();
-if(p==="systemsettings")renderSysSettings()}
+function nav(p){if(isTechnician()&&["dashboard","locations","vendors","report","assetsreport","costreport","mntsettings","systemsettings","users"].includes(p)){if(p==="dashboard")p="techdashboard";else{toast("Akses terbatas","Menu tersebut hanya tersedia untuk Admin.","warning");return}}if(p!=="scan")stopScanCamera();S.page=p;document.querySelectorAll(".page").forEach(x=>x.classList.remove("active"));$("p-"+p)?.classList.add("active");document.querySelectorAll(".nav button").forEach(x=>x.classList.toggle("active",x.dataset.page===p));$("title").textContent=titles[p]?.[0]||p;$("crumb").textContent=titles[p]?.[1]||"";$("side").classList.remove("open");renderPage(p);scrollTo(0,0)}function renderPage(p){if(p==="techdashboard"){renderTechDashboard();return}if(p==="users"){renderUsers();return}if(p==="scan"){renderScanPage();setScanCameraButtonState();return}if(p==="dashboard")dash();if(p==="units")renderUnits();if(p==="locations")renderLocations();if(p==="vendors")renderVendors();if(p==="mcb")renderMcbPage();if(p==="schedule")renderSchedule();if(p==="mntform")populateMnt();if(p==="history")renderHistory();if(p==="report")renderReport();if(p==="assetsreport")renderAssets();if(p==="costreport")renderCost();if(p==="mntsettings")renderMntSettings();if(p==="systemsettings")renderSysSettings()}
+
 function opts(id,arr,placeholder,map){const e=$(id);
 if(!e)return;
 const old=e.value;
@@ -2272,7 +2251,8 @@ opts("mVendor",S.vendors.filter(x=>x.active!==false),"Pilih vendor",x=>({v:x.id,
 const ts=[...new Set(S.maintenance.map(x=>x.type).filter(Boolean))];
 opts("hType",ts,"Semua Jenis",x=>({v:x,t:typeName(x)}));
 opts("rType",ts,"Semua Jenis",x=>({v:x,t:typeName(x)}))}
-function dash(){filters();
+function renderTechDashboard(){filters();if($("techWelcomeName"))$("techWelcomeName").textContent=`Halo, ${profileName()}`;const over=S.units.filter(x=>x.status!=="disposed"&&sched(x.nextRoutineMaintenanceDate).key==="overdue").length;const soon=S.units.filter(x=>x.status!=="disposed"&&["soon","due"].includes(sched(x.nextRoutineMaintenanceDate).key)).length;const tod=S.units.filter(x=>x.status!=="disposed"&&String(x.nextRoutineMaintenanceDate||"")===today()).length;const done=S.maintenance.filter(x=>x.status!=="void"&&String(x.date).slice(0,7)===month()).length;$("tOverdue").textContent=over;$("tSoon").textContent=soon;$("tToday").textContent=tod;$("tDoneMonth").textContent=done;const up=S.units.filter(x=>x.status!=="disposed"&&x.nextRoutineMaintenanceDate).map(x=>({...x,s:sched(x.nextRoutineMaintenanceDate)})).sort((a,b)=>String(a.nextRoutineMaintenanceDate).localeCompare(String(b.nextRoutineMaintenanceDate))).slice(0,6);$("techUpcoming").innerHTML=up.length?`<div class="mini">${up.map(x=>`<div class="minirow"><div><b>${esc(x.code)} — ${esc(x.brand)}</b><small>${esc(shortLoc(x.locationId))}</small></div><div style="text-align:right"><b>${date(x.nextRoutineMaintenanceDate)}</b><small>${dayText(x.s.d)}</small></div></div>`).join('')}</div>`:`<div class="empty">Tidak ada jadwal terdekat.</div>`}
+function dash(){if(!requireAdmin())return renderTechDashboard();filters();
 const active=S.units.filter(x=>x.status==="active").length,over=S.units.filter(x=>x.status!=="disposed"&&sched(x.nextRoutineMaintenanceDate).key==="overdue").length,mm=month(),ms=S.maintenance.filter(x=>x.status!=="void"&&String(x.date).slice(0,7)===mm),cost=ms.reduce((a,x)=>a+Number(x.totalCost||0),0);
 $("sTotal").textContent=S.units.length;
 $("sActive").textContent=active;
@@ -2299,14 +2279,11 @@ function unitRows(){
 const q=(($('uSearch')?.value)||"").trim().toLowerCase(),st=$('uStatus')?.value||"",lo=$('uLoc')?.value||"",br=$('uBrand')?.value||"",pk=$('uPk')?.value||"";
 return S.units.filter(x=>[x.code,x.brand,x.model,x.serialNumber,loc(x.locationId)].join(" ").toLowerCase().includes(q)&&(!st||x.status===st)&&(!lo||x.locationId===lo)&&(!br||x.brand===br)&&(!pk||String(x.capacityPk)===pk))
 }
-function renderUnits(){filters();
-const rows=unitRows();
-$("uBody").innerHTML=rows.length?rows.map(x=>{const r=S.maintenance.filter(m=>m.acId===x.id&&m.status!=="void"&&["cuci_ac","service_rutin"].includes(m.type)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];
-return`<tr><td><b>${esc(x.code)}</b><br><small>${esc(x.serialNumber||"-")}</small></td><td><b>${esc(x.brand)}</b><br><small>${esc(x.model||"-")}</small></td><td>${esc(x.capacityPk)} PK</td><td>${esc(shortLoc(x.locationId))}</td><td>${r?date(r.date):"-"}</td><td>${date(x.nextRoutineMaintenanceDate)}<br>${ssBadge(x.nextRoutineMaintenanceDate)}</td><td>${stBadge(x.status)}</td><td><button class="btn" data-detail="${esc(x.id)}">Detail</button> <button class="btn" data-edit="${esc(x.id)}">Edit</button> <button class="btn" data-barcode="${esc(x.id)}">🏷 Barcode</button></td></tr>`}).join(""):`<tr><td colspan="8"><div class="empty">Belum ada unit AC.</div></td></tr>`}
+function renderUnits(){filters();const rows=unitRows();const tech=isTechnician();$("uBody").innerHTML=rows.length?rows.map(x=>{const r=S.maintenance.filter(m=>m.acId===x.id&&m.status!=="void"&&["cuci_ac","service_rutin"].includes(m.type)).sort((a,b)=>String(b.date).localeCompare(String(a.date)))[0];const actions=tech?`<button class="btn" data-detail="${esc(x.id)}">Detail</button> <button class="btn" data-barcode="${esc(x.id)}">🏷 Barcode</button>`:`<button class="btn" data-detail="${esc(x.id)}">Detail</button> <button class="btn" data-edit="${esc(x.id)}">Edit</button> <button class="btn" data-barcode="${esc(x.id)}">🏷 Barcode</button>`;return`<tr><td><b>${esc(x.code)}</b><br><small>${esc(x.serialNumber||"-")}</small></td><td><b>${esc(x.brand)}</b><br><small>${esc(x.model||"-")}</small></td><td>${esc(x.capacityPk)} PK</td><td>${esc(shortLoc(x.locationId))}</td><td>${r?date(r.date):"-"}</td><td>${date(x.nextRoutineMaintenanceDate)}<br>${ssBadge(x.nextRoutineMaintenanceDate)}</td><td>${stBadge(x.status)}</td><td>${actions}</td></tr>`}).join(""):`<tr><td colspan="8"><div class="empty">Belum ada unit AC.</div></td></tr>`}
 function renderLocations(){const q=(($('lSearch')?.value)||"").toLowerCase();
 const rows=S.locations.filter(x=>[x.building,x.floor,x.area,x.room].join(" ").toLowerCase().includes(q));
 $('lBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.building)}</td><td>${esc(x.floor)}</td><td>${esc(x.area)}</td><td>${esc(x.room)}</td><td>${x.active!==false?'<span class="badge ok">Aktif</span>':'<span class="badge neutral">Nonaktif</span>'}</td><td class="no-print"><button class="btn" data-ledit="${x.id}">Edit</button> <button class="btn danger" data-ltoggle="${x.id}">${x.active!==false?'Nonaktifkan':'Aktifkan'}</button></td></tr>`).join(""):`<tr><td colspan="6"><div class="empty">Belum ada lokasi.</div></td></tr>`}
-function printLocations(){renderLocations();print("p-locations")}
+function printLocations(){if(!requireAdmin())return;renderLocations();print("p-locations")}
 function renderVendors(){const q=(($('vSearch')?.value)||"").toLowerCase();
 const rows=S.vendors.filter(x=>[x.name,x.type,x.phone,x.email].join(" ").toLowerCase().includes(q));
 $('vBody').innerHTML=rows.length?rows.map(x=>`<tr><td><b>${esc(x.name)}</b></td><td>${esc(x.type==="internal"?"Teknisi Internal":x.type==="external"?"Teknisi Eksternal":"Vendor")}</td><td>${esc(x.phone||"-")}</td><td>${esc(x.email||"-")}</td><td>${x.active!==false?'<span class="badge ok">Aktif</span>':'<span class="badge neutral">Nonaktif</span>'}</td><td><button class="btn" data-vedit="${x.id}">Edit</button> <button class="btn danger" data-vtoggle="${x.id}">${x.active!==false?'Nonaktifkan':'Aktifkan'}</button></td></tr>`).join(""):`<tr><td colspan="6"><div class="empty">Belum ada vendor / teknisi.</div></td></tr>`}
@@ -2316,26 +2293,22 @@ const rows=S.units.filter(x=>x.status!=="disposed"&&x.nextRoutineMaintenanceDate
 return(!mo||x.nextRoutineMaintenanceDate.slice(0,7)===mo)&&(!lo||x.locationId===lo)&&(!br||x.brand===br)&&(!pk||String(x.capacityPk)===pk)&&(!st||s.key===st)}).sort((a,b)=>a.nextRoutineMaintenanceDate.localeCompare(b.nextRoutineMaintenanceDate));
 $("schBody").innerHTML=rows.length?rows.map(x=>{const s=sched(x.nextRoutineMaintenanceDate);
 return`<tr><td><b>${esc(x.code)}</b><br><small>${esc(x.brand)} ${esc(x.model||"")}</small></td><td>${esc(shortLoc(x.locationId))}</td><td>${date(x.lastRoutineMaintenanceDate)}</td><td>${date(x.nextRoutineMaintenanceDate)}</td><td>${dayText(s.d)}</td><td><span class="badge ${s.cls}">${s.label}</span></td><td><button class="btn" data-schedule-edit="${x.id}">Edit</button> <button class="btn" data-detail="${x.id}">Detail</button></td></tr>`}).join(""):`<tr><td colspan="7"><div class="empty">Tidak ada jadwal sesuai filter.</div></td></tr>`}
-function scheduleModal(id){const u=unit(id);if(!u)return;
-modal("Edit / Reschedule Jadwal",`<form id="scheduleForm"><div class="formgrid"><div class="field"><label>Unit AC</label><input value="${esc(u.code)} — ${esc(u.brand||"")} ${esc(u.model||"")}" readonly></div><div class="field"><label>Jadwal Saat Ini</label><input value="${esc(date(u.nextRoutineMaintenanceDate))}" readonly></div><div class="field"><label>Jadwal Baru *</label><input id="schNewDate" type="date" value="${esc(u.nextRoutineMaintenanceDate||"")}" required></div><div class="field full"><label>Alasan Reschedule</label><textarea id="schReason" placeholder="Contoh: menyesuaikan jadwal operasional atau permintaan user.">${esc(u.scheduleRescheduleReason||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan Jadwal</button></div></form>`);
-$('scheduleForm').onsubmit=async e=>{e.preventDefault();const nd=$('schNewDate').value.trim(),reason=$('schReason').value.trim();if(!nd)return toast("Validasi","Jadwal baru wajib diisi.","warning");try{loading(true);const data={nextRoutineMaintenanceDate:nd,scheduleRescheduleReason:reason,scheduleUpdatedAt:serverTimestamp(),scheduleUpdatedBy:user?.uid||"admin"};if(demo)Object.assign(u,data);else await updateDoc(doc(db,"ac_units",u.id),data);closeModal(true);renderAll();toast("Berhasil","Jadwal maintenance berhasil diubah.","success")}catch(err){console.error(err);toast("Gagal","Jadwal maintenance gagal diubah.","error")}finally{loading(false)}}}
-function resetM(){$("mEdit").value="";$("mDate").value=today();$("mType").value="";$("mTech").value="";$("mComplaint").value="";$("mAction").value="";$("mNotes").value="";$("mChecklistNotes").value="";renderMaintenanceChecklist({});populateMaintenanceMeasurements({});["mPhotosBefore","mPhotosAfter","mFiles"].forEach(id=>{if($(id))$(id).value=""});["mPhotosBeforeList","mPhotosAfterList","mFilesList","mExistingEvidence"].forEach(id=>{if($(id))$(id).innerHTML=""});$("mService").value=0;$("mOther").value=0;$("mReset").value="true";$("mInterval").value=String(Math.max(3,S.settings.maintenance.defaultIntervalMonths||3));$("mNext").value="";$("spares").innerHTML="";filters();$("mAc").value="";$("mVendor").value="";$("mResult").value="";updateResultButtons();$("measurementPanel")?.removeAttribute("open");$("spareCostPanel")?.removeAttribute("open");$("evidencePanel")?.removeAttribute("open");costM()}
+function scheduleModal(id){if(!isAdmin()&&!isTechnician())return toast("Akses terbatas","Jadwal dapat diubah oleh Admin atau Teknisi aktif.","warning");const u=unit(id);if(!u)return;
+modal("Edit / Reschedule Jadwal",`<form id="scheduleForm"><div class="formgrid"><div class="field"><label>Unit AC</label><input value="${esc(u.code)} — ${esc(u.brand||"")} ${esc(u.model||"")}" readonly></div><div class="field"><label>Jadwal Saat Ini</label><input value="${esc(date(u.nextRoutineMaintenanceDate))}" readonly></div><div class="field"><label>Jadwal Baru *</label><input id="schNewDate" type="date" value="${esc(u.nextRoutineMaintenanceDate||"")}" required></div><div class="field full"><label>Alasan Reschedule</label><textarea id="schReason" placeholder="Contoh: menyesuaikan jadwal operasional atau kondisi lapangan.">${esc(u.scheduleRescheduleReason||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary" id="saveScheduleBtn">💾 Simpan Jadwal</button></div></form>`);
+$('scheduleForm').onsubmit=async e=>{e.preventDefault();const nd=$('schNewDate').value.trim(),reason=$('schReason').value.trim();if(!nd)return toast("Validasi","Jadwal baru wajib diisi.","warning");const b=$('saveScheduleBtn');if(b){b.disabled=true;b.dataset.originalText=b.textContent;b.textContent="⏳ Menyimpan..."}try{loading(true,"Menyimpan jadwal...");const data={nextRoutineMaintenanceDate:nd,scheduleRescheduleReason:reason,scheduleUpdatedAt:serverTimestamp(),scheduleUpdatedBy:user?.uid||"admin"};if(demo)Object.assign(u,data);else if(isTechnician()){const batch=writeBatch(db);batch.update(doc(db,"ac_units",u.id),{...data,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});batch.update(doc(db,"ac_units_public",u.id),data);await batch.commit();Object.assign(u,data)}else{await updateDoc(doc(db,"ac_units",u.id),data);Object.assign(u,data);await syncPublicUnit({...u,...data})}closeModal(true);renderAll();toast("Berhasil","Jadwal maintenance berhasil diubah.","success")}catch(err){console.error("Schedule save error:",err);toast("Gagal","Jadwal maintenance gagal diubah.","error")}finally{loading(false);if(b){b.disabled=false;b.textContent=b.dataset.originalText||"💾 Simpan Jadwal";delete b.dataset.originalText}}}}
+function maintenanceMinInterval(){return 1}
+function resetM(){$("mEdit").value="";$("mDate").value=today();$("mType").value="";$("mTech").value="";$("mComplaint").value="";$("mAction").value="";$("mNotes").value="";$("mChecklistNotes").value="";renderMaintenanceChecklist({});populateMaintenanceMeasurements({});["mPhotosBefore","mPhotosAfter","mFiles"].forEach(id=>{if($(id))$(id).value=""});["mPhotosBeforeList","mPhotosAfterList","mFilesList","mExistingEvidence"].forEach(id=>{if($(id))$(id).innerHTML=""});$("mService").value=0;$("mOther").value=0;$("mReset").value="true";$("mInterval").value=String(Math.max(maintenanceMinInterval(),Math.min(12,Number(S.settings.maintenance.defaultIntervalMonths)||3)));$("mNext").value="";$("spares").innerHTML="";filters();$("mAc").value="";$("mVendor").value="";$("mResult").value="";updateResultButtons();$("measurementPanel")?.removeAttribute("open");$("spareCostPanel")?.removeAttribute("open");$("evidencePanel")?.removeAttribute("open");costM()}
 function updateResultButtons(){const v=$("mResult")?.value||"";document.querySelectorAll("#mResultButtons [data-result-value]").forEach(b=>{const on=b.dataset.resultValue===v;b.classList.toggle("selected",on);b.setAttribute("aria-pressed",String(on))})}
-function populateMnt(edit=null){filters();if(!edit){if(!$('mType').value||$('mEdit').value)resetM();else{renderMaintenanceChecklist({});populateMaintenanceMeasurements({});updateResultButtons()}return}const m=S.maintenance.find(x=>x.id===edit);if(!m)return;$("mEdit").value=m.id;$("mAc").value=m.acId;$("mDate").value=m.date;$("mType").value=m.type;$("mVendor").value=m.vendorId||"";$("mTech").value=m.technicianName||"";$("mResult").value=m.inspectionResult||"";updateResultButtons();$("mComplaint").value=m.complaint||"";$("mAction").value=m.action||"";$("mNotes").value=m.notes||"";$("mChecklistNotes").value=m.checklistNotes||"";renderMaintenanceChecklist(m.checklist||{});populateMaintenanceMeasurements(m.measurements||{});$("mExistingEvidence").innerHTML=existingEvidenceHtml(m);$("mService").value=m.serviceCost||0;$("mOther").value=m.otherCost||0;$("mReset").value=String(!!m.resetsRoutineSchedule);$("mInterval").value=String(Math.max(3,m.intervalMonths||3));$("spares").innerHTML="";(m.spareParts||[]).forEach(addSpare);if(m.spareParts?.length)$("spareCostPanel").open=true;else $("spareCostPanel").removeAttribute("open");previewM();const meas=m.measurements||{};const hasMeas=Object.values(meas).some(v=>v!==null&&v!==undefined&&v!==""&&v!==0);if(hasMeas)$("measurementPanel").open=true;const hasEv=(m.photosBefore?.length||0)+(m.photosAfter?.length||0)+(m.attachments?.length||0);if(hasEv)$("evidencePanel").open=true}
-function addSpare(x={name:"",qty:1,price:0}){const d=document.createElement("div");
-d.className="spare";
-d.innerHTML=`<div class="field sp-name"><label>Nama</label><input value="${esc(x.name||"")}"></div><div class="field"><label>Qty</label><input class="sq" type="number" min="0" value="${x.qty??1}"></div><div class="field"><label>Harga</label><input class="sp" type="number" min="0" value="${x.price||0}"></div><button type="button" class="btn danger">×</button>`;
-d.querySelectorAll("input").forEach(i=>i.addEventListener("input",costM));
-d.querySelector("button").onclick=()=>{d.remove();
-costM()};
-$("spares").appendChild(d)}function spareData(){return[...document.querySelectorAll(".spare")].map(d=>({name:d.querySelector(".sp-name input").value.trim(),qty:+d.querySelector(".sq").value||0,price:+d.querySelector(".sp").value||0})).filter(x=>x.name&&x.qty>0)}function costM(){const sp=spareData().reduce((a,x)=>a+x.qty*x.price,0),tot=sp+(+$('mService').value||0)+(+$('mOther').value||0);
+function populateMnt(edit=null){filters();if(!edit){if(!$('mType').value||$('mEdit').value)resetM();else{renderMaintenanceChecklist({});populateMaintenanceMeasurements({});updateResultButtons()}return}const m=S.maintenance.find(x=>x.id===edit);if(!m)return;$("mEdit").value=m.id;$("mAc").value=m.acId;$("mDate").value=m.date;$("mType").value=m.type;$("mVendor").value=m.vendorId||"";$("mTech").value=m.technicianName||"";$("mResult").value=m.inspectionResult||"";updateResultButtons();$("mComplaint").value=m.complaint||"";$("mAction").value=m.action||"";$("mNotes").value=m.notes||"";$("mChecklistNotes").value=m.checklistNotes||"";renderMaintenanceChecklist(m.checklist||{});populateMaintenanceMeasurements(m.measurements||{});$("mExistingEvidence").innerHTML=existingEvidenceHtml(m);$("mService").value=m.serviceCost||0;$("mOther").value=m.otherCost||0;$("mReset").value=String(!!m.resetsRoutineSchedule);$("mInterval").value=String(Math.max(maintenanceMinInterval(),Math.min(12,Number(m.intervalMonths)||3)));$("spares").innerHTML="";(m.spareParts||[]).forEach(addSpare);if(m.spareParts?.length)$("spareCostPanel").open=true;else $("spareCostPanel").removeAttribute("open");previewM();const meas=m.measurements||{};const hasMeas=Object.values(meas).some(v=>v!==null&&v!==undefined&&v!==""&&v!==0);if(hasMeas)$("measurementPanel").open=true;const hasEv=(m.photosBefore?.length||0)+(m.photosAfter?.length||0)+(m.attachments?.length||0);if(hasEv)$("evidencePanel").open=true}
+function addSpare(x={name:"",qty:1,price:0}){const d=document.createElement("div");d.className="spare";d.innerHTML=`<div class="field sp-name"><label>Nama</label><input value="${esc(x.name||"")}"></div><div class="field"><label>Qty</label><input class="sq" type="number" min="0" value="${x.qty??1}"></div>${isAdmin()?`<div class="field"><label>Harga</label><input class="sp" type="number" min="0" value="${x.price||0}"></div>`:""}<button type="button" class="btn danger">×</button>`;d.querySelectorAll("input").forEach(i=>i.addEventListener("input",costM));d.querySelector("button").onclick=()=>{d.remove();costM()};$("spares").appendChild(d)}
+function spareData(){return[...document.querySelectorAll(".spare")].map(d=>({name:d.querySelector(".sp-name input").value.trim(),qty:+d.querySelector(".sq").value||0,price:+(d.querySelector(".sp")?.value||0)||0})).filter(x=>x.name&&x.qty>0)}function costM(){const sp=spareData().reduce((a,x)=>a+x.qty*x.price,0),tot=sp+(+$('mService').value||0)+(+$('mOther').value||0);
 $('mSpare').value=sp;
 $('mTotal').value=tot;
 previewM()}function previewM(){const d=$("mDate").value,ok=$("mReset").value==="true";
-$("mNext").value=d&&ok?addM(d,Math.max(3,+$("mInterval").value||3)):""}
+$("mNext").value=d&&ok?addM(d,Math.max(maintenanceMinInterval(),Math.min(12,+$("mInterval").value||3))):""}
 let maintenanceSubmitInProgress=false;
 
-async function submitM(e){e.preventDefault();if(maintenanceSubmitInProgress){toast("Sedang diproses","Maintenance ini sedang disimpan. Mohon tunggu sampai proses selesai.","info");return}const ac=$("mAc").value,d=$("mDate").value,t=$("mType").value;if(!ac||!d||!t)return toast("Validasi","Unit, tanggal, dan jenis wajib diisi.","warning");const result=$("mResult").value;if(!result)return toast("Validasi","Pilih Hasil Setelah Maintenance sebelum menyimpan.","warning");maintenanceSubmitInProgress=true;const submitBtn=$("saveMntBtn");if(submitBtn){submitBtn.disabled=true;submitBtn.dataset.originalText=submitBtn.textContent;submitBtn.textContent="⏳ Menyimpan...";submitBtn.setAttribute("aria-busy","true")}const reset=$("mReset").value==="true",interval=Math.max(3,+$("mInterval").value||3),sp=spareData(),svc=+$('mService').value||0,spc=sp.reduce((a,x)=>a+x.qty*x.price,0),oth=+$('mOther').value||0,total=svc+spc+oth,id=$("mEdit").value||null,existing=id?S.maintenance.find(x=>x.id===id):null;const data={maintenanceNumber:existing?.maintenanceNumber||nextMaintenanceNumber(),acId:ac,date:d,type:t,resetsRoutineSchedule:reset,intervalMonths:reset?interval:null,nextRoutineMaintenanceDate:reset?addM(d,interval):null,vendorId:$('mVendor').value||"",technicianName:$("mTech").value.trim(),complaint:$("mComplaint").value.trim(),inspectionResult:$("mResult").value,action:$("mAction").value.trim(),notes:$("mNotes").value.trim(),checklist:collectMaintenanceChecklist(),checklistNotes:$("mChecklistNotes").value.trim(),measurements:collectMaintenanceMeasurements(),serviceCost:svc,sparePartCost:spc,otherCost:oth,totalCost:total,spareParts:sp,photosBefore:existing?.photosBefore||[],photosAfter:existing?.photosAfter||[],attachments:existing?.attachments||[],status:existing?.status||"active"};try{loading(true,id?"Menyimpan perubahan maintenance...":"Menyimpan maintenance...");let maintenanceId=id;if(id){if(demo)Object.assign(existing,data);else await save("maintenance",id,data)}else{maintenanceId=demo?"MNT-"+Date.now():await add("maintenance",data,"MNT");if(demo)S.maintenance.push({id:maintenanceId,...data})}let uploaded=[];let failedUploads=[];const hasFiles=(($("mPhotosBefore")?.files?.length)||0)+(($("mPhotosAfter")?.files?.length)||0)+(($("mFiles")?.files?.length)||0);if(hasFiles&&!demo){loading(true,"Mengunggah foto/lampiran...");try{const uploadResult=await uploadMaintenanceFiles(maintenanceId);uploaded=uploadResult.uploaded||[];failedUploads=uploadResult.failed||[];if(failedUploads.length)toast("Sebagian file gagal",`${failedUploads.length} file tidak berhasil diunggah. Data maintenance tetap tersimpan.` ,"warning")}catch(fileErr){console.error("Maintenance file upload error:",fileErr);toast("Maintenance tersimpan",fileErr.message||"Ada file yang gagal diunggah.","warning")}}if(uploaded.length){const before=[...(data.photosBefore||[])],after=[...(data.photosAfter||[])],extra=[...(data.attachments||[])];uploaded.forEach(x=>{if(x.category==="before")before.push(x);else if(x.category==="after")after.push(x);else extra.push(x)});const evidence={photosBefore:before,photosAfter:after,attachments:extra};if(demo)Object.assign(S.maintenance.find(x=>x.id===maintenanceId),evidence);else await updateDoc(doc(db,"maintenance",maintenanceId),{...evidence,updatedAt:serverTimestamp()})}const u=unit(ac);if(reset){const ud={lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval};if(demo)Object.assign(u,ud);else await updateDoc(doc(db,"ac_units",u.id),{...ud,updatedAt:serverTimestamp()})}toast("Berhasil","Maintenance berhasil disimpan.","success");resetM();renderAll();nav("history")}catch(err){console.error("Maintenance save error:",err);toast("Gagal","Maintenance gagal disimpan.","error")}finally{maintenanceSubmitInProgress=false;const submitBtn=$("saveMntBtn");if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=submitBtn.dataset.originalText||"💾 Simpan Maintenance";submitBtn.removeAttribute("aria-busy");delete submitBtn.dataset.originalText}loading(false)}}
+async function submitM(e){e.preventDefault();if(maintenanceSubmitInProgress){toast("Sedang diproses","Maintenance ini sedang disimpan. Mohon tunggu sampai proses selesai.","info");return}const ac=$("mAc").value,d=$("mDate").value,t=$("mType").value;if(!ac||!d||!t)return toast("Validasi","Unit, tanggal, dan jenis wajib diisi.","warning");const result=$("mResult").value;if(!result)return toast("Validasi","Pilih Hasil Setelah Maintenance sebelum menyimpan.","warning");const id=$("mEdit").value||null;if(id&&!isAdmin())return toast("Akses terbatas","Histori lama tidak dapat diedit oleh Teknisi.","warning");maintenanceSubmitInProgress=true;const submitBtn=$("saveMntBtn");if(submitBtn){submitBtn.disabled=true;submitBtn.dataset.originalText=submitBtn.textContent;submitBtn.textContent="⏳ Menyimpan...";submitBtn.setAttribute("aria-busy","true")}const reset=$("mReset").value==="true",interval=Math.max(maintenanceMinInterval(),Math.min(12,+$("mInterval").value||3)),sp=spareData(),svc=isAdmin()?+$('mService').value||0:0,spc=isAdmin()?sp.reduce((a,x)=>a+x.qty*x.price,0):0,oth=isAdmin()?+$('mOther').value||0:0,total=svc+spc+oth,existing=id?S.maintenance.find(x=>x.id===id):null;const safeSpareParts=sp.map(x=>isAdmin()?{name:x.name,qty:x.qty,price:x.price}:{name:x.name,qty:x.qty});const data={maintenanceNumber:existing?.maintenanceNumber||nextMaintenanceNumber(),acId:ac,date:d,type:t,resetsRoutineSchedule:reset,intervalMonths:reset?interval:null,nextRoutineMaintenanceDate:reset?addM(d,interval):null,vendorId:$('mVendor').value||"",technicianName:isTechnician()?profileName():$('mTech').value.trim(),complaint:$('mComplaint').value.trim(),inspectionResult:$('mResult').value,action:$('mAction').value.trim(),notes:$('mNotes').value.trim(),checklist:collectMaintenanceChecklist(),checklistNotes:$('mChecklistNotes').value.trim(),measurements:collectMaintenanceMeasurements(),serviceCost:svc,sparePartCost:spc,otherCost:oth,totalCost:total,spareParts:safeSpareParts,photosBefore:existing?.photosBefore||[],photosAfter:existing?.photosAfter||[],attachments:existing?.attachments||[],status:existing?.status||"active"};try{loading(true,id?"Menyimpan perubahan maintenance...":"Menyimpan maintenance...");let maintenanceId=id;const u=unit(ac);if(id){await save("maintenance",id,data);await syncPublicMaintenance({...data,id:maintenanceId})}else if(isTechnician()){maintenanceId="MNT-"+Date.now().toString().slice(-7);const safe=publicMaintenanceData({...data,spareParts:safeSpareParts},maintenanceId);if(demo){S.maintenance.push({id:maintenanceId,...safe});if(reset&&u)Object.assign(u,{lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval})}else{const batch=writeBatch(db);batch.set(doc(db,"maintenance",maintenanceId),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"",updatedBy:user?.uid||""});batch.set(doc(db,"maintenance_public",maintenanceId),safe);if(reset&&u){const ud={lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval};batch.update(doc(db,"ac_units",u.id),{...ud,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});batch.update(doc(db,"ac_units_public",u.id),ud)}await batch.commit()}}else{maintenanceId=demo?"MNT-"+Date.now():await add("maintenance",data,"MNT");if(demo)S.maintenance.push({id:maintenanceId,...data});else await syncPublicMaintenance({...data,id:maintenanceId});if(reset&&u&&!demo){await updateDoc(doc(db,"ac_units",u.id),{lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});await syncPublicUnit({...u,lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval})}else if(reset&&u&&demo)Object.assign(u,{lastRoutineMaintenanceDate:d,nextRoutineMaintenanceDate:addM(d,interval),maintenanceIntervalMonths:interval})}let uploaded=[],failedUploads=[];const hasFiles=(($('mPhotosBefore')?.files?.length)||0)+(($('mPhotosAfter')?.files?.length)||0)+(($('mFiles')?.files?.length)||0);if(hasFiles&&!demo){loading(true,"Mengunggah foto/lampiran...");try{const uploadResult=await uploadMaintenanceFiles(maintenanceId);uploaded=uploadResult.uploaded||[];failedUploads=uploadResult.failed||[];if(failedUploads.length)toast("Sebagian file gagal",`${failedUploads.length} file tidak berhasil diunggah. Data maintenance tetap tersimpan.` ,"warning")}catch(fileErr){console.error("Maintenance file upload error:",fileErr);toast("Maintenance tersimpan",fileErr.message||"Ada file yang gagal diunggah.","warning")}}if(uploaded.length){const before=[...(data.photosBefore||[])],after=[...(data.photosAfter||[])],extra=[...(data.attachments||[])];uploaded.forEach(x=>{if(x.category==="before")before.push(x);else if(x.category==="after")after.push(x);else extra.push(x)});const evidence={photosBefore:before,photosAfter:after,attachments:extra};if(demo){const target=S.maintenance.find(x=>x.id===maintenanceId);if(target)Object.assign(target,evidence)}else if(isTechnician()){const batch=writeBatch(db);batch.update(doc(db,"maintenance",maintenanceId),{...evidence,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});batch.update(doc(db,"maintenance_public",maintenanceId),{...evidence,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});await batch.commit()}else{await updateDoc(doc(db,"maintenance",maintenanceId),{...evidence,updatedAt:serverTimestamp()});await syncPublicMaintenance({...data,...evidence,id:maintenanceId},maintenanceId)}}toast("Berhasil","Maintenance berhasil disimpan.","success");resetM();renderAll();nav("history")}catch(err){console.error("Maintenance save error:",err);toast("Gagal","Maintenance gagal disimpan.","error")}finally{maintenanceSubmitInProgress=false;const b=$("saveMntBtn");if(b){b.disabled=false;b.textContent=b.dataset.originalText||"💾 Simpan Maintenance";b.removeAttribute("aria-busy");delete b.dataset.originalText}loading(false)}}
 
 // Bind form actions explicitly so the Maintenance form cannot fall back to a normal page submit.
 const mntFormEl=$("mntForm");
@@ -2353,11 +2326,8 @@ if(resetMntEl)resetMntEl.onclick=()=>{
 
 function historyRows(){const q=(($('hSearch')?.value)||"").toLowerCase(),a=$('hStart')?.value||"",b=$('hEnd')?.value||"",ac=$('hAc')?.value||"",t=$('hType')?.value||"";
 return S.maintenance.filter(m=>m.status!=="void").filter(m=>{const u=unit(m.acId),hay=[m.maintenanceNumber,m.technicianName,ven(m.vendorId),u?.code,u?.brand,shortLoc(u?.locationId)].join(" ").toLowerCase();
-return(!q||hay.includes(q))&&(!a||m.date>=a)&&(!b||m.date<=b)&&(!ac||m.acId===ac)&&(!t||m.type===t)}).sort((a,b)=>String(b.date).localeCompare(String(a.date)))}function renderHistory(){filters();
-const rows=historyRows();
-$('hBody').innerHTML=rows.length?rows.map((m,i)=>{const u=unit(m.acId);
-return`<tr><td>${i+1}</td><td>${date(m.date)}</td><td><b>${esc(u?.code||m.acId)}</b></td><td>${esc(shortLoc(u?.locationId))}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td><td>${cur(m.totalCost)}</td><td><button class="btn" data-md="${m.id}">Detail</button> <button class="btn" data-me="${m.id}">Edit</button> <button class="btn danger" data-mv="${m.id}">Void</button></td></tr>`}).join(""):`<tr><td colspan="9"><div class="empty">Belum ada histori.</div></td></tr>`}
-function printHistory(){
+return(!q||hay.includes(q))&&(!a||m.date>=a)&&(!b||m.date<=b)&&(!ac||m.acId===ac)&&(!t||m.type===t)}).sort((a,b)=>String(b.date).localeCompare(String(a.date)))}function renderHistory(){filters();const rows=historyRows();const tech=isTechnician();$('hBody').innerHTML=rows.length?rows.map((m,i)=>{const u=unit(m.acId);const actions=tech?`<button class="btn" data-md="${m.id}">Detail</button>`:`<button class="btn" data-md="${m.id}">Detail</button> <button class="btn" data-me="${m.id}">Edit</button> <button class="btn danger" data-mv="${m.id}">Void</button>`;return`<tr><td>${i+1}</td><td>${date(m.date)}</td><td><b>${esc(u?.code||m.acId)}</b></td><td>${esc(shortLoc(u?.locationId))}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${tech?"":`<td>${cur(m.totalCost)}</td>`}<td>${actions}</td></tr>`}).join(""):`<tr><td colspan="${tech?8:9}"><div class="empty">Belum ada histori.</div></td></tr>`}
+function printHistory(){if(!requireAdmin())return;
 const rows=historyRows();
 if(!rows.length){toast("Tidak ada data","Tidak ada histori maintenance untuk dicetak dengan filter saat ini.","warning");return}
 renderHistory();
@@ -2378,7 +2348,7 @@ print("p-history");
 }
 function reportRows(){const a=$('rStart').value,b=$('rEnd').value,l=$('rLoc').value,ac=$('rAc').value,t=$('rType').value;
 return S.maintenance.filter(m=>m.status!=="void").filter(m=>{const u=unit(m.acId);
-return(!a||m.date>=a)&&(!b||m.date<=b)&&(!l||u?.locationId===l)&&(!ac||m.acId===ac)&&(!t||m.type===t)}).sort((a,b)=>a.date.localeCompare(b.date))}function renderReport(){if(!$('rStart').value)$('rStart').value=`${month()}-01`;
+return(!a||m.date>=a)&&(!b||m.date<=b)&&(!l||u?.locationId===l)&&(!ac||m.acId===ac)&&(!t||m.type===t)}).sort((a,b)=>a.date.localeCompare(b.date))}function renderReport(){if(!requireAdmin())return;if(!$('rStart').value)$('rStart').value=`${month()}-01`;
 if(!$('rEnd').value)$('rEnd').value=today();
 filters();
 const rows=reportRows(),cost=rows.reduce((a,x)=>a+ +x.totalCost||0,0);
@@ -2390,12 +2360,12 @@ $('rBody').innerHTML=rows.length?rows.map((m,i)=>{const u=unit(m.acId);
 return`<tr><td>${i+1}</td><td>${date(m.date)}</td><td>${esc(u?.code||m.acId)}</td><td>${esc(shortLoc(u?.locationId))}</td><td>${esc(typeName(m.type))}</td><td>${esc(ven(m.vendorId))}</td><td>${esc(m.technicianName||"-")}</td><td>${esc(resultName(m.inspectionResult))}</td><td>${cur(m.totalCost)}</td></tr>`}).join(""):`<tr><td colspan="9"><div class="empty">Tidak ada data pada periode ini.</div></td></tr>`;
 $('printCompany').textContent=S.settings.system.companyName||"NAMA PERUSAHAAN";
 $('printPeriod').textContent=`Periode ${date($('rStart').value)} – ${date($('rEnd').value)}`}function assetRows(){const l=$('aLoc').value,b=$('aBrand').value,p=$('aPk').value,s=$('aStatus').value,y=$('aYear').value;
-return S.units.filter(x=>(!l||x.locationId===l)&&(!b||x.brand===b)&&(!p||String(x.capacityPk)===p)&&(!s||x.status===s)&&(!y||String(x.purchaseDate||'').slice(0,4)===String(y)))}function renderAssets(){filters();
+return S.units.filter(x=>(!l||x.locationId===l)&&(!b||x.brand===b)&&(!p||String(x.capacityPk)===p)&&(!s||x.status===s)&&(!y||String(x.purchaseDate||'').slice(0,4)===String(y)))}function renderAssets(){if(!requireAdmin())return;filters();
 const rows=assetRows();
 $('aBody').innerHTML=rows.length?rows.map(x=>`<tr><td>${esc(x.code)}</td><td>${esc(x.brand)} ${esc(x.model||"")}</td><td>${esc(x.capacityPk)} PK</td><td>${esc(shortLoc(x.locationId))}</td><td>${date(x.purchaseDate)}</td><td>${cur(x.purchasePrice)}</td><td>${stBadge(x.status)}</td></tr>`).join(""):`<tr><td colspan="7"><div class="empty">Tidak ada aset.</div></td></tr>`}function costRows(){const a=$('cStart').value,b=$('cEnd').value,l=$('cLoc').value,ac=$('cAc').value;
 return S.maintenance.filter(m=>m.status!=="void").filter(m=>{const u=unit(m.acId);
 return(!a||m.date>=a)&&(!b||m.date<=b)&&(!l||u?.locationId===l)&&(!ac||m.acId===ac)})}
-function renderCost(){if(!$('cStart').value)$('cStart').value=`${month()}-01`;
+function renderCost(){if(!requireAdmin())return;if(!$('cStart').value)$('cStart').value=`${month()}-01`;
 if(!$('cEnd').value)$('cEnd').value=today();
 filters();
 const rows=costRows(),j=rows.reduce((a,x)=>a+(+x.serviceCost||0),0),s=rows.reduce((a,x)=>a+(+x.sparePartCost||0),0),o=rows.reduce((a,x)=>a+(+x.otherCost||0),0);
@@ -2411,7 +2381,7 @@ const map={};
 rows.forEach(x=>{map[x.type]??={n:0,c:0};map[x.type].n++;map[x.type].c+=+x.totalCost||0});
 $('cBody').innerHTML=Object.entries(map).sort((a,b)=>b[1].c-a[1].c).map(([k,v])=>`<tr><td>${esc(typeName(k))}</td><td>${v.n}</td><td>${cur(v.c)}</td></tr>`).join('')||`<tr><td colspan="3"><div class="empty">Tidak ada data biaya.</div></td></tr>`}
 function renderMntSettings(){const s=S.settings.maintenance;
-$('setInterval').value=String(Math.max(3,s.defaultIntervalMonths||3));
+$('setInterval').value=String(Math.max(maintenanceMinInterval(),Math.min(12,Number(s.defaultIntervalMonths)||3)));
 $('setR1').value=s.reminderDaysFirst||30;
 $('setR2').value=s.reminderDaysSecond||7;
 $('setDue').value=String(s.reminderOnDueDate!==false);
@@ -2470,7 +2440,8 @@ function renderMcbPage(){
   const locId=ml?.value||''; const oldUnit=mu?.value||''; if(mu)opts('mapUnit',S.units.filter(x=>(!locId||x.locationId===locId)&&x.status!=='disposed'),'Pilih Unit AC',x=>({v:x.id,t:`${x.code} — ${x.brand}`})); if(mu&&oldUnit&&[...mu.options].some(o=>o.value===oldUnit))mu.value=oldUnit;
   const oldMcb=mm?.value||''; const filteredMcbs=S.mcbs.filter(x=>(!locId||x.locationId===locId)&&x.status!=='inactive'); if(mm)opts('mapMcb',filteredMcbs,'Pilih MCB',x=>({v:x.id,t:`${x.code} — ${x.panelName||'Panel'} / ${x.number||'-'}`})); const linkedForUnit=mu?.value?unit(mu.value)?.mcbId:''; if(linkedForUnit&&mm&&[...mm.options].some(o=>o.value===linkedForUnit))mm.value=linkedForUnit; else if(mm&&oldMcb&&[...mm.options].some(o=>o.value===oldMcb))mm.value=oldMcb;
   const rows=mcbRows();
-  if($('mcbBody'))$('mcbBody').innerHTML=rows.length?rows.map(x=>{const linked=mcbLinkedUnits(x.id);return`<tr><td><b>${esc(x.code)}</b></td><td>${esc(x.panelName||'-')}</td><td>${esc(x.number||'-')}</td><td>${x.ratingA?esc(x.ratingA)+' A':'-'} ${x.pole?`<small>${esc(x.pole)}</small>`:''}</td><td>${esc(loc(x.locationId))}<br><small>${esc(x.point||'-')}</small></td><td><div class="mcb-link-list">${linked.length?linked.map(v=>`<span class="badge info">${esc(v.code)}</span>`).join(''):'<span class="badge neutral">Belum terhubung</span>'}</div></td><td>${mcbStatusBadge(x.status)}</td><td><button class="btn" data-mcb-edit="${esc(x.id)}">Edit</button> <button class="btn" data-mcb-navigate="${esc(x.id)}">🧭 Peta</button></td></tr>`}).join(''):`<tr><td colspan="8"><div class="empty">Belum ada data MCB.</div></td></tr>`;
+  const tech=isTechnician();
+  if($('mcbBody'))$('mcbBody').innerHTML=rows.length?rows.map(x=>{const linked=mcbLinkedUnits(x.id);return`<tr><td><b>${esc(x.code)}</b></td><td>${esc(x.panelName||'-')}</td><td>${esc(x.number||'-')}</td><td>${x.ratingA?esc(x.ratingA)+' A':'-'} ${x.pole?`<small>${esc(x.pole)}</small>`:''}</td><td>${esc(loc(x.locationId))}<br><small>${esc(x.point||'-')}</small></td><td><div class="mcb-link-list">${linked.length?linked.map(v=>`<span class="badge info">${esc(v.code)}</span>`).join(''):'<span class="badge neutral">Belum terhubung</span>'}</div></td><td>${mcbStatusBadge(x.status)}</td><td>${tech?"":`<button class="btn" data-mcb-edit="${esc(x.id)}">Edit</button> `}<button class="btn" data-mcb-navigate="${esc(x.id)}">🧭 Peta</button></td></tr>`}).join(''):`<tr><td colspan="8"><div class="empty">Belum ada data MCB.</div></td></tr>`;
   drawMcbMap();
 }
 const MCB_ROUTE_TYPES={
@@ -2499,17 +2470,17 @@ function renderMcbRouteEditor(steps=[]){const root=$("mcbRouteSteps");if(!root)r
 function collectMcbRouteSteps(){return[...document.querySelectorAll("#mcbRouteSteps [data-route-row]")].map((row,i)=>({order:i+1,type:row.querySelector(".rs-type")?.value||"straight",text:row.querySelector(".rs-instruction")?.value.trim()||"",floor:row.querySelector(".rs-floor")?.value.trim()||"",distanceM:Number(row.querySelector(".rs-distance")?.value)||0,x:clampMapX(row.querySelector(".rs-x")?.value,50),y:clampMapY(row.querySelector(".rs-y")?.value,50)})).filter(x=>x.text)}
 function addMcbRouteStep(prefill={type:"straight",text:"",floor:"",distanceM:0,x:50,y:50}){const current=collectMcbRouteSteps();renderMcbRouteEditor([...current,prefill]);const rows=document.querySelectorAll("#mcbRouteSteps [data-route-row]");rows[rows.length-1]?.querySelector(".rs-instruction")?.focus()}
 function routeStepsHtml(steps){const rows=normalizeRouteSteps(steps);if(!rows.length)return`<div class="empty">Belum ada petunjuk rute. Admin dapat mengisinya melalui Edit MCB.</div>`;return`<div>${rows.map((x,i)=>{const floor=x.floor?` • ${esc(x.floor)}`:"";return`<div class="mcb-route-step"><div class="mcb-route-num">${i+1}</div><div><b>${MCB_ROUTE_ICONS[x.type]||"•"} ${esc(MCB_ROUTE_TYPES[x.type]||"Petunjuk")}${floor}</b><small>${esc(x.text)}${x.distanceM?` • ${x.distanceM} m`:""}</small></div></div>`}).join("")}</div>`}
-function mcbModal(id=null){
+function mcbModal(id=null){if(!requireAdmin("Master MCB hanya dapat diubah Admin."))return;
   const x=id?mcb(id):null;
   const locations=S.locations.filter(v=>v.active!==false).map(v=>`<option value="${esc(v.id)}" ${x?.locationId===v.id?'selected':''}>${esc(loc(v.id))}</option>`).join('');
   const linkedIds=new Set(x?mcbLinkedUnits(x.id).map(v=>v.id):[]);
   const unitOptions=S.units.filter(v=>v.status!=='disposed').map(v=>`<option value="${esc(v.id)}" ${linkedIds.has(v.id)?'selected':''}>${esc(v.code)} — ${esc(v.brand||'')} ${esc(v.model||'')}</option>`).join('');
   const existingRoute=normalizeRouteSteps(x?.routeSteps||[]);
-  modal(x?'Edit MCB':'Tambah MCB',`<form id="mcbForm"><div class="formgrid"><div class="field"><label>Kode MCB *</label><input id="mCode" required value="${esc(x?.code||('MCB-'+String(S.mcbs.length+1).padStart(3,'0')))}" ${x?'readonly':''}></div><div class="field"><label>Panel *</label><input id="mPanel" required value="${esc(x?.panelName||'')}"></div><div class="field"><label>Nomor MCB *</label><input id="mNumber" required value="${esc(x?.number||'')}"></div><div class="field"><label>Rating (A)</label><input id="mRating" type="number" min="0" step="1" value="${esc(x?.ratingA||16)}"></div><div class="field"><label>Pole</label><select id="mPole"><option value="1P">1P</option><option value="2P">2P</option><option value="3P">3P</option><option value="4P">4P</option></select></div><div class="field"><label>Lokasi</label><select id="mLoc"><option value="">Pilih lokasi</option>${locations}</select></div><div class="field full"><label>Titik / Posisi Fisik</label><input id="mPoint" value="${esc(x?.point||'')}" placeholder="Contoh: Electrical Room Lt. 2, panel baris 2 kolom 3"></div><div class="field"><label>Sirkuit</label><input id="mCircuit" value="${esc(x?.circuit||'')}" placeholder="Contoh: AC-001"></div><div class="field"><label>Status</label><select id="mStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field full"><label>Unit AC Terhubung</label><select id="mUnits" multiple size="5">${unitOptions}</select><small style="display:block;color:var(--muted);margin-top:5px">Satu MCB dapat dihubungkan ke beberapa Unit AC.</small></div><div class="field"><label>Posisi MCB pada peta X (%)</label><input id="mMapX" type="number" min="5" max="95" step="0.1" value="${esc(x?.mapX??80)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div><div class="field"><label>Posisi MCB pada peta Y (%)</label><input id="mMapY" type="number" min="8" max="92" step="0.1" value="${esc(x?.mapY??30)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div></div><div class="section"><h3>Rute Bertitik + Petunjuk Langkah</h3><div class="mcb-route-routehint">Rute disimpan sebagai urutan langkah. Anda dapat memasukkan <b>belok kanan/kiri, koridor, ruangan, tangga naik/turun, lift, pintu</b>, sampai tujuan MCB. Koordinat X/Y dipakai hanya untuk menggambar rute pada peta skematik.</div><div id="mcbRouteSteps" style="margin-top:10px"></div><div class="mcb-route-toolbar"><small>Setiap langkah sebaiknya memiliki petunjuk yang jelas. Jarak bersifat opsional.</small><button type="button" class="btn" id="addMcbRouteStep">＋ Tambah Langkah</button></div></div><div class="section"><h3>Catatan</h3><textarea id="mNotes">${esc(x?.notes||'')}</textarea></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan MCB</button></div></form>`);
+  modal(x?'Edit MCB':'Tambah MCB',`<form id="mcbForm"><div class="formgrid"><div class="field"><label>Kode MCB *</label><input id="mCode" required value="${esc(x?.code||('MCB-'+String(S.mcbs.length+1).padStart(3,'0')))}" ${x?'readonly':''}></div><div class="field"><label>Panel *</label><input id="mPanel" required value="${esc(x?.panelName||'')}"></div><div class="field"><label>Nomor MCB *</label><input id="mNumber" required value="${esc(x?.number||'')}"></div><div class="field"><label>Rating (A)</label><input id="mRating" type="number" min="0" step="1" value="${esc(x?.ratingA||16)}"></div><div class="field"><label>Pole</label><select id="mPole"><option value="1P">1P</option><option value="2P">2P</option><option value="3P">3P</option><option value="4P">4P</option></select></div><div class="field"><label>Lokasi</label><select id="mLoc"><option value="">Pilih lokasi</option>${locations}</select></div><div class="field full"><label>Titik / Posisi Fisik</label><input id="mPoint" value="${esc(x?.point||'')}" placeholder="Contoh: Electrical Room Lt. 2, panel baris 2 kolom 3"></div><div class="field"><label>Sirkuit</label><input id="mCircuit" value="${esc(x?.circuit||'')}" placeholder="Contoh: AC-001"></div><div class="field"><label>Status</label><select id="mStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field full"><label>Unit AC Terhubung</label><select id="mUnits" multiple size="5">${unitOptions}</select><small style="display:block;color:var(--muted);margin-top:5px">Satu MCB dapat dihubungkan ke beberapa Unit AC.</small></div><div class="field"><label>Posisi MCB pada peta X (%)</label><input id="mMapX" type="number" min="5" max="95" step="0.1" value="${esc(x?.mapX??80)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div><div class="field"><label>Posisi MCB pada peta Y (%)</label><input id="mMapY" type="number" min="8" max="92" step="0.1" value="${esc(x?.mapY??30)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div></div><div class="section"><h3>Rute Bertitik + Petunjuk Langkah</h3><div class="mcb-route-routehint">Rute disimpan sebagai urutan langkah. Anda dapat memasukkan <b>belok kanan/kiri, koridor, ruangan, tangga naik/turun, lift, pintu</b>, sampai tujuan MCB. Koordinat X/Y dipakai hanya untuk menggambar rute pada peta skematik.</div><div id="mcbRouteSteps" style="margin-top:10px"></div><div class="mcb-route-toolbar"><small>Setiap langkah sebaiknya memiliki petunjuk yang jelas. Jarak bersifat opsional.</small><button type="button" class="btn" id="addMcbRouteStep">＋ Tambah Langkah</button></div></div><div class="section"><h3>Catatan</h3><textarea id="mcbNotes">${esc(x?.notes||'')}</textarea></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan MCB</button></div></form>`);
   if(x){$('mPole').value=x.pole||'1P';$('mStatus').value=x.status||'active'}
   renderMcbRouteEditor(existingRoute);
   $('addMcbRouteStep').onclick=()=>addMcbRouteStep();
-  $('mcbForm').onsubmit=async e=>{e.preventDefault();const code=$('mCode').value.trim().toUpperCase(),panel=$('mPanel').value.trim(),number=$('mNumber').value.trim(),locationId=$('mLoc').value;if(!code||!panel||!number||!locationId)return toast('Validasi','Kode, Panel, Nomor MCB, dan Lokasi wajib diisi.','warning');if(!x&&S.mcbs.some(v=>String(v.code).toUpperCase()===code))return toast('Duplikat','Kode MCB sudah digunakan.','error');const selected=[...$('mUnits').selectedOptions].map(o=>o.value);const mapX=clampMapX($('mMapX').value,80),mapY=clampMapY($('mMapY').value,30),routeSteps=collectMcbRouteSteps();const data={code,panelName:panel,number,ratingA:Number($('mRating').value)||0,pole:$('mPole').value,locationId,point:$('mPoint').value.trim(),circuit:$('mCircuit').value.trim(),status:$('mStatus').value,mapX,mapY,routeSteps,notes:$('mNotes').value.trim()};try{loading(true);const targetId=x?.id||code;if(demo){if(x)Object.assign(x,data);else S.mcbs.push({id:targetId,...data});S.units.forEach(v=>{if(selected.includes(v.id))v.mcbId=targetId;else if(v.mcbId===targetId)v.mcbId=''});}else{if(x)await save('mcbs',x.id,data);else await setDoc(doc(db,'mcbs',targetId),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||'admin'});const affected=S.units.filter(v=>selected.includes(v.id)||v.mcbId===targetId);for(const v of affected)await updateDoc(doc(db,'ac_units',v.id),{mcbId:selected.includes(v.id)?targetId:'',updatedAt:serverTimestamp()})}closeModal(true);renderAll();toast('Berhasil','Data MCB dan rute navigasi disimpan.','success')}catch(err){console.error('MCB save error:',err);toast('Gagal','Data MCB gagal disimpan.','error')}finally{loading(false)}};
+  $('mcbForm').onsubmit=async e=>{e.preventDefault();const code=$('mCode').value.trim().toUpperCase(),panel=$('mPanel').value.trim(),number=$('mNumber').value.trim(),locationId=$('mLoc').value;if(!code||!panel||!number||!locationId)return toast('Validasi','Kode, Panel, Nomor MCB, dan Lokasi wajib diisi.','warning');if(!x&&S.mcbs.some(v=>String(v.code).toUpperCase()===code))return toast('Duplikat','Kode MCB sudah digunakan.','error');const selected=[...$('mUnits').selectedOptions].map(o=>o.value);const mapX=clampMapX($('mMapX').value,80),mapY=clampMapY($('mMapY').value,30),routeSteps=collectMcbRouteSteps();const data={code,panelName:panel,number,ratingA:Number($('mRating').value)||0,pole:$('mPole').value,locationId,point:$('mPoint').value.trim(),circuit:$('mCircuit').value.trim(),status:$('mStatus').value,mapX,mapY,routeSteps,notes:$('mcbNotes').value.trim()};try{loading(true);const targetId=x?.id||code;if(demo){if(x)Object.assign(x,data);else S.mcbs.push({id:targetId,...data});S.units.forEach(v=>{if(selected.includes(v.id))v.mcbId=targetId;else if(v.mcbId===targetId)v.mcbId=''});}else{if(x)await save('mcbs',x.id,data);else await setDoc(doc(db,'mcbs',targetId),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||'admin'});const affected=S.units.filter(v=>selected.includes(v.id)||v.mcbId===targetId);for(const v of affected){const mcbValue=selected.includes(v.id)?targetId:'';await updateDoc(doc(db,'ac_units',v.id),{mcbId:mcbValue,updatedAt:serverTimestamp()});await syncPublicUnit({...v,mcbId:mcbValue})}}closeModal(true);renderAll();toast('Berhasil','Data MCB dan rute navigasi disimpan.','success')}catch(err){console.error('MCB save error:',err);toast('Gagal','Data MCB gagal disimpan.','error')}finally{loading(false)}};
 }
 function getMcbTarget(m){return{x:(clampMapX(m?.mapX,80))*10,y:(clampMapY(m?.mapY,30))*6}}
 function getRoutePolyline(you,target,steps=[]){const pts=[];if(you)pts.push({x:you.x,y:you.y});normalizeRouteSteps(steps).forEach(s=>pts.push({x:s.x*10,y:s.y*6}));if(target)pts.push(target);if(pts.length<2)return'';let d=`M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;for(let i=1;i<pts.length;i++)d+=` L ${pts[i].x.toFixed(1)} ${pts[i].y.toFixed(1)}`;return d}
@@ -2519,9 +2490,11 @@ function routePath(a,b){return getRoutePolyline(a,b,[])}
 const mapState={you:null};
 function syncMapControls(){const unitId=$('mapUnit')?.value||'',mm=$('mapMcb');if(!mm)return;const linked=unitId?unit(unitId)?.mcbId:'';if(linked&&mcb(linked))mm.value=linked;drawMcbMap()}
 
-function renderAll(){filters();
-renderPage(S.page);
-notifications()}
+function renderUsers(){if(!requireAdmin())return;const rows=S.users.filter(x=>x.role==="technician"||x.role==="admin").sort((a,b)=>String(a.name||a.displayName||a.email||"").localeCompare(String(b.name||b.displayName||b.email||"")));const body=$("usersBody");if(!body)return;const html=rows.map(x=>{const name=x.displayName||x.name||x.email||"-";const role=x.role==="technician"?"Teknisi":"Admin";const active=x.active!==false;const status=active?'<span class="badge ok">Aktif</span>':'<span class="badge neutral">Nonaktif</span>';const roleBadge=`<span class="badge ${x.role==="admin"?"info":"neutral"}">${role}</span>`;const action=x.role==="technician"?`<button class="btn ${active?"danger":"success"}" data-user-toggle="${esc(x.id)}">${active?"Nonaktifkan":"Aktifkan"}</button>`:'<span class="badge info">Akun Utama</span>';return`<tr><td><b>${esc(name)}</b></td><td>${esc(x.email||"-")}</td><td>${roleBadge}</td><td>${status}</td><td>${action}</td></tr>`}).join("");body.innerHTML=html||'<tr><td colspan="5"><div class="empty">Belum ada pengguna.</div></td></tr>'}
+function userModal(){if(!requireAdmin())return;modal("Tambah Teknisi",`<form id="userForm"><div class="formgrid"><div class="field full"><label>Nama Teknisi *</label><input id="usrName" required placeholder="Contoh: Andi"></div><div class="field full"><label>Email *</label><input id="usrEmail" type="email" required placeholder="teknisi@perusahaan.com"></div><div class="field"><label>Password *</label><input id="usrPassword" type="password" minlength="8" required placeholder="Minimal 8 karakter"></div><div class="field"><label>Konfirmasi Password *</label><input id="usrPassword2" type="password" minlength="8" required placeholder="Ulangi password"></div></div><div class="alert"><span class="badge info">Akses</span><b style="margin-left:6px">Teknisi tidak memiliki akses biaya, pengaturan, atau master data.</b><small>Gunakan satu akun untuk satu teknisi dan jangan berbagi password.</small></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">👨‍🔧 Buat Akun Teknisi</button></div></form>`);$("userForm").onsubmit=async e=>{e.preventDefault();const name=$("usrName").value.trim(),email=$("usrEmail").value.trim().toLowerCase(),p1=$("usrPassword").value,p2=$("usrPassword2").value;if(!name||!email||!p1)return toast("Validasi","Nama, email, dan password wajib diisi.","warning");if(p1.length<8)return toast("Validasi","Password minimal 8 karakter.","warning");if(p1!==p2)return toast("Validasi","Konfirmasi password tidak sama.","warning");try{loading(true,"Membuat akun teknisi...");if(!secondaryAuth)throw new Error("Layanan pembuatan akun belum siap.");const cred=await createUserWithEmailAndPassword(secondaryAuth,email,p1);await setDoc(doc(db,"users",cred.user.uid),{name,displayName:name,email,role:"technician",active:true,createdAt:serverTimestamp(),createdBy:user?.uid||""});await signOut(secondaryAuth);closeModal(true);toast("Berhasil","Akun Teknisi berhasil dibuat.","success");renderUsers()}catch(err){console.error("Create technician error:",err);const msg=err?.code==="auth/email-already-in-use"?"Email sudah digunakan oleh akun Firebase.":err?.message||"Akun Teknisi gagal dibuat.";toast("Gagal",msg,"error")}finally{loading(false)}}}
+async function toggleTechnicianUser(id){if(!requireAdmin())return;const u=S.users.find(x=>x.id===id);if(!u||u.role!=="technician")return;const next=u.active===false;if(!confirm(`${next?"Aktifkan":"Nonaktifkan"} akun ${u.displayName||u.name||u.email||id}?`))return;try{loading(true,"Memperbarui akun...");await updateDoc(doc(db,"users",id),{active:next,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});toast("Berhasil",`Akun Teknisi ${next?"diaktifkan":"dinonaktifkan"}.`,"success")}catch(err){console.error("Toggle technician error:",err);toast("Gagal","Status akun Teknisi gagal diubah.","error")}finally{loading(false)}}
+
+function renderAll(){filters();if(isTechnician()&&["dashboard","report","assetsreport","costreport","mntsettings","systemsettings","users","locations","vendors"].includes(S.page)){S.page="techdashboard"}renderPage(S.page);notifications()}
 let scanCamera=null;let scanResultLock=false;
 function setScanStatus(msg,kind="info"){const x=$("scanStatus");if(x){x.textContent=msg;x.className=`note ${kind}`}}
 function setScanCameraButtonState(){const b=$("scanCameraToggle");if(!b)return;const active=!!scanCamera&&!!scanCamera.isScanning;b.textContent=active?"⏹ Hentikan Kamera":"▶ Mulai Kamera";b.classList.toggle("primary",!active)}
@@ -2532,16 +2505,7 @@ function mcbInfoHtml(u){
   const steps=normalizeRouteSteps(mx.routeSteps||[]);
   return `<div class="summary"><div class="sum"><small>MCB</small><b>${esc(mx.code)}</b></div><div class="sum"><small>Panel</small><b>${esc(mx.panelName||"-")}</b></div><div class="sum"><small>Nomor</small><b>${esc(mx.number||"-")}</b></div><div class="sum"><small>Rating</small><b>${esc(mx.ratingA||0)} A ${esc(mx.pole||"")}</b></div><div class="sum"><small>Titik</small><b>${esc(mx.point||"-")}</b></div><div class="sum"><small>Rute</small><b>${steps.length?`${steps.length} langkah`:'Belum dibuat'}</b></div></div><div class="ma"><button type="button" class="btn primary" data-mcb-navigate="${esc(mx.id)}">🧭 Arah ke MCB</button></div>`;
 }
-function showScannedUnit(raw){
-  const value=String(raw||"").trim().toUpperCase(),box=$("scanResult");
-  if(!box)return;
-  if(!value){box.innerHTML=`<div class="empty">ID Unit AC belum diisi.</div>`;setScanStatus("Masukkan ID Unit AC atau lakukan scan.","info");return}
-  const u=unit(value);
-  if(!u){box.innerHTML=`<div class="empty">Unit <b>${esc(value)}</b> tidak ditemukan di database.</div>`;setScanStatus("Barcode terbaca, tetapi Unit AC tidak ditemukan.","warning");return}
-  setScanStatus(`Unit ${u.code} ditemukan.` ,"success");
-  const ms=S.maintenance.filter(x=>x.acId===u.id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),last=ms[0],total=ms.reduce((a,x)=>a+(+x.totalCost||0),0);
-  box.innerHTML=`<div class="summary"><div class="sum"><small>ID Unit</small><b>${esc(u.code)}</b></div><div class="sum"><small>Status</small><b>${stBadge(u.status)}</b></div><div class="sum"><small>Merk / Model</small><b>${esc(u.brand)} ${esc(u.model||"")}</b></div><div class="sum"><small>Jenis</small><b>${esc(u.type||"-")}</b></div><div class="sum"><small>Kapasitas</small><b>${esc(u.capacityPk)} PK</b></div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div><div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Maintenance Terakhir</small><b>${last?date(last.date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)} ${ssBadge(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div><div class="sum"><small>Total Biaya</small><b>${cur(total)}</b></div></div><div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Detail Pembelian & Kondisi</h3><div class="formgrid scan-detail-grid"><div><small>Harga Pembelian</small><b>${cur(u.purchasePrice)}</b></div><div><small>Invoice / PO</small><b>${esc(u.invoiceNumber||"-")}</b></div><div><small>Instalasi</small><b>${date(u.installationDate)}</b></div><div><small>Garansi</small><b>${date(u.warrantyUntil)}</b></div><div style="grid-column:1/-1"><small>Catatan</small><div>${esc(u.notes||"-")}</div></div></div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th><th>Biaya</th></tr></thead><tbody>${ms.length?ms.slice(0,10).map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td><td>${cur(m.totalCost)}</td></tr>`).join(""):`<tr><td colspan="5">Belum ada histori maintenance.</td></tr>`}</tbody></table></div></div><div class="ma"><button type="button" class="btn primary" data-scan-maint="${esc(u.id)}">＋ Input Maintenance</button><button type="button" class="btn" data-scan-detail="${esc(u.id)}">Detail Unit</button></div>`;
-}
+function showScannedUnit(raw){const value=String(raw||"").trim().toUpperCase(),box=$("scanResult");if(!box)return;if(!value){box.innerHTML=`<div class="empty">ID Unit AC belum diisi.</div>`;setScanStatus("Masukkan ID Unit AC atau lakukan scan.","info");return}const u=unit(value);if(!u){box.innerHTML=`<div class="empty">Unit <b>${esc(value)}</b> tidak ditemukan di database.</div>`;setScanStatus("Barcode terbaca, tetapi Unit AC tidak ditemukan.","warning");return}setScanStatus(`Unit ${u.code} ditemukan.` ,"success");const ms=S.maintenance.filter(x=>x.acId===u.id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),last=ms[0];const tech=isTechnician();const priceBlock=tech?"":`<div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div><div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Total Biaya</small><b>${cur(ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0))}</b></div>`;const detailPurchase=tech?"":`<div class="section"><h3>Detail Pembelian & Kondisi</h3><div class="formgrid scan-detail-grid"><div><small>Harga Pembelian</small><b>${cur(u.purchasePrice)}</b></div><div><small>Invoice / PO</small><b>${esc(u.invoiceNumber||"-")}</b></div><div><small>Instalasi</small><b>${date(u.installationDate)}</b></div><div><small>Garansi</small><b>${date(u.warrantyUntil)}</b></div></div></div>`;const histCostHeader=tech?"":`<th data-admin-only>Biaya</th>`;const histCostCells=m=>tech?"":`<td>${cur(m.totalCost)}</td>`;box.innerHTML=`<div class="summary"><div class="sum"><small>ID Unit</small><b>${esc(u.code)}</b></div><div class="sum"><small>Status</small><b>${stBadge(u.status)}</b></div><div class="sum"><small>Merk / Model</small><b>${esc(u.brand)} ${esc(u.model||"")}</b></div><div class="sum"><small>Jenis</small><b>${esc(u.type||"-")}</b></div><div class="sum"><small>Kapasitas</small><b>${esc(u.capacityPk)} PK</b></div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div>${priceBlock}<div class="sum"><small>Maintenance Terakhir</small><b>${last?date(last.date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)} ${ssBadge(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div></div><div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div>${detailPurchase}<div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCostHeader}</tr></thead><tbody>${ms.length?ms.slice(0,10).map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCostCells(m)}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori maintenance.</td></tr>`}</tbody></table></div></div><div class="ma"><button type="button" class="btn primary" data-scan-maint="${esc(u.id)}">＋ Input Maintenance</button><button type="button" class="btn" data-scan-detail="${esc(u.id)}">Detail Unit</button></div>`}
 async function startScanCamera(){if(scanCamera&&scanCamera.isScanning){setScanCameraButtonState();return}if(typeof Html5Qrcode==="undefined"){setScanStatus("Modul scanner tidak tersedia. Gunakan input ID manual.","warning");setScanCameraButtonState();return}try{if(scanCamera){try{await scanCamera.clear()}catch(_){}scanCamera=null}scanCamera=new Html5Qrcode("qrReader");setScanStatus("Meminta akses kamera...","info");const cfg={fps:10,qrbox:{width:300,height:150},aspectRatio:1.777778,formatsToSupport:[Html5QrcodeSupportedFormats.CODE_128]};await scanCamera.start({facingMode:"environment"},cfg,async(decodedText)=>{if(scanResultLock)return;scanResultLock=true;const value=decodedText.trim();$("scanInput").value=value;await stopScanCamera();showScannedUnit(value);setTimeout(()=>{scanResultLock=false},1200)},()=>{});setScanStatus("Kamera aktif. Arahkan barcode ke kotak scan.","success");setScanCameraButtonState()}catch(err){console.error("Barcode camera error:",err);await stopScanCamera();setScanStatus("Kamera tidak dapat digunakan. Periksa izin kamera atau gunakan input ID manual.","warning")}}
 async function stopScanCamera(){if(!scanCamera){setScanCameraButtonState();return}try{if(scanCamera.isScanning)await scanCamera.stop()}catch(err){console.warn("Stop scanner error",err)}try{await scanCamera.clear()}catch(err){console.warn("Clear scanner error",err)}scanCamera=null;setScanCameraButtonState()}
 function barcodeModal(id=null){
@@ -2605,7 +2569,7 @@ function closeModal(force=false){
   $("modal").innerHTML="";
   return true;
 }
-function unitModal(id=null){const u=id?unit(id):null;
+function unitModal(id=null){if(!requireAdmin("Master Unit AC hanya dapat diubah Admin."))return;const u=id?unit(id):null;
 const mcbOptions=S.mcbs.filter(x=>x.status!=="inactive").sort((a,b)=>String(a.code||a.id).localeCompare(String(b.code||b.id))).map(x=>`<option value="${esc(x.id)}" ${u?.mcbId===x.id?"selected":""}>${esc(x.code)} — ${esc(x.panelName||"Panel")} / ${esc(x.number||"-")}</option>`).join("");
 modal(u?"Edit Unit AC":"Tambah Unit AC",`<form id="unitForm"><div class="formgrid"><div class="field"><label>ID Unit</label><input id="fCode" readonly value="${esc(u?.code||nextCode())}"></div><div class="field"><label>Merk *</label><input id="fBrand" required value="${esc(u?.brand||"")}"></div><div class="field"><label>Model / Type</label><input id="fModel" value="${esc(u?.model||"")}"></div><div class="field"><label>Serial Number</label><input id="fSerial" value="${esc(u?.serialNumber||"")}"></div><div class="field"><label>Jenis AC</label><select id="fType"><option>Split Wall</option><option>Cassette</option><option>Floor Standing</option><option>Duct</option><option>VRV / VRF</option><option>Lainnya</option></select></div><div class="field"><label>Kapasitas PK *</label><select id="fPk">${[.5,.75,1,1.5,2,2.5,3,5].map(x=>`<option value="${x}" ${String(u?.capacityPk||1)===String(x)?"selected":""}>${x} PK</option>`).join("")}</select></div><div class="field full"><label>Lokasi *</label><select id="fLoc"><option value="">Pilih lokasi</option>${S.locations.filter(x=>x.active!==false).map(x=>`<option value="${x.id}" ${u?.locationId===x.id?"selected":""}>${esc(loc(x.id))}</option>`).join("")}</select></div></div><div class="section"><h3>Informasi Kelistrikan</h3><div class="formgrid"><div class="field full"><label>MCB Terhubung</label><select id="fMcb"><option value="">Belum ditentukan</option>${mcbOptions}</select><small id="fMcbInfo" class="form-help">Pilih MCB untuk melihat panel, rating, dan titik fisiknya.</small></div><div class="field"><label>Posisi Peta X (%)</label><input id="fMapX" type="number" min="5" max="95" step="0.1" value="${esc(u?.mapX??30)}"><small class="form-help">Posisi relatif Unit AC pada peta.</small></div><div class="field"><label>Posisi Peta Y (%)</label><input id="fMapY" type="number" min="8" max="92" step="0.1" value="${esc(u?.mapY??55)}"><small class="form-help">Posisi relatif Unit AC pada peta.</small></div></div></div><div class="section"><h3>Data Pembelian</h3><div class="form3"><div class="field"><label>Tanggal Pembelian</label><input id="fBuy" type="date" value="${u?.purchaseDate||""}"></div><div class="field"><label>Harga Pembelian</label><input id="fPrice" type="number" min="0" value="${u?.purchasePrice||0}"></div><div class="field"><label>Supplier</label><select id="fSupplier"><option value="">Pilih</option>${S.vendors.map(x=>`<option value="${x.id}" ${u?.supplierId===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div><div class="field"><label>Invoice / PO</label><input id="fInvoice" value="${esc(u?.invoiceNumber||"")}"></div><div class="field"><label>Instalasi</label><input id="fInstall" type="date" value="${u?.installationDate||""}"></div><div class="field"><label>Garansi</label><input id="fWarranty" type="date" value="${u?.warrantyUntil||""}"></div></div></div><div class="section"><h3>Kondisi</h3><div class="formgrid"><div class="field"><label>Status</label><select id="fStatus">${Object.entries({active:"Aktif",repair:"Dalam Perbaikan",broken:"Rusak",unused:"Tidak Digunakan",moved:"Dipindahkan",disposed:"Disposed"}).map(([k,v])=>`<option value="${k}" ${u?.status===k?"selected":""}>${v}</option>`).join("")}</select></div><div class="field"><label>Catatan</label><textarea id="fNotes">${esc(u?.notes||"")}</textarea></div></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
 if(u)$('fType').value=u.type||"Split Wall";
@@ -2622,8 +2586,8 @@ const mapX=Math.min(95,Math.max(5,Number($('fMapX').value)||30));
 const mapY=Math.min(92,Math.max(8,Number($('fMapY').value)||55));
 const data={code:$('fCode').value,brand,model:$('fModel').value.trim(),serialNumber:serial,type:$('fType').value,capacityPk:+$('fPk').value,locationId:$('fLoc').value,mcbId,mapX,mapY,purchaseDate:$('fBuy').value,purchasePrice:+$('fPrice').value||0,supplierId:$('fSupplier').value,invoiceNumber:$('fInvoice').value.trim(),installationDate:$('fInstall').value,warrantyUntil:$('fWarranty').value,status:$('fStatus').value,notes:$('fNotes').value.trim()};
 try{loading(true);
-if(u){if(demo)Object.assign(u,data);else await save("ac_units",u.id,data)}else{const newid=$('fCode').value;if(demo)S.units.push({id:newid,...data,lastRoutineMaintenanceDate:"",nextRoutineMaintenanceDate:"",maintenanceIntervalMonths:3});else await setDoc(doc(db,"ac_units",newid),{...data,lastRoutineMaintenanceDate:"",nextRoutineMaintenanceDate:"",maintenanceIntervalMonths:3,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"admin"})}closeModal(true);renderAll();toast("Berhasil","Unit AC disimpan.","success")}catch(e){console.error(e);toast("Gagal","Unit AC gagal disimpan.","error")}finally{loading(false)}}}
-function locModal(id=null){const x=id?S.locations.find(v=>v.id===id):null;
+if(u){if(demo)Object.assign(u,data);else await save("ac_units",u.id,data);if(!demo&&!isTechnician())await syncPublicUnit({...u,...data})}else{const newid=$('fCode').value;const full={...data,lastRoutineMaintenanceDate:"",nextRoutineMaintenanceDate:"",maintenanceIntervalMonths:3};if(demo)S.units.push({id:newid,...full});else{await setDoc(doc(db,"ac_units",newid),{...full,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"admin"});await syncPublicUnit({id:newid,...full})}}closeModal(true);renderAll();toast("Berhasil","Unit AC disimpan.","success")}catch(e){console.error(e);toast("Gagal","Unit AC gagal disimpan.","error")}finally{loading(false)}}}
+function locModal(id=null){if(!requireAdmin("Master Lokasi hanya dapat diubah Admin."))return;const x=id?S.locations.find(v=>v.id===id):null;
 modal(x?"Edit Lokasi":"Tambah Lokasi",`<form id="locForm"><div class="formgrid"><div class="field"><label>Gedung *</label><input id="lb" required value="${esc(x?.building||"")}"></div><div class="field"><label>Lantai</label><input id="lf" value="${esc(x?.floor||"")}"></div><div class="field"><label>Area</label><input id="la" value="${esc(x?.area||"")}"></div><div class="field"><label>Ruangan</label><input id="lr" value="${esc(x?.room||"")}"></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
 $('locForm').onsubmit=async e=>{e.preventDefault();
 const d={building:$('lb').value.trim(),floor:$('lf').value.trim(),area:$('la').value.trim(),room:$('lr').value.trim(),active:x?.active!==false};
@@ -2633,30 +2597,25 @@ else await save("locations",x.id,d)}else await add("locations",d,"LOC");
 closeModal(true);
 renderAll();
 toast("Berhasil","Lokasi disimpan.","success")}catch(e){toast("Gagal","Lokasi gagal disimpan.","error")}finally{loading(false)}}}
-function venModal(id=null){const x=id?S.vendors.find(v=>v.id===id):null;
+function venModal(id=null){if(!requireAdmin("Master Vendor hanya dapat diubah Admin."))return;const x=id?S.vendors.find(v=>v.id===id):null;
 modal(x?"Edit Vendor / Teknisi":"Tambah Vendor / Teknisi",`<form id="venForm"><div class="formgrid"><div class="field"><label>Nama *</label><input id="vn" required value="${esc(x?.name||"")}"></div><div class="field"><label>Tipe</label><select id="vt"><option value="vendor">Vendor</option><option value="internal">Teknisi Internal</option><option value="external">Teknisi Eksternal</option></select></div><div class="field"><label>Telepon</label><input id="vp" value="${esc(x?.phone||"")}"></div><div class="field"><label>Email</label><input id="ve" type="email" value="${esc(x?.email||"")}"></div><div class="field full"><label>Alamat</label><textarea id="va">${esc(x?.address||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
 if(x)$('vt').value=x.type||"vendor";
 $('venForm').onsubmit=async e=>{e.preventDefault();
 const d={name:$('vn').value.trim(),type:$('vt').value,phone:$('vp').value.trim(),email:$('ve').value.trim(),address:$('va').value.trim(),active:x?.active!==false};
 try{loading(true);
 if(x){if(demo)Object.assign(x,d);
-else await save("vendors",x.id,d)}else await add("vendors",d,"VEN");
+else await save("vendors",x.id,d);if(!demo)await syncPublicVendor({...x,...d})}else{const newId=await add("vendors",d,"VEN");if(!demo)await syncPublicVendor({id:newId,...d})}
 closeModal(true);
 renderAll();
 toast("Berhasil","Vendor disimpan.","success")}catch(e){toast("Gagal","Vendor gagal disimpan.","error")}finally{loading(false)}}}
-function detailUnit(id){
-  const u=unit(id);
-  if(!u)return;
-  const ms=S.maintenance.filter(x=>x.acId===id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),tc=ms.reduce((a,x)=>a+ +x.totalCost||0,0);
-  modal("Detail Unit AC",`<div class="formgrid"><div><b>${esc(u.code)}</b><div class="muted">${esc(u.brand)} ${esc(u.model||"")} • ${esc(u.capacityPk)} PK</div></div><div>${stBadge(u.status)} ${ssBadge(u.nextRoutineMaintenanceDate)}</div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div><div class="sum"><small>Harga</small><b>${cur(u.purchasePrice)}</b></div><div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Umur</small><b>${esc(age(u.purchaseDate))}</b></div></div><div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Maintenance Terakhir & Jadwal</h3><div class="summary"><div class="sum"><small>Maintenance Terakhir</small><b>${ms[0]?date(ms[0].date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div><div class="sum"><small>Total Biaya</small><b>${cur(tc)}</b></div></div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th><th>Biaya</th></tr></thead><tbody>${ms.length?ms.map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td><td>${cur(m.totalCost)}</td></tr>`).join(""):`<tr><td colspan="5">Belum ada histori.</td></tr>`}</tbody></table></div></div><div class="ma"><button class="btn" data-close>Tutup</button><button class="btn primary" data-detailmnt="${u.id}">＋ Maintenance</button></div>`);
-}
+function detailUnit(id){if(!userRole)return;const u=unit(id);if(!u)return;const ms=S.maintenance.filter(x=>x.acId===id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),tc=ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0);const tech=isTechnician();const costBlock=tech?"":`<div class="sum"><small>Harga</small><b>${cur(u.purchasePrice)}</b></div>`;const histCost=tech?"":`<th data-admin-only>Biaya</th>`;const histCells=tech?"":`<td>${cur(m.totalCost)}</td>`;const totalCostBlock=tech?"":`<div class="sum"><small>Total Biaya</small><b>${cur(tc)}</b></div>`;modal("Detail Unit AC",`<div class="formgrid"><div><b>${esc(u.code)}</b><div class="muted">${esc(u.brand)} ${esc(u.model||"")} • ${esc(u.capacityPk)} PK</div></div><div>${stBadge(u.status)} ${ssBadge(u.nextRoutineMaintenanceDate)}</div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div>${costBlock}<div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Umur</small><b>${esc(age(u.purchaseDate))}</b></div></div><div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Maintenance Terakhir & Jadwal</h3><div class="summary"><div class="sum"><small>Maintenance Terakhir</small><b>${ms[0]?date(ms[0].date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div>${totalCostBlock}</div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCost}</tr></thead><tbody>${ms.length?ms.map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCells}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori.</td></tr>`}</tbody></table></div></div><div class="ma"><button class="btn" data-close>Tutup</button><button class="btn primary" data-detailmnt="${u.id}">＋ Maintenance</button></div>`)}
 function age(v){if(!v)return"-";
 const a=pd(v),b=pd(today());
 let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth();
 if(b.getDate()<a.getDate())m--;
 if(m<0){y--;
 m+=12}return`${y} Tahun ${m} Bulan`}
-function maintDetail(id){const m=S.maintenance.find(x=>x.id===id),u=unit(m?.acId);if(!m)return;const measurements=m.measurements||{},checks=m.checklist||{},before=m.photosBefore||[],after=m.photosAfter||[],extra=m.attachments||[];const val=(v,suf="")=>(v!==undefined&&v!==null&&v!==""&&Number(v)!==0)?esc(String(v))+suf:"-";const photoLinks=items=>items.length?items.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:4px 6px 4px 0"><img src="${esc(x.url)}" alt="Foto ${i+1}" loading="lazy" style="width:115px;height:85px;object-fit:cover;border-radius:8px;border:1px solid #dbe4ee"></a>`:`<span>${esc(x.name||`File ${i+1}`)}</span>`).join(""):"Tidak ada foto.";const attachmentLinks=extra.length?extra.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:4px 6px 4px 0;padding:6px 8px;border:1px solid #dbe4ee;border-radius:8px;text-decoration:none;color:#1d4ed8">📎 ${esc(x.name||`Lampiran ${i+1}`)}</a>`:`<span>${esc(x.name||`Lampiran ${i+1}`)}</span>`).join(""):"Tidak ada lampiran.";modal(`Detail ${esc(m.maintenanceNumber||"")}`,`<div class="detail-info"><div class="sum"><small>Unit</small><b>${esc(u?.code||m.acId)}</b></div><div class="sum"><small>Tanggal</small><b>${date(m.date)}</b></div><div class="sum"><small>Jenis</small><b>${esc(typeName(m.type))}</b></div><div class="sum"><small>Lokasi</small><b>${esc(shortLoc(u?.locationId))}</b></div><div class="sum"><small>Vendor</small><b>${esc(ven(m.vendorId))}</b></div><div class="sum"><small>Teknisi</small><b>${esc(m.technicianName||"-")}</b></div><div class="sum"><small>Hasil</small><b>${esc(resultName(m.inspectionResult))}</b></div><div class="sum"><small>Total</small><b>${cur(m.totalCost)}</b></div></div><div class="section"><h3>Checklist Maintenance</h3><div class="summary">${MAINT_CHECK_ITEMS.map(([k,l])=>`<div class="sum"><small>${esc(l)}</small><b>${esc(MAINT_CHECK_STATUS[checks[k]]||"Belum diperiksa")}</b></div>`).join("")}</div><div style="margin-top:8px;color:#64748b;font-size:11px">${esc(m.checklistNotes||"Tidak ada catatan checklist.")}</div></div><div class="section"><h3>Pengukuran Teknis</h3><div class="summary"><div class="sum"><small>Tegangan</small><b>${val(measurements.voltageV," V")}</b></div><div class="sum"><small>Arus / Ampere</small><b>${val(measurements.ampereA," A")}</b></div><div class="sum"><small>Suhu Supply</small><b>${val(measurements.supplyTempC," °C")}</b></div><div class="sum"><small>Suhu Return</small><b>${val(measurements.returnTempC," °C")}</b></div><div class="sum"><small>Tekanan Refrigerant</small><b>${val(measurements.pressurePsi," PSI")}</b></div><div class="sum"><small>Refrigerant</small><b>${esc(measurements.refrigerant||"-")}</b></div></div><div style="margin-top:8px;color:#64748b;font-size:11px">${esc(measurements.measurementNotes||"Tidak ada catatan pengukuran.")}</div></div><div class="section"><h3>Keluhan</h3>${esc(m.complaint||"-")}</div><div class="section"><h3>Tindakan</h3>${esc(m.action||"-")}</div><div class="section"><h3>Sparepart</h3>${m.spareParts?.length?m.spareParts.map(x=>`${esc(x.name)} × ${x.qty} = ${cur(x.qty*x.price)}`).join("<br>"):"Tidak ada sparepart."}</div><div class="section"><h3>Foto Sebelum</h3><div>${photoLinks(before)}</div><h3 style="margin-top:14px">Foto Sesudah</h3><div>${photoLinks(after)}</div><h3 style="margin-top:14px">Lampiran Tambahan</h3><div>${attachmentLinks}</div></div><div class="ma"><button class="btn" data-close>Tutup</button></div>`)}
+function maintDetail(id){const m=S.maintenance.find(x=>x.id===id),u=unit(m?.acId);if(!m)return;const tech=isTechnician();const measurements=m.measurements||{},checks=m.checklist||{},before=m.photosBefore||[],after=m.photosAfter||[],extra=m.attachments||[];const val=(v,suf="")=>(v!==undefined&&v!==null&&v!==""&&Number(v)!==0)?esc(String(v))+suf:"-";const photoLinks=items=>items.length?items.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:4px 6px 4px 0"><img src="${esc(x.url)}" alt="Foto ${i+1}" loading="lazy" style="width:115px;height:85px;object-fit:cover;border-radius:8px;border:1px solid #dbe4ee"></a>`:`<span>${esc(x.name||`File ${i+1}`)}</span>`).join(""):"Tidak ada foto.";const attachmentLinks=extra.length?extra.map((x,i)=>x.url?`<a href="${esc(x.url)}" target="_blank" rel="noopener" style="display:inline-block;margin:4px 6px 4px 0;padding:6px 8px;border:1px solid #dbe4ee;border-radius:8px;text-decoration:none;color:#1d4ed8">📎 ${esc(x.name||`Lampiran ${i+1}`)}</a>`:`<span>${esc(x.name||`Lampiran ${i+1}`)}</span>`).join(""):"Tidak ada lampiran.";const costBlock=tech?"":`<div class="sum"><small>Total</small><b>${cur(m.totalCost)}</b></div>`;const spareItems=(m.spareParts||m.usedSpareParts||[]);const spareBlock=spareItems.length?spareItems.map(x=>`${esc(x.name)} × ${x.qty}${tech?"":` = ${cur(x.qty*x.price)}`}`).join("<br>"):"Tidak ada sparepart.";modal(`Detail ${esc(m.maintenanceNumber||"")}`,`<div class="detail-info"><div class="sum"><small>Unit</small><b>${esc(u?.code||m.acId)}</b></div><div class="sum"><small>Tanggal</small><b>${date(m.date)}</b></div><div class="sum"><small>Jenis</small><b>${esc(typeName(m.type))}</b></div><div class="sum"><small>Lokasi</small><b>${esc(shortLoc(u?.locationId))}</b></div><div class="sum"><small>Vendor</small><b>${esc(ven(m.vendorId))}</b></div><div class="sum"><small>Teknisi</small><b>${esc(m.technicianName||"-")}</b></div><div class="sum"><small>Hasil</small><b>${esc(resultName(m.inspectionResult))}</b></div>${costBlock}</div><div class="section"><h3>Checklist Maintenance</h3><div class="summary">${MAINT_CHECK_ITEMS.map(([k,l])=>`<div class="sum"><small>${esc(l)}</small><b>${esc(MAINT_CHECK_STATUS[checks[k]]||"Belum diperiksa")}</b></div>`).join("")}</div><div style="margin-top:8px;color:#64748b;font-size:11px">${esc(m.checklistNotes||"Tidak ada catatan checklist.")}</div></div><div class="section"><h3>Pengukuran Teknis</h3><div class="summary"><div class="sum"><small>Tegangan</small><b>${val(measurements.voltageV," V")}</b></div><div class="sum"><small>Arus / Ampere</small><b>${val(measurements.ampereA," A")}</b></div><div class="sum"><small>Suhu Supply</small><b>${val(measurements.supplyTempC," °C")}</b></div><div class="sum"><small>Suhu Return</small><b>${val(measurements.returnTempC," °C")}</b></div><div class="sum"><small>Tekanan Refrigerant</small><b>${val(measurements.pressurePsi," PSI")}</b></div><div class="sum"><small>Refrigerant</small><b>${esc(measurements.refrigerant||"-")}</b></div></div><div style="margin-top:8px;color:#64748b;font-size:11px">${esc(measurements.measurementNotes||"Tidak ada catatan pengukuran.")}</div></div><div class="section"><h3>Keluhan</h3>${esc(m.complaint||"-")}</div><div class="section"><h3>Tindakan</h3>${esc(m.action||"-")}</div><div class="section"><h3>Sparepart</h3>${spareBlock}</div><div class="section"><h3>Foto Sebelum</h3><div>${photoLinks(before)}</div><h3 style="margin-top:14px">Foto Sesudah</h3><div>${photoLinks(after)}</div><h3 style="margin-top:14px">Lampiran Tambahan</h3><div>${attachmentLinks}</div></div><div class="ma"><button class="btn" data-close>Tutup</button></div>`)}
 function ensureXlsx(){
   if(typeof XLSX==="undefined"){
     toast("Gagal","Library Excel belum tersedia. Periksa koneksi internet lalu coba lagi.","error");
@@ -2693,39 +2652,39 @@ function exportExcel(name,sheets){
     toast("Gagal","File Excel tidak dapat dibuat. Silakan coba lagi.","error");
   }
 }
-function exportUnits(){
+function exportUnits(){if(!requireAdmin())return;
   const rows=unitRows();
   exportExcel("unit-ac.xlsx",[{name:"Unit AC",rows:[
     ["ID AC","Merk","Model","Serial","Jenis","PK","Lokasi","Tanggal Pembelian","Harga","Supplier","Invoice","Instalasi","Garansi","Status","Maintenance Terakhir","Maintenance Berikutnya","Interval (bulan)","MCB","Panel MCB","Nomor MCB","Map X (%)","Map Y (%)","Catatan"],
     ...rows.map(x=>{const mx=mcb(x.mcbId);return[x.code,x.brand,x.model,x.serialNumber,x.type,x.capacityPk,loc(x.locationId),x.purchaseDate,x.purchasePrice,ven(x.supplierId),x.invoiceNumber,x.installationDate,x.warrantyUntil,statusName(x.status),x.lastRoutineMaintenanceDate,x.nextRoutineMaintenanceDate,x.maintenanceIntervalMonths,mx?.code||"",mx?.panelName||"",mx?.number||"",x.mapX??"",x.mapY??"",x.notes||""]})
   ]}]);
 }
-function exportMcb(){
+function exportMcb(){if(!requireAdmin())return;
   const rows=mcbRows();
   exportExcel("mcb.xlsx",[{name:"MCB",rows:[
     ["Kode MCB","Panel","Nomor","Rating (A)","Pole","Lokasi","Titik / Posisi","Sirkuit","Unit AC","Status","Map X (%)","Map Y (%)","Jumlah Langkah","Petunjuk Rute","Catatan"],
     ...rows.map(x=>{const steps=normalizeRouteSteps(x.routeSteps||[]);return[x.code,x.panelName,x.number,x.ratingA||0,x.pole||"",loc(x.locationId),x.point||"",x.circuit||"",mcbLinkedUnits(x.id).map(u=>u.code).join(", "),mcbStatusName(x.status),x.mapX??"",x.mapY??"",steps.length,steps.map((s,i)=>`${i+1}. ${MCB_ROUTE_TYPES[s.type]||"Petunjuk"}: ${s.text}${s.floor?` [${s.floor}]`:""}`).join(" | "),x.notes||""]})
   ]}]);
 }
-function exportHistory(){
+function exportHistory(){if(!requireAdmin())return;
   exportExcel("histori-maintenance.xlsx",[{name:"Histori Maintenance",rows:[
     ["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Checklist","Tegangan (V)","Ampere (A)","Suhu Supply (°C)","Suhu Return (°C)","Tekanan (PSI)","Refrigerant","Jasa","Sparepart","Lainnya","Total","Catatan"],
     ...historyRows().map((m,i)=>{const u=unit(m.acId),v=m.measurements||{};return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),checklistSummary(m.checklist||{}),v.voltageV||"",v.ampereA||"",v.supplyTempC||"",v.returnTempC||"",v.pressurePsi||"",v.refrigerant||"",m.serviceCost||0,m.sparePartCost||0,m.otherCost||0,m.totalCost||0,m.notes||""]})
   ]}]);
 }
-function exportReport(){
+function exportReport(){if(!requireAdmin())return;
   exportExcel("laporan-maintenance.xlsx",[{name:"Laporan Maintenance",rows:[
     ["No","Tanggal","ID AC","Merk","PK","Lokasi","Jenis","Vendor","Teknisi","Hasil","Total"],
     ...reportRows().map((m,i)=>{const u=unit(m.acId);return[i+1,m.date,u?.code||m.acId,u?.brand||"",u?.capacityPk||"",shortLoc(u?.locationId),typeName(m.type),ven(m.vendorId),m.technicianName||"",resultName(m.inspectionResult),m.totalCost||0]})
   ]}]);
 }
-function exportAssets(){
+function exportAssets(){if(!requireAdmin())return;
   exportExcel("laporan-aset-ac.xlsx",[{name:"Laporan Aset AC",rows:[
     ["ID","Merk","Model","Serial","PK","Lokasi","Pembelian","Harga","Supplier","Status"],
     ...assetRows().map(x=>[x.code,x.brand,x.model,x.serialNumber,x.capacityPk,loc(x.locationId),x.purchaseDate,x.purchasePrice,ven(x.supplierId),statusName(x.status)])
   ]}]);
 }
-function exportCost(){
+function exportCost(){if(!requireAdmin())return;
   const r=costRows(),byUnit={},byType={};
   r.forEach(x=>{const u=unit(x.acId);byUnit[x.acId]??={code:u?.code||x.acId,brand:u?.brand||"",model:u?.model||"",location:shortLoc(u?.locationId),j:0,s:0,o:0,total:0,n:0};byUnit[x.acId].j+=+x.serviceCost||0;byUnit[x.acId].s+=+x.sparePartCost||0;byUnit[x.acId].o+=+x.otherCost||0;byUnit[x.acId].total+=+x.totalCost||0;byUnit[x.acId].n++;byType[x.type]??={n:0,c:0};byType[x.type].n++;byType[x.type].c+=+x.totalCost||0});
   const out=[
@@ -2739,7 +2698,7 @@ function exportCost(){
   ];
   exportExcel("laporan-biaya.xlsx",[{name:"Laporan Biaya",rows:out}]);
 }
-async function importUnitsExcel(file){
+async function importUnitsExcel(file){if(!requireAdmin())return;
   if(!file)return;
   if(!ensureXlsx())return;
   const input=$('importUnitsFile');
@@ -2805,7 +2764,7 @@ async function importUnitsExcel(file){
         if(prior)throw new Error(`Baris ${r+1}: Serial Number ${serial} duplikat dengan baris ${prior}.`);
         seenSerials.set(serialKey,r+1);
       }
-      rows.push({rowNumber:r+1,code,brand,model:pick(row,"Model","Model / Type"),serialNumber:serial,type:pick(row,"Jenis","Jenis AC","Type")||"Split Wall",capacityPk:pk,locationId:location.id,purchaseDate:pick(row,"Tanggal Pembelian","Pembelian","Purchase Date"),purchasePrice:Number(pick(row,"Harga","Harga Pembelian","Purchase Price").replace(/[^0-9.,-]/g,"").replace(/\.(?=.*\.)/g,"").replace(",","."))||0,supplierId:supplier?.id||"",invoiceNumber:pick(row,"Invoice","Invoice / PO"),installationDate:pick(row,"Instalasi","Installation Date"),warrantyUntil:pick(row,"Garansi","Warranty Until"),status,notes:pick(row,"Catatan","Notes"),lastRoutineMaintenanceDate:pick(row,"Maintenance Terakhir"),nextRoutineMaintenanceDate:pick(row,"Maintenance Berikutnya"),maintenanceIntervalMonths:Number(pick(row,"Interval Maintenance","Maintenance Interval")||3)||3,mapX:mapXVal,mapY:mapYVal,mcbId:mcbRef?.id||"",mcbCode:mcbRef?.code||""});
+      rows.push({rowNumber:r+1,code,brand,model:pick(row,"Model","Model / Type"),serialNumber:serial,type:pick(row,"Jenis","Jenis AC","Type")||"Split Wall",capacityPk:pk,locationId:location.id,purchaseDate:pick(row,"Tanggal Pembelian","Pembelian","Purchase Date"),purchasePrice:Number(pick(row,"Harga","Harga Pembelian","Purchase Price").replace(/[^0-9.,-]/g,"").replace(/\.(?=.*\.)/g,"").replace(",","."))||0,supplierId:supplier?.id||"",invoiceNumber:pick(row,"Invoice","Invoice / PO"),installationDate:pick(row,"Instalasi","Installation Date"),warrantyUntil:pick(row,"Garansi","Warranty Until"),status,notes:pick(row,"Catatan","Notes"),lastRoutineMaintenanceDate:pick(row,"Maintenance Terakhir"),nextRoutineMaintenanceDate:pick(row,"Maintenance Berikutnya"),maintenanceIntervalMonths:Math.max(maintenanceMinInterval(),Math.min(12,Number(pick(row,"Interval Maintenance","Maintenance Interval")||3)||3)),mapX:mapXVal,mapY:mapYVal,mcbId:mcbRef?.id||"",mcbCode:mcbRef?.code||""});
     }
     if(!rows.length)throw new Error("Tidak ada baris data yang dapat diimport.");
     for(const item of rows){
@@ -2819,7 +2778,7 @@ async function importUnitsExcel(file){
     let added=0,updated=0;
     for(const item of rows){
       const existing=unit(item.code);
-      const data={code:item.code,brand:item.brand,model:item.model,serialNumber:item.serialNumber,type:item.type,capacityPk:item.capacityPk,locationId:item.locationId,mcbId:item.mcbId||existing?.mcbId||"",mapX:item.mapX,mapY:item.mapY,purchaseDate:item.purchaseDate,purchasePrice:item.purchasePrice,supplierId:item.supplierId,invoiceNumber:item.invoiceNumber,installationDate:item.installationDate,warrantyUntil:item.warrantyUntil,status:item.status,notes:item.notes,lastRoutineMaintenanceDate:item.lastRoutineMaintenanceDate||existing?.lastRoutineMaintenanceDate||"",nextRoutineMaintenanceDate:item.nextRoutineMaintenanceDate||existing?.nextRoutineMaintenanceDate||"",maintenanceIntervalMonths:Math.max(3,item.maintenanceIntervalMonths||existing?.maintenanceIntervalMonths||3)};
+      const data={code:item.code,brand:item.brand,model:item.model,serialNumber:item.serialNumber,type:item.type,capacityPk:item.capacityPk,locationId:item.locationId,mcbId:item.mcbId||existing?.mcbId||"",mapX:item.mapX,mapY:item.mapY,purchaseDate:item.purchaseDate,purchasePrice:item.purchasePrice,supplierId:item.supplierId,invoiceNumber:item.invoiceNumber,installationDate:item.installationDate,warrantyUntil:item.warrantyUntil,status:item.status,notes:item.notes,lastRoutineMaintenanceDate:item.lastRoutineMaintenanceDate||existing?.lastRoutineMaintenanceDate||"",nextRoutineMaintenanceDate:item.nextRoutineMaintenanceDate||existing?.nextRoutineMaintenanceDate||"",maintenanceIntervalMonths:Math.max(maintenanceMinInterval(),Math.min(12,Number(item.maintenanceIntervalMonths||existing?.maintenanceIntervalMonths||3)||3))};
       if(demo){
         if(existing){Object.assign(existing,data);updated++}
         else{S.units.push({id:item.code,...data});added++}
@@ -2828,6 +2787,7 @@ async function importUnitsExcel(file){
         else{await setDoc(doc(db,"ac_units",item.code),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"admin"});added++}
       }
     }
+    if(!demo)await syncAllPublicCaches();
     toast("Import selesai",`${added} data baru ditambahkan, ${updated} data diperbarui.`,"success");
     if(input)input.value="";
     renderAll();
@@ -2941,40 +2901,39 @@ if(a){if(a.dataset.action==="unit")unitModal();
 if(a.dataset.action==="location")locModal();
 if(a.dataset.action==="vendor")venModal();
 if(a.dataset.action==="mcb")mcbModal();
-if(a.dataset.action==="mnt"){nav("mntform");
-resetM()}return}if(e.target.closest("[data-close]")){closeModal();
+if(a.dataset.action==="user")userModal();
+if(a.dataset.action==="mnt"){nav("mntform");resetM()}return}if(e.target.closest("[data-close]")){closeModal();
 return}const mcbe=e.target.closest("[data-mcb-edit]");
-if(mcbe){mcbModal(mcbe.dataset.mcbEdit);return}
+if(mcbe){if(!requireAdmin())return;mcbModal(mcbe.dataset.mcbEdit);return}
+const ut=e.target.closest("[data-user-toggle]");
+if(ut){if(!requireAdmin())return;toggleTechnicianUser(ut.dataset.userToggle);return}
 const se=e.target.closest("[data-schedule-edit]");
 if(se){scheduleModal(se.dataset.scheduleEdit);
 return}const d=e.target.closest("[data-detail]");
 if(d){detailUnit(d.dataset.detail);
 return}const ed=e.target.closest("[data-edit]");
-if(ed){unitModal(ed.dataset.edit);
-return}const le=e.target.closest("[data-ledit]");
-if(le){locModal(le.dataset.ledit);
-return}const lt=e.target.closest("[data-ltoggle]");
-if(lt){const x=S.locations.find(x=>x.id===lt.dataset.ltoggle);
+if(ed){if(!requireAdmin())return;unitModal(ed.dataset.edit);return}const le=e.target.closest("[data-ledit]");
+if(le){if(!requireAdmin())return;locModal(le.dataset.ledit);return}const lt=e.target.closest("[data-ltoggle]");
+if(lt){if(!requireAdmin())return;const x=S.locations.find(x=>x.id===lt.dataset.ltoggle);
 x.active=x.active===false;
 if(!demo)await updateDoc(doc(db,"locations",x.id),{active:x.active,updatedAt:serverTimestamp()});
 renderAll();
 return}const ve=e.target.closest("[data-vedit]");
-if(ve){venModal(ve.dataset.vedit);
-return}const vt=e.target.closest("[data-vtoggle]");
-if(vt){const x=S.vendors.find(x=>x.id===vt.dataset.vtoggle);
+if(ve){if(!requireAdmin())return;venModal(ve.dataset.vedit);return}const vt=e.target.closest("[data-vtoggle]");
+if(vt){if(!requireAdmin())return;const x=S.vendors.find(x=>x.id===vt.dataset.vtoggle);
 x.active=x.active===false;
-if(!demo)await updateDoc(doc(db,"vendors",x.id),{active:x.active,updatedAt:serverTimestamp()});
+if(!demo)await updateDoc(doc(db,"vendors",x.id),{active:x.active,updatedAt:serverTimestamp()});if(!demo)await syncPublicVendor(x);
 renderAll();
 return}const md=e.target.closest("[data-md]");
 if(md){maintDetail(md.dataset.md);
 return}const me=e.target.closest("[data-me]");
-if(me){nav("mntform");
+if(me){if(!requireAdmin())return;nav("mntform");
 populateMnt(me.dataset.me);
 return}const mv=e.target.closest("[data-mv]");
-if(mv){const x=S.maintenance.find(x=>x.id===mv.dataset.mv),r=prompt("Alasan Void Maintenance:");
+if(mv){if(!requireAdmin())return;const x=S.maintenance.find(x=>x.id===mv.dataset.mv),r=prompt("Alasan Void Maintenance:");
 if(!r?.trim())return;
 if(demo){x.status="void";
-x.voidReason=r.trim()}else await updateDoc(doc(db,"maintenance",x.id),{status:"void",voidReason:r.trim(),voidAt:serverTimestamp()});
+x.voidReason=r.trim()}else{await updateDoc(doc(db,"maintenance",x.id),{status:"void",voidReason:r.trim(),voidAt:serverTimestamp(),updatedAt:serverTimestamp()});await syncPublicMaintenance({...x,status:"void",voidReason:r.trim()},x.id)}
 renderAll();
 toast("Berhasil","Maintenance di-void dan tetap tercatat untuk audit.","success");
 return}const dm=e.target.closest("[data-detailmnt]");
@@ -2998,78 +2957,28 @@ document.addEventListener("input",e=>{
   if(["mcbSearch","mcbPanelFilter"].includes(e.target.id))renderMcbPage();
 });
 
+const mntSettingsEl=$("mntSettings");
+if(mntSettingsEl)mntSettingsEl.onsubmit=async e=>{e.preventDefault();const defRaw=Number($('setInterval').value||3),def=Math.min(12,Math.max(1,Number.isFinite(defRaw)?Math.floor(defRaw):3));const r1=Math.max(1,Number($('setR1').value||30));const r2=Math.max(1,Number($('setR2').value||7));const data={defaultIntervalMonths:def,minimumIntervalMonths:1,reminderDaysFirst:r1,reminderDaysSecond:r2,reminderOnDueDate:$('setDue').value!=="false",reminderOverdue:$('setOver').value!=="false"};try{loading(true);if(demo)S.settings.maintenance={...S.settings.maintenance,...data};else await setDoc(doc(db,"settings","maintenance"),{...data,updatedAt:serverTimestamp(),updatedBy:user?.uid||"admin"},{merge:true});S.settings.maintenance={...S.settings.maintenance,...data};renderAll();toast("Berhasil","Pengaturan maintenance disimpan.","success")}catch(err){console.error("Maintenance settings save error:",err);toast("Gagal","Pengaturan maintenance gagal disimpan.","error")}finally{loading(false)}};
+
 const sysSettingsEl=$("sysSettings");
 if(sysSettingsEl)sysSettingsEl.onsubmit=async e=>{e.preventDefault();const data={companyName:$('companyName').value.trim(),companyPhone:$('companyPhone').value.trim(),companyEmail:$('companyEmail').value.trim(),companyAddress:$('companyAddress').value.trim(),timezone:"Asia/Jakarta"};try{loading(true);if(demo)S.settings.system={...S.settings.system,...data};else await setDoc(doc(db,"settings","system"),{...data,updatedAt:serverTimestamp(),updatedBy:user?.uid||"admin"},{merge:true});S.settings.system={...S.settings.system,...data};renderAll();toast("Berhasil","Pengaturan sistem disimpan.","success")}catch(err){console.error(err);toast("Gagal","Pengaturan sistem gagal disimpan.","error")}finally{loading(false)}};
 
-$("loginForm").onsubmit = async e => {
-  e.preventDefault();
-
-  $("loginErr").classList.add("hidden");
-
-  const email = $("loginEmail").value.trim();
-
-  const password = $("loginPass").value;
-
-  if (!email || !password) {
-    $("loginErr").textContent = "Email Admin dan password wajib diisi.";
-
-    $("loginErr").classList.remove("hidden");
-    return;
-  }
-
-  try {
-    loading(true);
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (e) {
-    console.error("Login error:", e);
-
-    $("loginErr").textContent = "Login gagal. Periksa email dan password Admin.";
-
-    $("loginErr").classList.remove("hidden");
-  } finally {
-    loading(false);
-  }
-};
-
+document.querySelectorAll("[data-login-role]").forEach(btn=>btn.addEventListener("click",()=>{selectedLoginRole=btn.dataset.loginRole||"";document.querySelectorAll("[data-login-role]").forEach(x=>x.classList.toggle("selected",x.dataset.loginRole===selectedLoginRole));if($("loginEmailLabel"))$("loginEmailLabel").textContent=selectedLoginRole==="technician"?"Email Teknisi":"Email Admin";$("loginEmail").placeholder=selectedLoginRole==="technician"?"Email teknisi":"Email admin";$("loginErr").classList.add("hidden");}));
+$("loginForm").onsubmit=async e=>{e.preventDefault();$("loginErr").classList.add("hidden");const email=$("loginEmail").value.trim(),password=$("loginPass").value;if(!selectedLoginRole)return toast("Pilih akses","Pilih Teknisi atau Admin terlebih dahulu.","warning");if(!email||!password){$("loginErr").textContent="Email dan password wajib diisi.";$("loginErr").classList.remove("hidden");return}try{loading(true,"Login...");await signInWithEmailAndPassword(auth,email,password)}catch(err){console.error("Login error:",err);$("loginErr").textContent="Login gagal. Periksa email/password dan pastikan akses yang dipilih sesuai akun.";$("loginErr").classList.remove("hidden")}finally{loading(false)}};
 function enter(){
   $("login").classList.add("hidden");
   $("app").classList.remove("hidden");
   startRealtime();
 }
 
-$("logout").onclick = async () => {
-  try {
-    await signOut(auth);
-  } finally {
-    stopRealtime();
-    user = null;
+$("logout").onclick=async()=>{try{await signOut(auth)}finally{stopRealtime();user=null;userProfile=null;userRole="";selectedLoginRole="";publicCacheSyncStarted=false;S.users=[];S.units=[];S.maintenance=[];applyRoleUI();$("app").classList.add("hidden");$("login").classList.remove("hidden");$("loginPass").value="";document.querySelectorAll("[data-login-role]").forEach(x=>x.classList.remove("selected"));$("loginEmail").value="";$("loginEmail").placeholder="Pilih akses terlebih dahulu";$("loginErr").classList.add("hidden")}};
 
-    $("app").classList.add("hidden");
-
-    $("login").classList.remove("hidden");
-
-    $("loginPass").value = "";
-  }
-};
-
-onAuthStateChanged(auth, firebaseUser => {
-  if (firebaseUser) {
-    handleAuthenticatedUser(firebaseUser);
-  } else {
-    user = null;
-
-    $("app").classList.add("hidden");
-
-    $("login").classList.remove("hidden");
-  }
-});
+onAuthStateChanged(auth,firebaseUser=>{if(firebaseUser){handleAuthenticatedUser(firebaseUser)}else{user=null;userProfile=null;userRole="";applyRoleUI();$("app").classList.add("hidden");$("login").classList.remove("hidden")}});
 $('mDate').value=today();
 $('rStart').value=`${month()}-01`;
 $('rEnd').value=today();
 $('cStart').value=`${month()}-01`;
 $('cEnd').value=today();
-setInterval(()=>{if(!$('app').classList.contains('hidden')){dash();
-renderSchedule();
-notifications()}},60000);
+setInterval(()=>{if(!$('app').classList.contains('hidden')){if(isTechnician())renderTechDashboard();else dash();renderSchedule();notifications()}},60000);
 </script></body>
 </html>
