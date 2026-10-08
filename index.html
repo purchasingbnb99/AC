@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261008-R5">
+<meta name="ac-build" content="QT-20261008-R6">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -386,8 +386,14 @@ textarea {
 .two {
   display:grid;
   grid-template-columns:1.3fr .8fr;
-  gap:17px
+  gap:17px;
+  min-width:0
 }
+#p-scan .two{grid-template-columns:1fr}
+#p-scan .two>.card{min-width:0}
+#p-scan .summary{min-width:0}
+#p-scan .sum{min-width:0;overflow:hidden}
+#p-scan .sum b,#p-scan .sum small{overflow-wrap:anywhere;word-break:break-word}
 #p-dashboard > .two > .card:nth-child(1){background:linear-gradient(135deg,#f7fbff 0%,#d7e9ff 100%);border-color:#c5dcfb}
 #p-dashboard > .two > .card:nth-child(2){background:linear-gradient(135deg,#f7fffa 0%,#d8f1e2 100%);border-color:#c3e3d2}
 #p-dashboard > .two[style*="margin-top:17px"] > .card:nth-child(1){background:linear-gradient(135deg,#fffdf7 0%,#f9e8c0 100%);border-color:#e7cf93}
@@ -2943,6 +2949,7 @@ else if(reportAction.id==="exportCost")exportCost();
 else if(reportAction.id==="printCost"){renderCost();print("p-costreport")}
 else if(reportAction.id==="exportMcb")exportMcb();
 return}
+const quickAction=e.target.closest(".tech-quick[data-page]");if(quickAction){nav(quickAction.dataset.page);return}
 const scanAction=e.target.closest("#scanSearch,#scanCameraToggle,#scanBarcodeGen,[data-scan-maint],[data-scan-detail],[data-barcode]");if(scanAction){if(scanAction.id==="scanSearch"){await stopScanCamera();showScannedUnit($("scanInput")?.value||"");}else if(scanAction.id==="scanBarcodeGen")barcodeModal($("scanInput")?.value||null);else if(scanAction.id==="scanCameraToggle"){if(scanCamera&&scanCamera.isScanning){await stopScanCamera();setScanStatus("Kamera dihentikan. Klik Mulai Kamera untuk scan lagi.","info")}else{await startScanCamera()}}else if(scanAction.dataset.barcode)barcodeModal(scanAction.dataset.barcode);else if(scanAction.dataset.scanMaint){await stopScanCamera();nav("mntform");resetM();$("mAc").value=scanAction.dataset.scanMaint}else if(scanAction.dataset.scanDetail){await stopScanCamera();detailUnit(scanAction.dataset.scanDetail)}return}const n=e.target.closest(".nav button");
 if(n){nav(n.dataset.page);
 return}
