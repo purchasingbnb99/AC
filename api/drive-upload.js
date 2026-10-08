@@ -67,6 +67,43 @@ function validatePayload(payload) {
   }
 }
 
+function isAnonymous(decoded) {
+  return decoded?.firebase?.sign_in_provider === 'anonymous';
+}
+
+function validateAnonymousUpload(payload) {
+  const photoType = String(payload?.photoType || '').trim().toLowerCase();
+  const allowedAnonymousTypes = new Set([
+    'technician_access',
+    'before',
+    'after',
+    'attachments'
+  ]);
+
+  if (!allowedAnonymousTypes.has(photoType)) {
+    const err = new Error('Jenis upload tidak diizinkan untuk Quick Technician.');
+    err.statusCode = 403;
+    throw err;
+  }
+
+  if (photoType === 'technician_access') {
+    const name = String(payload?.technicianName || '').trim();
+    if (name.length < 2 || name.length > 120) {
+      const err = new Error('Nama Teknisi tidak valid.');
+      err.statusCode = 400;
+      throw err;
+    }
+    return;
+  }
+
+  const maintenanceNumber = String(payload?.maintenanceNumber || '').trim();
+  if (!/^MNT-[A-Z0-9_-]+$/i.test(maintenanceNumber)) {
+    const err = new Error('Nomor maintenance tidak valid untuk upload Teknisi.');
+    err.statusCode = 400;
+    throw err;
+  }
+}
+
 module.exports = async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Allow', 'POST, OPTIONS');
@@ -99,33 +136,51 @@ module.exports = async function handler(req, res) {
 
     const app = getAdminApp();
     const decoded = await getAuth(app).verifyIdToken(idToken);
-    const userSnap = await getFirestore(app)
-      .collection('users')
-      .doc(decoded.uid)
-      .get();
+    const anonymous = isAnonymous(decoded);
+    let actorRole = '';
 
-    if (!userSnap.exists) {
-      return json(res, 403, {
-        ok: false,
-        error: 'Profil pengguna tidak ditemukan.'
-      });
-    }
+    if (anonymous) {
+      actorRole = 'technician_quick';
+    } else {
+      const userSnap = await getFirestore(app)
+        .collection('users')
+        .doc(decoded.uid)
+        .get();
 
-    const userData = userSnap.data() || {};
-    if (userData.role !== 'admin' || userData.active !== true) {
-      return json(res, 403, {
-        ok: false,
-        error: 'Akses hanya untuk Admin aktif.'
-      });
+      if (!userSnap.exists) {
+        return json(res, 403, {
+          ok: false,
+          error: 'Akun tidak terdaftar di sistem.'
+        });
+      }
+
+      const userData = userSnap.data() || {};
+      const isActiveAllowedRole =
+        (userData.role === 'admin' || userData.role === 'technician') &&
+        userData.active === true;
+
+      if (!isActiveAllowedRole) {
+        return json(res, 403, {
+          ok: false,
+          error: 'Akun tidak memiliki akses aktif untuk upload.'
+        });
+      }
+
+      actorRole = userData.role;
     }
 
     const payload = getBody(req);
     validatePayload(payload);
 
+    if (anonymous) {
+      validateAnonymousUpload(payload);
+    }
+
     const upstreamPayload = {
       ...payload,
       token: process.env.DRIVE_GATEWAY_TOKEN,
-      uploadedByUid: decoded.uid
+      uploadedByUid: decoded.uid,
+      uploadedByRole: actorRole
     };
 
     const upstream = await fetch(process.env.DRIVE_GATEWAY_URL, {
@@ -156,7 +211,8 @@ module.exports = async function handler(req, res) {
   } catch (err) {
     console.error('Drive upload proxy error:', err);
 
-    return json(res, 500, {
+    const status = Number(err?.statusCode);
+    return json(res, Number.isInteger(status) && status >= 400 && status <= 599 ? status : 500, {
       ok: false,
       error: err instanceof Error
         ? err.message
