@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261008-R2">
+<meta name="ac-build" content="QT-20261008-R3">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -993,7 +993,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261008-R2</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261008-R3</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -1201,7 +1201,7 @@ button,input,select,textarea{font-size:14px}
 <div class="cb">
 <div id="qrReader" style="width:100%;max-width:520px;margin:auto"></div>
 <div id="scanStatus" class="note" style="margin-top:12px">Siap melakukan scan.</div>
-<div class="field" style="margin-top:12px"><label>ID Unit AC</label><div class="scan-controls"><input id="scanInput" placeholder="Contoh: AC-001" autocomplete="off"><button type="button" class="btn primary" id="scanSearch">🔎 Cari</button><button type="button" class="btn" id="scanBarcodeGen">🏷 Generate Barcode</button><button type="button" class="btn" id="scanCameraToggle">▶ Mulai Kamera</button></div></div>
+<div class="field" style="margin-top:12px"><label>ID Unit AC</label><div class="scan-controls"><input id="scanInput" placeholder="Contoh: AC-001" autocomplete="off"><button type="button" class="btn primary" id="scanSearch">🔎 Cari</button><button type="button" class="btn" id="scanBarcodeGen" data-admin-only>🏷 Generate Barcode</button><button type="button" class="btn" id="scanCameraToggle">▶ Mulai Kamera</button></div></div>
 </div></div>
 <div class="card"><div class="ch"><b>Informasi Unit</b></div><div class="cb" id="scanResult"><div class="empty">Scan atau masukkan ID Unit AC untuk melihat informasi.</div></div></div>
 </div>
@@ -2050,7 +2050,7 @@ const READY = !!(FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.authDomain && FIREBAS
 let fb = null, auth = null, db = null, user = null;
 let secondaryAuth = null;
 let authPersistenceReady = Promise.resolve();
-const QUICK_TECH_BUILD = "QT-20261008-R2";
+const QUICK_TECH_BUILD = "QT-20261008-R3";
 window.__AC_QUICK_TECH_BUILD__ = QUICK_TECH_BUILD;
 const demo = false;
 
