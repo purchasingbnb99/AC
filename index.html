@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261008-R4">
+<meta name="ac-build" content="QT-20261008-R5">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -985,6 +985,7 @@ button,input,select,textarea{font-size:14px}
 .tech-quick b{font-size:16px;display:block}.tech-quick small{display:block;color:#64748b;font-size:10px;margin-top:2px}
 [data-role-hidden="true"]{display:none!important}
 @media(max-width:600px){.login-access{grid-template-columns:1fr}.tech-quick-grid{grid-template-columns:1fr}.tech-welcome{padding:13px}.login-card{padding:24px 18px}}
+.history-vendor-col{min-width:150px}
 </style>
 </head>
 <body>
@@ -1633,6 +1634,7 @@ button,input,select,textarea{font-size:14px}
 <th>Lokasi</th>
 <th>Jenis</th>
 <th>Teknisi</th>
+<th class="history-vendor-col">Vendor</th>
 <th>Hasil</th>
 <th class="history-cost-col" data-admin-only>Total</th>
 <th class="history-action-col">Aksi</th>
@@ -2397,7 +2399,7 @@ if(resetMntEl)resetMntEl.onclick=()=>{
 
 function historyRows(){const q=(($('hSearch')?.value)||"").toLowerCase(),a=$('hStart')?.value||"",b=$('hEnd')?.value||"",ac=$('hAc')?.value||"",t=$('hType')?.value||"";
 return S.maintenance.filter(m=>m.status!=="void").filter(m=>{const u=unit(m.acId),hay=[m.maintenanceNumber,m.technicianName,ven(m.vendorId),u?.code,u?.brand,shortLoc(u?.locationId)].join(" ").toLowerCase();
-return(!q||hay.includes(q))&&(!a||m.date>=a)&&(!b||m.date<=b)&&(!ac||m.acId===ac)&&(!t||m.type===t)}).sort((a,b)=>String(b.date).localeCompare(String(a.date)))}function renderHistory(){filters();const rows=historyRows();const tech=isTechnician();$('hBody').innerHTML=rows.length?rows.map((m,i)=>{const u=unit(m.acId);const actions=tech?`<button class="btn" data-md="${m.id}">Detail</button>`:`<button class="btn" data-md="${m.id}">Detail</button> <button class="btn" data-me="${m.id}">Edit</button> <button class="btn danger" data-mv="${m.id}">Void</button>`;return`<tr><td>${i+1}</td><td>${date(m.date)}</td><td><b>${esc(u?.code||m.acId)}</b></td><td>${esc(shortLoc(u?.locationId))}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${tech?"":`<td>${cur(m.totalCost)}</td>`}<td>${actions}</td></tr>`}).join(""):`<tr><td colspan="${tech?8:9}"><div class="empty">Belum ada histori.</div></td></tr>`}
+return(!q||hay.includes(q))&&(!a||m.date>=a)&&(!b||m.date<=b)&&(!ac||m.acId===ac)&&(!t||m.type===t)}).sort((a,b)=>String(b.date).localeCompare(String(a.date)))}function renderHistory(){filters();const rows=historyRows();const tech=isTechnician();$('hBody').innerHTML=rows.length?rows.map((m,i)=>{const u=unit(m.acId);const actions=tech?`<button class="btn" data-md="${m.id}">Detail</button>`:`<button class="btn" data-md="${m.id}">Detail</button> <button class="btn" data-me="${m.id}">Edit</button> <button class="btn danger" data-mv="${m.id}">Void</button>`;return`<tr><td>${i+1}</td><td>${date(m.date)}</td><td><b>${esc(u?.code||m.acId)}</b></td><td>${esc(shortLoc(u?.locationId))}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||"-")}</td><td>${esc(ven(m.vendorId)||"-")}</td><td>${esc(resultName(m.inspectionResult))}</td>${tech?"":`<td>${cur(m.totalCost)}</td>`}<td>${actions}</td></tr>`}).join(""):`<tr><td colspan="${tech?9:10}"><div class="empty">Belum ada histori.</div></td></tr>`}
 function printHistory(){if(!requireAdmin())return;
 const rows=historyRows();
 if(!rows.length){toast("Tidak ada data","Tidak ada histori maintenance untuk dicetak dengan filter saat ini.","warning");return}
