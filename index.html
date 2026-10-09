@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261008-R7">
+<meta name="ac-build" content="QT-20261009-R8">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -993,14 +993,6 @@ button,input,select,textarea{font-size:14px}
 @media(max-width:600px){.login-access{grid-template-columns:1fr}.tech-quick-grid{grid-template-columns:1fr}.tech-welcome{padding:13px}.login-card{padding:24px 18px}}
 .history-vendor-col{min-width:150px}
 
-/* ADMIN TEST RESET */
-.reset-danger-card{margin-top:16px;border:1px solid #fecaca;background:linear-gradient(135deg,#fff7f7,#fff)}
-.reset-danger-card .ch{border-bottom-color:#fee2e2}
-.reset-danger-box{padding:14px;border:1px solid #fecaca;border-radius:12px;background:#fff7f7}
-.reset-danger-box h3{margin:0 0 6px;color:#991b1b;font-size:14px}
-.reset-danger-box p{margin:0;color:#7f1d1d;font-size:11px;line-height:1.55}
-.reset-danger-box .reset-points{margin:10px 0 0;padding-left:18px;color:#7f1d1d;font-size:11px;line-height:1.55}
-.reset-danger-box .btn{margin-top:12px}
 </style>
 </head>
 <body>
@@ -1009,7 +1001,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261008-R7</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261009-R8</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -2022,22 +2014,6 @@ button,input,select,textarea{font-size:14px}
 </form>
 </div>
 </div>
-<div class="card reset-danger-card">
-<div class="ch"><b>⚠ Zona Bahaya</b><small>Reset hanya untuk menghapus seluruh data TEST sebelum aplikasi mulai dipakai.</small></div>
-<div class="cb">
-<div class="reset-danger-box">
-<h3>🗑 Reset Semua Data Test</h3>
-<p>Fitur ini menghapus data operasional TEST dari Firebase dan seluruh file/foto di folder Google Drive <b>AC MAINTENANCE - FOTO</b>. Akun Admin yang sedang digunakan tetap dipertahankan.</p>
-<div class="reset-points">
-<div>• Unit AC, Lokasi, Vendor/Teknisi, MCB, Maintenance, notifikasi, cache publik.</div>
-<div>• Aktivitas Quick Technician dan sesi Quick Technician.</div>
-<div>• Profil/akun Teknisi yang tersimpan sebagai data test.</div>
-<div>• Semua file dan subfolder di dalam folder foto aplikasi, tanpa menghapus folder induknya.</div>
-</div>
-<button type="button" class="btn danger" id="resetAllTestDataBtn" data-admin-only>🗑 Reset Semua Data Test</button>
-</div>
-</div>
-</div>
 </section>
 <section id="p-users" class="page" data-admin-only>
 <div class="head"><div><h1>Pengguna</h1><p>Kelola akun Admin dan Teknisi.</p></div><div class="actions"><button class="btn primary" data-action="user">＋ Tambah Teknisi</button></div></div>
@@ -2598,29 +2574,6 @@ function renderUsers(){if(!requireAdmin())return;const rows=S.users.filter(x=>x.
 function userModal(){if(!requireAdmin())return;modal("Tambah Teknisi",`<form id="userForm"><div class="formgrid"><div class="field full"><label>Nama Teknisi *</label><input id="usrName" required placeholder="Contoh: Andi"></div><div class="field full"><label>Email *</label><input id="usrEmail" type="email" required placeholder="teknisi@perusahaan.com"></div><div class="field"><label>Password *</label><input id="usrPassword" type="password" minlength="8" required placeholder="Minimal 8 karakter"></div><div class="field"><label>Konfirmasi Password *</label><input id="usrPassword2" type="password" minlength="8" required placeholder="Ulangi password"></div></div><div class="alert"><span class="badge info">Akses</span><b style="margin-left:6px">Teknisi tidak memiliki akses biaya, pengaturan, atau master data.</b><small>Gunakan satu akun untuk satu teknisi dan jangan berbagi password.</small></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">👨‍🔧 Buat Akun Teknisi</button></div></form>`);$("userForm").onsubmit=async e=>{e.preventDefault();const name=$("usrName").value.trim(),email=$("usrEmail").value.trim().toLowerCase(),p1=$("usrPassword").value,p2=$("usrPassword2").value;if(!name||!email||!p1)return toast("Validasi","Nama, email, dan password wajib diisi.","warning");if(p1.length<8)return toast("Validasi","Password minimal 8 karakter.","warning");if(p1!==p2)return toast("Validasi","Konfirmasi password tidak sama.","warning");try{loading(true,"Membuat akun teknisi...");if(!secondaryAuth)throw new Error("Layanan pembuatan akun belum siap.");const cred=await createUserWithEmailAndPassword(secondaryAuth,email,p1);await setDoc(doc(db,"users",cred.user.uid),{name,displayName:name,email,role:"technician",active:true,createdAt:serverTimestamp(),createdBy:user?.uid||""});await signOut(secondaryAuth);closeModal(true);toast("Berhasil","Akun Teknisi berhasil dibuat.","success");renderUsers()}catch(err){console.error("Create technician error:",err);const msg=err?.code==="auth/email-already-in-use"?"Email sudah digunakan oleh akun Firebase.":err?.message||"Akun Teknisi gagal dibuat.";toast("Gagal",msg,"error")}finally{loading(false)}}}
 async function toggleTechnicianUser(id){if(!requireAdmin())return;const u=S.users.find(x=>x.id===id);if(!u||u.role!=="technician")return;const next=u.active===false;if(!confirm(`${next?"Aktifkan":"Nonaktifkan"} akun ${u.displayName||u.name||u.email||id}?`))return;try{loading(true,"Memperbarui akun...");await updateDoc(doc(db,"users",id),{active:next,updatedAt:serverTimestamp(),updatedBy:user?.uid||""});toast("Berhasil",`Akun Teknisi ${next?"diaktifkan":"dinonaktifkan"}.`,"success")}catch(err){console.error("Toggle technician error:",err);toast("Gagal","Status akun Teknisi gagal diubah.","error")}finally{loading(false)}}
 
-async function resetAllTestData(){
-  if(!requireAdmin("Reset data hanya dapat dijalankan oleh Admin."))return;
-  const body=`<div class="reset-danger-box"><h3>⚠ Konfirmasi Reset Permanen</h3><p>Tindakan ini tidak dapat dibatalkan. Data TEST Firebase dan seluruh file/foto di folder aplikasi akan dihapus.</p><div class="reset-points"><div>• Admin yang sedang login tidak dihapus.</div><div>• Akun/profil Teknisi test ikut dihapus.</div><div>• Semua file/subfolder dalam <b>AC MAINTENANCE - FOTO</b> ikut dibersihkan.</div></div></div><div class="field" style="margin-top:12px"><label>Ketik <b>RESET DATA TEST</b> untuk melanjutkan</label><input id="resetConfirmPhrase" autocomplete="off" placeholder="RESET DATA TEST"></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button type="button" class="btn danger" id="confirmResetAllTestData">Ya, Hapus Semua Data Test</button></div>`;
-  modal("Reset Semua Data Test",body);
-  $("confirmResetAllTestData").onclick=async()=>{
-    const phrase=String($("resetConfirmPhrase")?.value||"").trim().toUpperCase();
-    if(phrase!=="RESET DATA TEST"){toast("Konfirmasi salah","Ketik RESET DATA TEST persis seperti yang diminta.","warning");return}
-    try{
-      loading(true,"Menghapus data test dan foto...");
-      const token=await user.getIdToken(true);
-      const response=await fetch("/api/reset-test-data",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},body:JSON.stringify({confirmation:phrase})});
-      let result={};try{result=await response.json()}catch(_){throw new Error("Respons reset tidak valid.")}
-      if(!response.ok||!result?.ok)throw new Error(result?.error||`Reset gagal (${response.status}).`);
-      closeModal(true);
-      S.locations=[];S.vendors=[];S.mcbs=[];S.units=[];S.maintenance=[];S.users=[];S.techAccessLogs=[];
-      S.settings={maintenance:{...S.settings.maintenance},system:{...S.settings.system}};
-      renderAll();
-      toast("Reset berhasil",`Data Firebase: ${Number(result.firestoreDeleted||0)} dokumen. File Drive: ${Number(result.driveDeletedFiles||0)} file, ${Number(result.driveDeletedFolders||0)} subfolder.` ,"success");
-      setTimeout(()=>nav("dashboard"),250);
-    }catch(err){console.error("Reset all test data error:",err);toast("Reset gagal",err?.message||"Data test belum berhasil dihapus.","error")}finally{loading(false)}
-  };
-}
-
 function renderAll(){filters();if(isTechnician()&&["dashboard","report","assetsreport","costreport","mntsettings","systemsettings","users","locations","vendors"].includes(S.page)){S.page="techdashboard"}renderPage(S.page);notifications()}
 let scanCamera=null;let scanResultLock=false;
 function setScanStatus(msg,kind="info"){const x=$("scanStatus");if(x){x.textContent=msg;x.className=`note ${kind}`}}
@@ -2977,8 +2930,6 @@ if(importUnitsFileEl)importUnitsFileEl.addEventListener("change",e=>{
 
 /* EVENTS */
 document.addEventListener("click",async e=>{
-  const resetBtn=e.target.closest("#resetAllTestDataBtn");
-  if(resetBtn){e.preventDefault();if(!requireAdmin("Reset data hanya dapat dijalankan oleh Admin."))return;resetAllTestData();return}
 const resultChoice=e.target.closest("[data-result-value]");if(resultChoice){$("mResult").value=resultChoice.dataset.resultValue;updateResultButtons();return}
   if(!e.target.closest("#notifBtn,#npanel")) $("npanel")?.classList.add("hidden");
   const reportAction=e.target.closest("#exportUnits,#printUnits,#exportHist,#printHist,#exportReport,#printReport,#exportAssets,#printAssets,#exportCost,#printCost,#printLocations,#exportMcb");
