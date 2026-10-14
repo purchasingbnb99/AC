@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261014-R11.3">
+<meta name="ac-build" content="QT-20261014-R11.4">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -1046,7 +1046,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261014-R11.3</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261014-R11.4</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -2988,8 +2988,11 @@ closeModal(true);
 renderAll();
 toast("Berhasil","Lokasi disimpan.","success")}catch(e){toast("Gagal","Lokasi gagal disimpan.","error")}finally{loading(false)}}}
 function venModal(id=null){if(!requireAdmin("Master Vendor hanya dapat diubah Admin."))return;const x=id?S.vendors.find(v=>v.id===id):null;
-modal(x?"Edit Vendor / Teknisi":"Tambah Vendor / Teknisi",`<form id="venForm"><div class="formgrid"><div class="field"><label>Nama *</label><input id="vn" required value="${esc(x?.name||"")}"></div><div class="field"><label>Tipe</label><select id="vt"><option value="vendor">Vendor</option><option value="internal">Teknisi Internal</option><option value="external">Teknisi Eksternal</option></select></div><div class="field"><label>Telepon</label><input id="vp" value="${esc(x?.phone||"")}"></div><div class="field"><label>Email</label><input id="ve" type="email" value="${esc(x?.email||"")}"></div><div class="field full"><label>Alamat</label><textarea id="va">${esc(x?.address||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
+modal(x?"Edit Vendor / Teknisi":"Tambah Vendor / Teknisi",`<form id="venForm"><div class="formgrid"><div class="field"><label id="vnLabel" for="vn">Nama Vendor *</label><input id="vn" required value="${esc(x?.name||"")}" placeholder="Contoh: PT Sejuk Teknik"></div><div class="field"><label for="vt">Tipe</label><select id="vt"><option value="vendor">Vendor</option><option value="internal">Teknisi Internal</option><option value="external">Teknisi Eksternal</option></select></div><div class="field"><label for="vp">Telepon</label><input id="vp" value="${esc(x?.phone||"")}"></div><div class="field"><label for="ve">Email</label><input id="ve" type="email" value="${esc(x?.email||"")}"></div><div class="field full"><label for="va">Alamat</label><textarea id="va">${esc(x?.address||"")}</textarea></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
 if(x)$('vt').value=x.type||"vendor";
+const updateVendorNameLabel=()=>{const type=$('vt').value,isVendor=type==="vendor",label=$('vnLabel'),name=$('vn');if(label)label.textContent=isVendor?"Nama Vendor *":"Nama Teknisi *";if(name)name.placeholder=isVendor?"Contoh: PT Sejuk Teknik":"Contoh: Budi Santoso";};
+$('vt').addEventListener('change',updateVendorNameLabel);
+updateVendorNameLabel();
 $('venForm').onsubmit=async e=>{e.preventDefault();
 const d={name:$('vn').value.trim(),type:$('vt').value,phone:$('vp').value.trim(),email:$('ve').value.trim(),address:$('va').value.trim(),active:x?.active!==false};
 try{loading(true);
