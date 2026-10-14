@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261012-R9">
+<meta name="ac-build" content="QT-20261014-R11">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -1021,6 +1021,16 @@ button,input,select,textarea{font-size:14px}
 [data-role-hidden="true"]{display:none!important}
 @media(max-width:600px){.login-access{grid-template-columns:1fr}.tech-quick-grid{grid-template-columns:1fr}.tech-welcome{padding:13px}.login-card{padding:24px 18px}}
 .history-vendor-col{min-width:150px}
+/* UNIT LOCATION SEARCH + LABEL PHOTO */
+.unit-label-current{padding:10px 12px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc;margin-top:8px;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.unit-label-current a{color:#1d4ed8;font-weight:700;text-decoration:none}
+.unit-label-preview{display:flex;align-items:flex-start;gap:12px;margin-top:10px;padding:10px;border:1px solid #dbe4ee;border-radius:10px;background:#f8fafc}
+.unit-label-preview img{display:block;width:min(180px,42%);max-height:180px;object-fit:contain;border:1px solid #dbe4ee;border-radius:8px;background:#fff}
+.unit-label-preview small{display:block;color:#64748b;font-size:10px;overflow-wrap:anywhere}
+.unit-label-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.unit-label-actions .btn{min-height:36px}
+@media(max-width:560px){.unit-label-preview{flex-direction:column}.unit-label-preview img{width:100%;max-width:260px;max-height:220px}}
+
 
 </style>
 </head>
@@ -1030,7 +1040,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261012-R9</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261014-R11</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -2266,7 +2276,7 @@ function requireAdmin(message="Fitur ini hanya untuk Admin."){if(!isAdmin()){toa
 function profileName(){return userProfile?.displayName||userProfile?.name||user?.email||"Pengguna"}
 function applyRoleUI(){const tech=isTechnician();document.querySelectorAll("[data-admin-only]").forEach(el=>el.setAttribute("data-role-hidden",tech?"true":"false"));document.querySelectorAll("[data-tech-only]").forEach(el=>el.setAttribute("data-role-hidden",tech?"false":"true"));if($("userNameLabel"))$("userNameLabel").textContent=profileName();if($("userRoleLabel"))$("userRoleLabel").textContent=tech?"Teknisi":"Admin";if($("techWelcomeName"))$("techWelcomeName").textContent=`Halo, ${profileName()}`;}
 function publicVendorData(v){if(!v)return null;return {name:v.name||"",type:v.type||"vendor",active:v.active!==false,updatedAt:serverTimestamp()};}
-function publicUnitData(u){if(!u)return null;return {code:u.code||"",brand:u.brand||"",model:u.model||"",serialNumber:u.serialNumber||"",type:u.type||"",capacityPk:Number(u.capacityPk)||0,locationId:u.locationId||"",mcbId:u.mcbId||"",mapX:u.mapX??30,mapY:u.mapY??55,status:u.status||"active",lastRoutineMaintenanceDate:u.lastRoutineMaintenanceDate||"",nextRoutineMaintenanceDate:u.nextRoutineMaintenanceDate||"",maintenanceIntervalMonths:Number(u.maintenanceIntervalMonths)||3,notes:u.notes||"",updatedAt:serverTimestamp()};}
+function publicUnitData(u){if(!u)return null;return {code:u.code||"",brand:u.brand||"",model:u.model||"",serialNumber:u.serialNumber||"",type:u.type||"",capacityPk:Number(u.capacityPk)||0,locationId:u.locationId||"",mcbId:u.mcbId||"",mapX:u.mapX??30,mapY:u.mapY??55,status:u.status||"active",lastRoutineMaintenanceDate:u.lastRoutineMaintenanceDate||"",nextRoutineMaintenanceDate:u.nextRoutineMaintenanceDate||"",maintenanceIntervalMonths:Number(u.maintenanceIntervalMonths)||3,notes:u.notes||"",...(u.labelPhoto?{labelPhoto:{fileId:String(u.labelPhoto.fileId||""),url:String(u.labelPhoto.url||""),name:String(u.labelPhoto.name||""),type:String(u.labelPhoto.type||""),size:Number(u.labelPhoto.size)||0,uploadedAt:String(u.labelPhoto.uploadedAt||"")}}:{}),updatedAt:serverTimestamp()};}
 function publicMaintenanceData(m,idOverride=""){if(!m)return null;return {maintenanceNumber:m.maintenanceNumber||idOverride||"",acId:m.acId||"",date:m.date||"",type:m.type||"",resetsRoutineSchedule:!!m.resetsRoutineSchedule,intervalMonths:m.intervalMonths??null,nextRoutineMaintenanceDate:m.nextRoutineMaintenanceDate||null,vendorId:m.vendorId||"",technicianName:m.technicianName||"",complaint:m.complaint||"",inspectionResult:m.inspectionResult||"",action:m.action||"",notes:m.notes||"",checklist:m.checklist||{},checklistNotes:m.checklistNotes||"",measurements:m.measurements||{},spareParts:(m.spareParts||m.usedSpareParts||[]).map(x=>({name:x.name||"",qty:Number(x.qty)||0})),photosBefore:m.photosBefore||[],photosAfter:m.photosAfter||[],attachments:m.attachments||[],status:m.status||"active",createdAt:m.createdAt||serverTimestamp(),createdBy:m.createdBy||user?.uid||"",updatedAt:serverTimestamp(),updatedBy:user?.uid||""};}
 async function syncPublicUnit(u){if(!u||demo||!isAdmin())return;await setDoc(doc(db,"ac_units_public",u.id),publicUnitData(u),{merge:true});}
 async function syncPublicVendor(v){if(!v||demo||!isAdmin())return;await setDoc(doc(db,"vendors_public",v.id),publicVendorData(v),{merge:true});}
@@ -2581,21 +2591,74 @@ function collectMcbRouteSteps(){return[...document.querySelectorAll("#mcbRouteSt
 function addMcbRouteStep(prefill={type:"straight",text:"",floor:"",distanceM:0,x:50,y:50}){const current=collectMcbRouteSteps();renderMcbRouteEditor([...current,prefill]);const rows=document.querySelectorAll("#mcbRouteSteps [data-route-row]");rows[rows.length-1]?.querySelector(".rs-instruction")?.focus()}
 function routeStepsHtml(steps){const rows=normalizeRouteSteps(steps);if(!rows.length)return`<div class="empty">Belum ada petunjuk rute. Admin dapat mengisinya melalui Edit MCB.</div>`;return`<div>${rows.map((x,i)=>{const floor=x.floor?` • ${esc(x.floor)}`:"";return`<div class="mcb-route-step"><div class="mcb-route-num">${i+1}</div><div><b>${MCB_ROUTE_ICONS[x.type]||"•"} ${esc(MCB_ROUTE_TYPES[x.type]||"Petunjuk")}${floor}</b><small>${esc(x.text)}${x.distanceM?` • ${x.distanceM} m`:""}</small></div></div>`}).join("")}</div>`}
 function mcbModal(id=null){if(!requireAdmin("Master MCB hanya dapat diubah Admin."))return;
+  clearMcbPhotoPreviewUrl();
+  pendingMcbPhotoUpload=null;
+  pendingMcbPhotoUploadKey="";
   const x=id?mcb(id):null;
   const locations=S.locations.filter(v=>v.active!==false).map(v=>`<option value="${esc(v.id)}" ${x?.locationId===v.id?'selected':''}>${esc(loc(v.id))}</option>`).join('');
   const linkedIds=new Set(x?mcbLinkedUnits(x.id).map(v=>v.id):[]);
   const unitOptions=S.units.filter(v=>v.status!=='disposed').map(v=>`<option value="${esc(v.id)}" ${linkedIds.has(v.id)?'selected':''}>${esc(v.code)} — ${esc(v.brand||'')} ${esc(v.model||'')}</option>`).join('');
   const existingRoute=normalizeRouteSteps(x?.routeSteps||[]);
-  modal(x?'Edit MCB':'Tambah MCB',`<form id="mcbForm"><div class="formgrid"><div class="field"><label>Kode MCB *</label><input id="mCode" required value="${esc(x?.code||('MCB-'+String(S.mcbs.length+1).padStart(3,'0')))}" ${x?'readonly':''}></div><div class="field"><label>Panel *</label><input id="mPanel" required value="${esc(x?.panelName||'')}"></div><div class="field"><label>Nomor MCB *</label><input id="mNumber" required value="${esc(x?.number||'')}"></div><div class="field"><label>Rating (A)</label><input id="mRating" type="number" min="0" step="1" value="${esc(x?.ratingA||16)}"></div><div class="field"><label>Pole</label><select id="mPole"><option value="1P">1P</option><option value="2P">2P</option><option value="3P">3P</option><option value="4P">4P</option></select></div><div class="field"><label>Lokasi</label><select id="mLoc"><option value="">Pilih lokasi</option>${locations}</select></div><div class="field full"><label>Titik / Posisi Fisik</label><input id="mPoint" value="${esc(x?.point||'')}" placeholder="Contoh: Electrical Room Lt. 2, panel baris 2 kolom 3"></div><div class="field"><label>Sirkuit</label><input id="mCircuit" value="${esc(x?.circuit||'')}" placeholder="Contoh: AC-001"></div><div class="field"><label>Status</label><select id="mStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field full"><label>Unit AC Terhubung</label><select id="mUnits" multiple size="5">${unitOptions}</select><small style="display:block;color:var(--muted);margin-top:5px">Satu MCB dapat dihubungkan ke beberapa Unit AC.</small></div><div class="field"><label>Posisi MCB pada peta X (%)</label><input id="mMapX" type="number" min="5" max="95" step="0.1" value="${esc(x?.mapX??80)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div><div class="field"><label>Posisi MCB pada peta Y (%)</label><input id="mMapY" type="number" min="8" max="92" step="0.1" value="${esc(x?.mapY??30)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div></div><div class="section"><h3>Rute Bertitik + Petunjuk Langkah</h3><div class="mcb-route-routehint">Rute disimpan sebagai urutan langkah. Anda dapat memasukkan <b>belok kanan/kiri, koridor, ruangan, tangga naik/turun, lift, pintu</b>, sampai tujuan MCB. Koordinat X/Y dipakai hanya untuk menggambar rute pada peta skematik.</div><div id="mcbRouteSteps" style="margin-top:10px"></div><div class="mcb-route-toolbar"><small>Setiap langkah sebaiknya memiliki petunjuk yang jelas. Jarak bersifat opsional.</small><button type="button" class="btn" id="addMcbRouteStep">＋ Tambah Langkah</button></div></div><div class="section"><h3>Catatan</h3><textarea id="mcbNotes">${esc(x?.notes||'')}</textarea></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan MCB</button></div></form>`);
+  const savedMcbPhoto=x?.photoIdentification||null;
+  const savedMcbPhotoUrl=savedMcbPhoto?.url||(savedMcbPhoto?.fileId?`https://drive.google.com/file/d/${encodeURIComponent(savedMcbPhoto.fileId)}/view`:"");
+  const savedMcbPhotoHtml=savedMcbPhoto?.fileId?`<div class="unit-label-current" id="mPhotoSaved">✅ Foto MCB tersimpan: <b>${esc(savedMcbPhoto.name||savedMcbPhoto.storedName||"Foto identifikasi MCB")}</b><br><a href="${esc(savedMcbPhotoUrl)}" target="_blank" rel="noopener noreferrer">↗ Buka foto di Google Drive</a></div>`:`<div class="unit-label-current" id="mPhotoSaved">Belum ada foto identifikasi MCB tersimpan.</div>`;
+  modal(x?'Edit MCB':'Tambah MCB',`<form id="mcbForm"><div class="formgrid"><div class="field"><label>Kode MCB *</label><input id="mCode" required value="${esc(x?.code||('MCB-'+String(S.mcbs.length+1).padStart(3,'0')))}" ${x?'readonly':''}></div><div class="field"><label>Panel *</label><input id="mPanel" required value="${esc(x?.panelName||'')}"></div><div class="field"><label>Nomor MCB *</label><input id="mNumber" required value="${esc(x?.number||'')}"></div><div class="field"><label>Rating (A)</label><input id="mRating" type="number" min="0" step="1" value="${esc(x?.ratingA||16)}"></div><div class="field"><label>Pole</label><select id="mPole"><option value="1P">1P</option><option value="2P">2P</option><option value="3P">3P</option><option value="4P">4P</option></select></div><div class="field"><label>Lokasi</label><select id="mLoc"><option value="">Pilih lokasi</option>${locations}</select></div><div class="field full"><label>Titik / Posisi Fisik</label><input id="mPoint" value="${esc(x?.point||'')}" placeholder="Contoh: Electrical Room Lt. 2, panel baris 2 kolom 3"></div><div class="field"><label>Sirkuit</label><input id="mCircuit" value="${esc(x?.circuit||'')}" placeholder="Contoh: AC-001"></div><div class="field"><label>Status</label><select id="mStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field full"><label>Unit AC Terhubung</label><select id="mUnits" multiple size="5">${unitOptions}</select><small style="display:block;color:var(--muted);margin-top:5px">Satu MCB dapat dihubungkan ke beberapa Unit AC.</small></div><div class="field"><label>Posisi MCB pada peta X (%)</label><input id="mMapX" type="number" min="5" max="95" step="0.1" value="${esc(x?.mapX??80)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div><div class="field"><label>Posisi MCB pada peta Y (%)</label><input id="mMapY" type="number" min="8" max="92" step="0.1" value="${esc(x?.mapY??30)}"><small class="form-help">Titik tujuan MCB pada peta skematik.</small></div></div><div class="section"><h3>Foto Identifikasi MCB</h3><div class="field"><label>Upload Foto MCB (Opsional)</label><input id="mPhotoInput" type="file" accept="image/*"><small class="form-help">Ambil foto yang memperlihatkan MCB tujuan beserta posisi atau MCB di sekitarnya agar teknisi dapat membedakannya dari tipe yang sama. Foto dikompresi dan disimpan di Google Drive; maksimal 2,5 MB setelah kompresi.</small>${savedMcbPhotoHtml}<div id="mPhotoPreview" class="unit-label-preview hidden"></div><div class="unit-label-actions"><button type="button" class="btn hidden" id="mPhotoClear">Batalkan pilihan foto baru</button></div></div></div><div class="section"><h3>Rute Bertitik + Petunjuk Langkah</h3><div class="mcb-route-routehint">Rute disimpan sebagai urutan langkah. Anda dapat memasukkan <b>belok kanan/kiri, koridor, ruangan, tangga naik/turun, lift, pintu</b>, sampai tujuan MCB. Koordinat X/Y dipakai hanya untuk menggambar rute pada peta skematik.</div><div id="mcbRouteSteps" style="margin-top:10px"></div><div class="mcb-route-toolbar"><small>Setiap langkah sebaiknya memiliki petunjuk yang jelas. Jarak bersifat opsional.</small><button type="button" class="btn" id="addMcbRouteStep">＋ Tambah Langkah</button></div></div><div class="section"><h3>Catatan</h3><textarea id="mcbNotes">${esc(x?.notes||'')}</textarea></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan MCB</button></div></form>`);
   if(x){$('mPole').value=x.pole||'1P';$('mStatus').value=x.status||'active'}
   renderMcbRouteEditor(existingRoute);
   $('addMcbRouteStep').onclick=()=>addMcbRouteStep();
-  $('mcbForm').onsubmit=async e=>{e.preventDefault();const code=$('mCode').value.trim().toUpperCase(),panel=$('mPanel').value.trim(),number=$('mNumber').value.trim(),locationId=$('mLoc').value;if(!code||!panel||!number||!locationId)return toast('Validasi','Kode, Panel, Nomor MCB, dan Lokasi wajib diisi.','warning');if(!x&&S.mcbs.some(v=>String(v.code).toUpperCase()===code))return toast('Duplikat','Kode MCB sudah digunakan.','error');const selected=[...$('mUnits').selectedOptions].map(o=>o.value);const mapX=clampMapX($('mMapX').value,80),mapY=clampMapY($('mMapY').value,30),routeSteps=collectMcbRouteSteps();const data={code,panelName:panel,number,ratingA:Number($('mRating').value)||0,pole:$('mPole').value,locationId,point:$('mPoint').value.trim(),circuit:$('mCircuit').value.trim(),status:$('mStatus').value,mapX,mapY,routeSteps,notes:$('mcbNotes').value.trim()};try{loading(true);const targetId=x?.id||code;if(demo){if(x)Object.assign(x,data);else S.mcbs.push({id:targetId,...data});S.units.forEach(v=>{if(selected.includes(v.id))v.mcbId=targetId;else if(v.mcbId===targetId)v.mcbId=''});}else{if(x)await save('mcbs',x.id,data);else await setDoc(doc(db,'mcbs',targetId),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||'admin'});const affected=S.units.filter(v=>selected.includes(v.id)||v.mcbId===targetId);for(const v of affected){const mcbValue=selected.includes(v.id)?targetId:'';await updateDoc(doc(db,'ac_units',v.id),{mcbId:mcbValue,updatedAt:serverTimestamp()});await syncPublicUnit({...v,mcbId:mcbValue})}}closeModal(true);renderAll();toast('Berhasil','Data MCB dan rute navigasi disimpan.','success')}catch(err){console.error('MCB save error:',err);toast('Gagal','Data MCB gagal disimpan.','error')}finally{loading(false)}};
+  const mPhotoInput=$("mPhotoInput"),mPhotoPreview=$("mPhotoPreview"),mPhotoClear=$("mPhotoClear"),mPhotoSaved=$("mPhotoSaved");
+  const clearSelectedMcbPhoto=()=>{
+    clearMcbPhotoPreviewUrl();pendingMcbPhotoUpload=null;pendingMcbPhotoUploadKey="";
+    if(mPhotoInput)mPhotoInput.value="";
+    if(mPhotoPreview){mPhotoPreview.innerHTML="";mPhotoPreview.classList.add("hidden");}
+    if(mPhotoClear)mPhotoClear.classList.add("hidden");
+    if(mPhotoSaved)mPhotoSaved.classList.remove("hidden");
+  };
+  if(mPhotoInput)mPhotoInput.addEventListener("change",()=>{
+    clearMcbPhotoPreviewUrl();pendingMcbPhotoUpload=null;pendingMcbPhotoUploadKey="";
+    const file=mPhotoInput.files?.[0];
+    if(!file){if(mPhotoPreview){mPhotoPreview.innerHTML="";mPhotoPreview.classList.add("hidden");}if(mPhotoClear)mPhotoClear.classList.add("hidden");if(mPhotoSaved)mPhotoSaved.classList.remove("hidden");return;}
+    if(!file.type?.startsWith("image/")){mPhotoInput.value="";if(mPhotoSaved)mPhotoSaved.classList.remove("hidden");toast("Format tidak didukung","Pilih file gambar untuk foto identifikasi MCB.","warning");return;}
+    try{mcbPhotoPreviewUrl=URL.createObjectURL(file);}catch(err){console.warn("Preview foto MCB tidak tersedia:",err);toast("Pratinjau tidak tersedia","File tetap dapat dipilih untuk diunggah.","warning");}
+    if(mPhotoSaved)mPhotoSaved.classList.add("hidden");
+    if(mPhotoPreview){mPhotoPreview.innerHTML=`${mcbPhotoPreviewUrl?`<img src="${mcbPhotoPreviewUrl}" alt="Pratinjau foto identifikasi MCB">`:""}<div><b>Foto baru dipilih</b><small>${esc(file.name)} • ${(file.size/1024/1024).toFixed(2)} MB sebelum kompresi</small><small>Foto lama tetap tersimpan jika proses upload atau penyimpanan gagal.</small></div>`;mPhotoPreview.classList.remove("hidden");}
+    if(mPhotoClear)mPhotoClear.classList.remove("hidden");
+  });
+  if(mPhotoClear)mPhotoClear.addEventListener("click",clearSelectedMcbPhoto);
+  $('mcbForm').onsubmit=async e=>{
+    e.preventDefault();
+    const code=$('mCode').value.trim().toUpperCase(),panel=$('mPanel').value.trim(),number=$('mNumber').value.trim(),locationId=$('mLoc').value,selectedPhotoFile=$('mPhotoInput')?.files?.[0]||null;
+    if(!code||!panel||!number||!locationId)return toast('Validasi','Kode, Panel, Nomor MCB, dan Lokasi wajib diisi.','warning');
+    if(!x&&S.mcbs.some(v=>String(v.code).toUpperCase()===code))return toast('Duplikat','Kode MCB sudah digunakan.','error');
+    if(selectedPhotoFile&&demo)return toast('Mode demo','Upload foto MCB ke Google Drive membutuhkan koneksi backend. Data MCB belum disimpan.','warning');
+    const selected=[...$('mUnits').selectedOptions].map(o=>o.value),mapX=clampMapX($('mMapX').value,80),mapY=clampMapY($('mMapY').value,30),routeSteps=collectMcbRouteSteps();
+    const data={code,panelName:panel,number,ratingA:Number($('mRating').value)||0,pole:$('mPole').value,locationId,point:$('mPoint').value.trim(),circuit:$('mCircuit').value.trim(),status:$('mStatus').value,mapX,mapY,routeSteps,notes:$('mcbNotes').value.trim(),photoIdentification:x?.photoIdentification||null};
+    const saveButton=$('mcbForm').querySelector('button[type="submit"],button:not([type])');
+    if(saveButton){saveButton.disabled=true;saveButton.dataset.originalText=saveButton.textContent;saveButton.textContent='⏳ Menyimpan...';}
+    try{
+      loading(true,selectedPhotoFile?'Mengompres dan mengunggah foto MCB ke Google Drive...':'Menyimpan data MCB...');
+      if(selectedPhotoFile){
+        const fileKey=unitLabelFileKey(selectedPhotoFile);
+        if(pendingMcbPhotoUpload&&pendingMcbPhotoUploadKey===fileKey)data.photoIdentification=pendingMcbPhotoUpload;
+        else{const uploaded=await uploadMcbIdentificationPhoto(code,selectedPhotoFile);pendingMcbPhotoUpload=uploaded;pendingMcbPhotoUploadKey=fileKey;data.photoIdentification=uploaded;}
+      }
+      const targetId=x?.id||code;
+      if(demo){if(x)Object.assign(x,data);else S.mcbs.push({id:targetId,...data});S.units.forEach(v=>{if(selected.includes(v.id))v.mcbId=targetId;else if(v.mcbId===targetId)v.mcbId='';});}
+      else{
+        if(x)await save('mcbs',x.id,data);
+        else await setDoc(doc(db,'mcbs',targetId),{...data,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||'admin'});
+        const affected=S.units.filter(v=>selected.includes(v.id)||v.mcbId===targetId);
+        for(const v of affected){const mcbValue=selected.includes(v.id)?targetId:'';await updateDoc(doc(db,'ac_units',v.id),{mcbId:mcbValue,updatedAt:serverTimestamp()});await syncPublicUnit({...v,mcbId:mcbValue});}
+      }
+      closeModal(true);renderAll();toast('Berhasil','Data MCB, foto, dan rute navigasi disimpan.','success');
+    }catch(err){console.error('MCB save/upload error:',err);toast('Gagal',err?.message||'Data MCB gagal disimpan. Periksa koneksi dan konfigurasi upload.','error');}
+    finally{loading(false);if(saveButton){saveButton.disabled=false;saveButton.textContent=saveButton.dataset.originalText||'💾 Simpan MCB';delete saveButton.dataset.originalText;}}
+  };
 }
 function getMcbTarget(m){return{x:(clampMapX(m?.mapX,80))*10,y:(clampMapY(m?.mapY,30))*6}}
 function getRoutePolyline(you,target,steps=[]){const pts=[];if(you)pts.push({x:you.x,y:you.y});normalizeRouteSteps(steps).forEach(s=>pts.push({x:s.x*10,y:s.y*6}));if(target)pts.push(target);if(pts.length<2)return'';let d=`M ${pts[0].x.toFixed(1)} ${pts[0].y.toFixed(1)}`;for(let i=1;i<pts.length;i++)d+=` L ${pts[i].x.toFixed(1)} ${pts[i].y.toFixed(1)}`;return d}
 function routeDistanceLabel(steps){const rows=normalizeRouteSteps(steps),total=rows.reduce((a,x)=>a+(Number(x.distanceM)||0),0);return total?`± ${total.toLocaleString('id-ID')} m • ${rows.length} langkah`:`${rows.length} langkah`}
-function drawMcbMap(){const svg=$('mcbMapSvg');if(!svg)return;const locId=$('mapLoc')?.value||'',unitId=$('mapUnit')?.value||'',targetId=$('mapMcb')?.value||'',selectedMcb=targetId?mcb(targetId):null,selectedUnit=unitId?unit(unitId):null,you=mapState.you,sameLocMcbs=S.mcbs.filter(x=>(!locId||x.locationId===locId)&&x.status!=='inactive'),sameLocUnits=S.units.filter(x=>(!locId||x.locationId===locId)&&x.status!=='disposed'),target=selectedMcb?getMcbTarget(selectedMcb):null,steps=normalizeRouteSteps(selectedMcb?.routeSteps||[]),route=getRoutePolyline(you,target,steps);svg.innerHTML=`<defs><pattern id="mcbGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="#dbe5ef" stroke-width="1"/></pattern><filter id="mcbShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#64748b" flood-opacity=".18"/></filter></defs><rect x="0" y="0" width="1000" height="600" fill="url(#mcbGrid)"/><rect x="35" y="35" width="930" height="530" rx="18" fill="none" stroke="#cbd5e1" stroke-width="2"/><text x="55" y="75" class="mcb-map-floor">${esc(locId?loc(locId):'PETA GEDUNG / LANTAI')}</text><text x="55" y="96" class="mcb-map-sub">${steps.length?'Rute mengikuti titik navigasi tersimpan':'Belum ada rute bertitik. Edit MCB untuk menambahkan langkah.'}</text>${route?`<path d="${route}" class="mcb-route"/>`:''}${steps.map((s,i)=>{const x=s.x*10,y=s.y*6;return`<g><circle class="mcb-route-map-step" cx="${x}" cy="${y}" r="12"/><text x="${x}" y="${y+1}" class="mcb-route-map-step-label">${i+1}</text><text x="${x+16}" y="${y-6}" class="mcb-map-label">${esc(MCB_ROUTE_TYPES[s.type]||'Petunjuk')}</text><text x="${x+16}" y="${y+10}" class="mcb-map-sub">${esc(s.floor||'')}</text></g>`}).join('')}${sameLocUnits.map(u=>{const x=clampMapX(u.mapX,30)*10,y=clampMapY(u.mapY,55)*6,active=selectedUnit?.id===u.id;return`<g class="mcb-map-unit" data-map-unit="${esc(u.id)}"><circle cx="${x}" cy="${y}" r="${active?12:8}" fill="#64748b" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${x+14}" y="${y-7}" class="mcb-map-label">${esc(u.code)}</text><text x="${x+14}" y="${y+9}" class="mcb-map-sub">${esc(u.brand||'')}</text></g>`}).join('')}${sameLocMcbs.map(m=>{const t=getMcbTarget(m),active=selectedMcb?.id===m.id;return`<g class="mcb-map-point" data-map-mcb="${esc(m.id)}"><rect x="${t.x-12}" y="${t.y-12}" width="24" height="24" rx="7" fill="#f59e0b" stroke="#fff" stroke-width="${active?4:3}" filter="url(#mcbShadow)"/><text x="${t.x+18}" y="${t.y-7}" class="mcb-map-label">${esc(m.code)}</text><text x="${t.x+18}" y="${t.y+9}" class="mcb-map-sub">${esc(m.panelName||'Panel')} / ${esc(m.number||'-')}</text></g>`}).join('')}${you?`<g><circle cx="${you.x}" cy="${you.y}" r="11" fill="#2563eb" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${you.x+16}" y="${you.y+5}" class="mcb-map-label">Anda</text></g>`:''}`;svg.onclick=e=>{if(e.target.closest('[data-map-mcb],[data-map-unit]'))return;const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return;const sp=pt.matrixTransform(ctm.inverse());mapState.you={x:Math.max(45,Math.min(955,sp.x)),y:Math.max(45,Math.min(555,sp.y))};drawMcbMap()};svg.querySelectorAll('[data-map-mcb]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();if($('mapMcb'))$('mapMcb').value=el.dataset.mapMcb;drawMcbMap()}));svg.querySelectorAll('[data-map-unit]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const id=el.dataset.mapUnit;if($('mapUnit'))$('mapUnit').value=id;const linked=unit(id)?.mcbId;if(linked&&mcb(linked)&&$('mapMcb'))$('mapMcb').value=linked;drawMcbMap()}));if($('mcbMapSelected'))$('mcbMapSelected').textContent=selectedMcb?`${selectedMcb.code} • ${selectedMcb.panelName||'Panel'}${selectedUnit?' • '+selectedUnit.code:''}`:'Pilih MCB / Unit AC';if($('mapYouInfo'))$('mapYouInfo').textContent=you?`X ${Math.round(you.x/10)}% • Y ${Math.round(you.y/6)}%`:'Tap peta untuk menentukan';if($('mapTargetInfo'))$('mapTargetInfo').textContent=selectedMcb?`${selectedMcb.code} • ${selectedMcb.panelName||'Panel'} • ${selectedMcb.point||'Titik belum diisi'}`:'Pilih MCB';if($('mapDistanceInfo'))$('mapDistanceInfo').textContent=selectedMcb?(steps.length?routeDistanceLabel(steps):'Belum ada rute'): '-';if($('mapRouteSteps'))$('mapRouteSteps').innerHTML=selectedMcb?routeStepsHtml(steps):'<div class="empty">Pilih MCB untuk melihat petunjuk rute.</div>'}
+function drawMcbMap(){const svg=$('mcbMapSvg');if(!svg)return;const locId=$('mapLoc')?.value||'',unitId=$('mapUnit')?.value||'',targetId=$('mapMcb')?.value||'',selectedMcb=targetId?mcb(targetId):null,selectedUnit=unitId?unit(unitId):null,you=mapState.you,sameLocMcbs=S.mcbs.filter(x=>(!locId||x.locationId===locId)&&x.status!=='inactive'),sameLocUnits=S.units.filter(x=>(!locId||x.locationId===locId)&&x.status!=='disposed'),target=selectedMcb?getMcbTarget(selectedMcb):null,steps=normalizeRouteSteps(selectedMcb?.routeSteps||[]),route=getRoutePolyline(you,target,steps);svg.innerHTML=`<defs><pattern id="mcbGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="#dbe5ef" stroke-width="1"/></pattern><filter id="mcbShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#64748b" flood-opacity=".18"/></filter></defs><rect x="0" y="0" width="1000" height="600" fill="url(#mcbGrid)"/><rect x="35" y="35" width="930" height="530" rx="18" fill="none" stroke="#cbd5e1" stroke-width="2"/><text x="55" y="75" class="mcb-map-floor">${esc(locId?loc(locId):'PETA GEDUNG / LANTAI')}</text><text x="55" y="96" class="mcb-map-sub">${steps.length?'Rute mengikuti titik navigasi tersimpan':'Belum ada rute bertitik. Edit MCB untuk menambahkan langkah.'}</text>${route?`<path d="${route}" class="mcb-route"/>`:''}${steps.map((s,i)=>{const x=s.x*10,y=s.y*6;return`<g><circle class="mcb-route-map-step" cx="${x}" cy="${y}" r="12"/><text x="${x}" y="${y+1}" class="mcb-route-map-step-label">${i+1}</text><text x="${x+16}" y="${y-6}" class="mcb-map-label">${esc(MCB_ROUTE_TYPES[s.type]||'Petunjuk')}</text><text x="${x+16}" y="${y+10}" class="mcb-map-sub">${esc(s.floor||'')}</text></g>`}).join('')}${sameLocUnits.map(u=>{const x=clampMapX(u.mapX,30)*10,y=clampMapY(u.mapY,55)*6,active=selectedUnit?.id===u.id;return`<g class="mcb-map-unit" data-map-unit="${esc(u.id)}"><circle cx="${x}" cy="${y}" r="${active?12:8}" fill="#64748b" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${x+14}" y="${y-7}" class="mcb-map-label">${esc(u.code)}</text><text x="${x+14}" y="${y+9}" class="mcb-map-sub">${esc(u.brand||'')}</text></g>`}).join('')}${sameLocMcbs.map(m=>{const t=getMcbTarget(m),active=selectedMcb?.id===m.id;return`<g class="mcb-map-point" data-map-mcb="${esc(m.id)}"><rect x="${t.x-12}" y="${t.y-12}" width="24" height="24" rx="7" fill="#f59e0b" stroke="#fff" stroke-width="${active?4:3}" filter="url(#mcbShadow)"/><text x="${t.x+18}" y="${t.y-7}" class="mcb-map-label">${esc(m.code)}</text><text x="${t.x+18}" y="${t.y+9}" class="mcb-map-sub">${esc(m.panelName||'Panel')} / ${esc(m.number||'-')}</text></g>`}).join('')}${you?`<g><circle cx="${you.x}" cy="${you.y}" r="11" fill="#2563eb" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${you.x+16}" y="${you.y+5}" class="mcb-map-label">Anda</text></g>`:''}`;svg.onclick=e=>{if(e.target.closest('[data-map-mcb],[data-map-unit]'))return;const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return;const sp=pt.matrixTransform(ctm.inverse());mapState.you={x:Math.max(45,Math.min(955,sp.x)),y:Math.max(45,Math.min(555,sp.y))};drawMcbMap()};svg.querySelectorAll('[data-map-mcb]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();if($('mapMcb'))$('mapMcb').value=el.dataset.mapMcb;drawMcbMap()}));svg.querySelectorAll('[data-map-unit]').forEach(el=>el.addEventListener('click',e=>{e.stopPropagation();const id=el.dataset.mapUnit;if($('mapUnit'))$('mapUnit').value=id;const linked=unit(id)?.mcbId;if(linked&&mcb(linked)&&$('mapMcb'))$('mapMcb').value=linked;drawMcbMap()}));if($('mcbMapSelected'))$('mcbMapSelected').textContent=selectedMcb?`${selectedMcb.code} • ${selectedMcb.panelName||'Panel'}${selectedUnit?' • '+selectedUnit.code:''}`:'Pilih MCB / Unit AC';if($('mapYouInfo'))$('mapYouInfo').textContent=you?`X ${Math.round(you.x/10)}% • Y ${Math.round(you.y/6)}%`:'Tap peta untuk menentukan';if($('mapTargetInfo'))$('mapTargetInfo').textContent=selectedMcb?`${selectedMcb.code} • ${selectedMcb.panelName||'Panel'} • ${selectedMcb.point||'Titik belum diisi'}`:'Pilih MCB';if($('mapDistanceInfo'))$('mapDistanceInfo').textContent=selectedMcb?(steps.length?routeDistanceLabel(steps):'Belum ada rute'):'-';if($('mapRouteSteps')){const photo=selectedMcb?.photoIdentification;const photoUrl=photo?.url||(photo?.fileId?`https://drive.google.com/file/d/${encodeURIComponent(photo.fileId)}/view`:'');const photoBlock=selectedMcb?`<div class="section" style="margin-bottom:12px;padding-top:12px"><h3>Foto Identifikasi MCB</h3>${photo?.fileId?`<div class="unit-label-current">📷 <b>${esc(photo.name||photo.storedName||"Foto MCB")}</b><br><a href="${esc(photoUrl)}" target="_blank" rel="noopener noreferrer">↗ Buka foto MCB di Google Drive</a></div>`:'<div class="empty">Belum ada foto identifikasi untuk MCB ini.</div>'}</div>`:'';$('mapRouteSteps').innerHTML=photoBlock+(selectedMcb?routeStepsHtml(steps):'<div class="empty">Pilih MCB untuk melihat petunjuk rute.</div>')}}
 function routePath(a,b){return getRoutePolyline(a,b,[])}
 const mapState={you:null};
 function syncMapControls(){const unitId=$('mapUnit')?.value||'',mm=$('mapMcb');if(!mm)return;const linked=unitId?unit(unitId)?.mcbId:'';if(linked&&mcb(linked))mm.value=linked;drawMcbMap()}
@@ -2613,7 +2676,10 @@ function mcbInfoHtml(u){
   const mx=mcb(u?.mcbId);
   if(!mx)return '<div class="empty">Belum ada MCB yang terhubung.</div>';
   const steps=normalizeRouteSteps(mx.routeSteps||[]);
-  return `<div class="summary"><div class="sum"><small>MCB</small><b>${esc(mx.code)}</b></div><div class="sum"><small>Panel</small><b>${esc(mx.panelName||"-")}</b></div><div class="sum"><small>Nomor</small><b>${esc(mx.number||"-")}</b></div><div class="sum"><small>Rating</small><b>${esc(mx.ratingA||0)} A ${esc(mx.pole||"")}</b></div><div class="sum"><small>Titik</small><b>${esc(mx.point||"-")}</b></div><div class="sum"><small>Rute</small><b>${steps.length?`${steps.length} langkah`:'Belum dibuat'}</b></div></div><div class="ma"><button type="button" class="btn primary" data-mcb-navigate="${esc(mx.id)}">🧭 Arah ke MCB</button></div>`;
+  const photo=mx.photoIdentification||null;
+  const photoUrl=photo?.url||(photo?.fileId?`https://drive.google.com/file/d/${encodeURIComponent(photo.fileId)}/view`:"");
+  const photoBlock=photo?.fileId?`<div class="unit-label-current" style="margin-top:10px">📷 <b>${esc(photo.name||photo.storedName||"Foto identifikasi MCB")}</b><br><a href="${esc(photoUrl)}" target="_blank" rel="noopener noreferrer">↗ Buka foto MCB di Google Drive</a></div>`:`<div class="form-help" style="margin-top:8px">Belum ada foto identifikasi untuk MCB ini.</div>`;
+  return `<div class="summary"><div class="sum"><small>MCB</small><b>${esc(mx.code)}</b></div><div class="sum"><small>Panel</small><b>${esc(mx.panelName||"-")}</b></div><div class="sum"><small>Nomor</small><b>${esc(mx.number||"-")}</b></div><div class="sum"><small>Rating</small><b>${esc(mx.ratingA||0)} A ${esc(mx.pole||"")}</b></div><div class="sum"><small>Titik</small><b>${esc(mx.point||"-")}</b></div><div class="sum"><small>Rute</small><b>${steps.length?`${steps.length} langkah`:'Belum dibuat'}</b></div></div>${photoBlock}<div class="ma"><button type="button" class="btn primary" data-mcb-navigate="${esc(mx.id)}">🧭 Arah ke MCB</button></div>`;
 }
 function showScannedUnit(raw){const value=String(raw||"").trim().toUpperCase(),box=$("scanResult");if(!box)return;if(!value){box.innerHTML=`<div class="empty">ID Unit AC belum diisi.</div>`;setScanStatus("Masukkan ID Unit AC atau lakukan scan.","info");return}const u=unit(value);if(!u){box.innerHTML=`<div class="empty">Unit <b>${esc(value)}</b> tidak ditemukan di database.</div>`;setScanStatus("Barcode terbaca, tetapi Unit AC tidak ditemukan.","warning");return}setScanStatus(`Unit ${u.code} ditemukan.` ,"success");const ms=S.maintenance.filter(x=>x.acId===u.id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),last=ms[0];const tech=isTechnician();const priceBlock=tech?"":`<div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div><div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Total Biaya</small><b>${cur(ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0))}</b></div>`;const detailPurchase=tech?"":`<div class="section"><h3>Detail Pembelian & Kondisi</h3><div class="formgrid scan-detail-grid"><div><small>Harga Pembelian</small><b>${cur(u.purchasePrice)}</b></div><div><small>Invoice / PO</small><b>${esc(u.invoiceNumber||"-")}</b></div><div><small>Instalasi</small><b>${date(u.installationDate)}</b></div><div><small>Garansi</small><b>${date(u.warrantyUntil)}</b></div></div></div>`;const histCostHeader=tech?"":`<th data-admin-only>Biaya</th>`;const histCostCells=m=>tech?"":`<td>${cur(m.totalCost)}</td>`;box.innerHTML=`<div class="summary"><div class="sum"><small>ID Unit</small><b>${esc(u.code)}</b></div><div class="sum"><small>Status</small><b>${stBadge(u.status)}</b></div><div class="sum"><small>Merk / Model</small><b>${esc(u.brand)} ${esc(u.model||"")}</b></div><div class="sum"><small>Jenis</small><b>${esc(u.type||"-")}</b></div><div class="sum"><small>Kapasitas</small><b>${esc(u.capacityPk)} PK</b></div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div>${priceBlock}<div class="sum"><small>Maintenance Terakhir</small><b>${last?date(last.date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)} ${ssBadge(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div></div><div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div>${detailPurchase}<div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCostHeader}</tr></thead><tbody>${ms.length?ms.slice(0,10).map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCostCells(m)}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori maintenance.</td></tr>`}</tbody></table></div></div><div class="ma"><button type="button" class="btn primary" data-scan-maint="${esc(u.id)}">＋ Input Maintenance</button><button type="button" class="btn" data-scan-detail="${esc(u.id)}">Detail Unit</button></div>`}
 async function startScanCamera(){if(scanCamera&&scanCamera.isScanning){setScanCameraButtonState();return}if(typeof Html5Qrcode==="undefined"){setScanStatus("Modul scanner tidak tersedia. Gunakan input ID manual.","warning");setScanCameraButtonState();return}try{if(scanCamera){try{await scanCamera.clear()}catch(_){}scanCamera=null}scanCamera=new Html5Qrcode("qrReader");setScanStatus("Meminta akses kamera...","info");const cfg={fps:10,qrbox:{width:300,height:150},aspectRatio:1.777778,formatsToSupport:[Html5QrcodeSupportedFormats.CODE_128]};await scanCamera.start({facingMode:"environment"},cfg,async(decodedText)=>{if(scanResultLock)return;scanResultLock=true;const value=decodedText.trim();$("scanInput").value=value;await stopScanCamera();showScannedUnit(value);setTimeout(()=>{scanResultLock=false},1200)},()=>{});setScanStatus("Kamera aktif. Arahkan barcode ke kotak scan.","success");setScanCameraButtonState()}catch(err){console.error("Barcode camera error:",err);await stopScanCamera();setScanStatus("Kamera tidak dapat digunakan. Periksa izin kamera atau gunakan input ID manual.","warning")}}
@@ -2638,9 +2704,73 @@ render();
 }
 function downloadBarcodeSvg(u){if(typeof JsBarcode==="undefined")return toast("Gagal","Generator barcode tidak tersedia.","error");const svg=document.createElementNS("http://www.w3.org/2000/svg","svg");JsBarcode(svg,u.code,{format:"CODE128",width:2,height:70,displayValue:true,fontSize:18,margin:8});const xml=new XMLSerializer().serializeToString(svg);const blob=new Blob([xml],{type:"image/svg+xml;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download=`barcode-${u.code}.svg`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),100)}
 function printBarcodeLabel(u){if(typeof JsBarcode==="undefined")return toast("Gagal","Generator barcode tidak tersedia.","error");const holder=document.createElement("div");holder.className="barcode-print-sheet";holder.id="barcodePrintSheet";holder.innerHTML=`<div class="barcode-label"><div style="font-size:15pt;font-weight:800">${esc(S.settings.system.companyName||"AC MAINTENANCE")}</div><div class="barcode-sub">${esc(u.brand||"")} ${esc(u.model||"")} • ${esc(u.capacityPk||"")} PK</div><svg id="barcodePrintSvg"></svg><div class="barcode-meta">${esc(u.code)}</div><div class="barcode-sub">${esc(loc(u.locationId))}</div></div>`;document.body.appendChild(holder);const svg=$("barcodePrintSvg");JsBarcode(svg,u.code,{format:"CODE128",width:2.2,height:75,displayValue:true,fontSize:19,margin:10});holder.classList.add("printing-barcode");const cleanup=()=>{holder.classList.remove("printing-barcode");holder.remove();window.removeEventListener("afterprint",cleanup)};window.addEventListener("afterprint",cleanup);requestAnimationFrame(()=>window.print())}
+async function uploadUnitLabelPhoto(unitCode,file){
+  if(!user)throw new Error("Sesi Admin tidak ditemukan. Silakan login ulang.");
+  if(!file||!file.type?.startsWith("image/"))throw new Error("Pilih file gambar yang valid untuk label unit AC.");
+  const processed=await prepareMaintenanceFile(file);
+  if(!processed.type?.startsWith("image/"))throw new Error("File label harus berupa gambar.");
+  const token=await user.getIdToken(true);
+  const payload={
+    fileName:processed.name,
+    mimeType:processed.type||"image/jpeg",
+    base64Data:await fileToBase64(processed),
+    maintenanceNumber:"UNIT-LABEL",
+    unitCode:String(unitCode||"").trim(),
+    photoType:"attachments"
+  };
+  const response=await fetch("/api/drive-upload",{
+    method:"POST",
+    headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},
+    body:JSON.stringify(payload)
+  });
+  let result={};
+  try{result=await response.json()}catch(_){throw new Error("Respons upload foto label tidak valid.");}
+  if(!response.ok||!result?.ok)throw new Error(result?.error||`Upload foto label gagal (HTTP ${response.status}).`);
+  const fileId=String(result.fileId||"").trim();
+  if(!fileId)throw new Error("Server melaporkan upload berhasil tetapi tidak mengembalikan ID file. Data Unit AC belum disimpan.");
+  return {
+    fileId,
+    url:`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`,
+    name:String(file.name||processed.name),
+    storedName:processed.name,
+    type:processed.type||"image/jpeg",
+    size:Number(result.size||processed.size||0),
+    folderName:String(result.folderName||""),
+    uploadedAt:new Date().toISOString()
+  };
+}
+
+
+async function uploadMcbIdentificationPhoto(mcbCode,file){
+  if(!user)throw new Error("Sesi Admin tidak ditemukan. Silakan login ulang.");
+  if(!file||!file.type?.startsWith("image/"))throw new Error("Pilih file gambar yang valid untuk foto identifikasi MCB.");
+  const processed=await prepareMaintenanceFile(file);
+  if(!processed.type?.startsWith("image/"))throw new Error("Foto MCB harus berupa gambar.");
+  const token=await user.getIdToken(true);
+  const code=String(mcbCode||"").trim();
+  if(!code)throw new Error("Kode MCB belum tersedia untuk upload foto.");
+  const payload={fileName:processed.name,mimeType:processed.type||"image/jpeg",base64Data:await fileToBase64(processed),maintenanceNumber:"MCB-PHOTO",unitCode:code,photoType:"attachments"};
+  const response=await fetch("/api/drive-upload",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${token}`},body:JSON.stringify(payload)});
+  let result={};
+  try{result=await response.json()}catch(_){throw new Error("Respons upload foto MCB tidak valid.");}
+  if(!response.ok||!result?.ok)throw new Error(result?.error||`Upload foto MCB gagal (HTTP ${response.status}).`);
+  const fileId=String(result.fileId||"").trim();
+  if(!fileId)throw new Error("Server menyatakan upload berhasil tetapi tidak mengembalikan ID file. Data MCB belum disimpan.");
+  return {fileId,url:`https://drive.google.com/file/d/${encodeURIComponent(fileId)}/view`,name:String(file.name||processed.name),storedName:processed.name,type:processed.type||"image/jpeg",size:Number(result.size||processed.size||0),folderName:String(result.folderName||""),uploadedAt:new Date().toISOString()};
+}
+
 function nextCode(){const n=S.units.map(x=>+(String(x.code||"").replace(/\D/g,""))).filter(Boolean);
 return`AC-${String((n.length?Math.max(...n):0)+1).padStart(3,"0")}`}
 let modalDirty=false;
+let unitLabelPreviewUrl="";
+let mcbPhotoPreviewUrl="";
+let pendingMcbPhotoUpload=null;
+let pendingMcbPhotoUploadKey="";
+function clearMcbPhotoPreviewUrl(){if(mcbPhotoPreviewUrl){try{URL.revokeObjectURL(mcbPhotoPreviewUrl)}catch(_){}mcbPhotoPreviewUrl=""}}
+let pendingUnitLabelUpload=null;
+let pendingUnitLabelUploadKey="";
+function unitLabelFileKey(file){return file?[String(file.name||""),Number(file.size)||0,Number(file.lastModified)||0,String(file.type||"")].join("|"):""}
+function clearUnitLabelPreviewUrl(){if(unitLabelPreviewUrl){try{URL.revokeObjectURL(unitLabelPreviewUrl)}catch(_){}unitLabelPreviewUrl=""}}
 
 function bindModalProtection(){
   const root=$("modal");
@@ -2676,27 +2806,120 @@ function closeModal(force=false){
     if(!leave)return false;
   }
   modalDirty=false;
+  clearUnitLabelPreviewUrl();
+  clearMcbPhotoPreviewUrl();
+  pendingMcbPhotoUpload=null;
+  pendingMcbPhotoUploadKey="";
+  pendingUnitLabelUpload=null;
+  pendingUnitLabelUploadKey="";
   $("modal").innerHTML="";
   return true;
 }
-function unitModal(id=null){if(!requireAdmin("Master Unit AC hanya dapat diubah Admin."))return;const u=id?unit(id):null;
+function unitModal(id=null){
+if(!requireAdmin("Master Unit AC hanya dapat diubah Admin."))return;
+const u=id?unit(id):null;
+clearUnitLabelPreviewUrl();
+pendingUnitLabelUpload=null;
+pendingUnitLabelUploadKey="";
 const mcbOptions=S.mcbs.filter(x=>x.status!=="inactive").sort((a,b)=>String(a.code||a.id).localeCompare(String(b.code||b.id))).map(x=>`<option value="${esc(x.id)}" ${u?.mcbId===x.id?"selected":""}>${esc(x.code)} — ${esc(x.panelName||"Panel")} / ${esc(x.number||"-")}</option>`).join("");
-modal(u?"Edit Unit AC":"Tambah Unit AC",`<form id="unitForm"><div class="formgrid"><div class="field"><label>ID Unit</label><input id="fCode" readonly value="${esc(u?.code||nextCode())}"></div><div class="field"><label>Merk *</label><input id="fBrand" required value="${esc(u?.brand||"")}"></div><div class="field"><label>Model / Type</label><input id="fModel" value="${esc(u?.model||"")}"></div><div class="field"><label>Serial Number</label><input id="fSerial" value="${esc(u?.serialNumber||"")}"></div><div class="field"><label>Jenis AC</label><select id="fType"><option>Split Wall</option><option>Cassette</option><option>Floor Standing</option><option>Duct</option><option>VRV / VRF</option><option>Lainnya</option></select></div><div class="field"><label>Kapasitas PK *</label><select id="fPk">${[.5,.75,1,1.5,2,2.5,3,5].map(x=>`<option value="${x}" ${String(u?.capacityPk||1)===String(x)?"selected":""}>${x} PK</option>`).join("")}</select></div><div class="field full"><label>Lokasi *</label><select id="fLoc"><option value="">Pilih lokasi</option>${S.locations.filter(x=>x.active!==false).map(x=>`<option value="${x.id}" ${u?.locationId===x.id?"selected":""}>${esc(loc(x.id))}</option>`).join("")}</select></div></div><div class="section"><h3>Informasi Kelistrikan</h3><div class="formgrid"><div class="field full"><label>MCB Terhubung</label><select id="fMcb"><option value="">Belum ditentukan</option>${mcbOptions}</select><small id="fMcbInfo" class="form-help">Pilih MCB untuk melihat panel, rating, dan titik fisiknya.</small></div><div class="field"><label>Posisi Peta X (%)</label><input id="fMapX" type="number" min="5" max="95" step="0.1" value="${esc(u?.mapX??30)}"><small class="form-help">Posisi relatif Unit AC pada peta.</small></div><div class="field"><label>Posisi Peta Y (%)</label><input id="fMapY" type="number" min="8" max="92" step="0.1" value="${esc(u?.mapY??55)}"><small class="form-help">Posisi relatif Unit AC pada peta.</small></div></div></div><div class="section"><h3>Data Pembelian</h3><div class="form3"><div class="field"><label>Tanggal Pembelian</label><input id="fBuy" type="date" value="${u?.purchaseDate||""}"></div><div class="field"><label>Harga Pembelian</label><input id="fPrice" type="number" min="0" value="${u?.purchasePrice||0}"></div><div class="field"><label>Supplier</label><select id="fSupplier"><option value="">Pilih</option>${S.vendors.map(x=>`<option value="${x.id}" ${u?.supplierId===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div><div class="field"><label>Invoice / PO</label><input id="fInvoice" value="${esc(u?.invoiceNumber||"")}"></div><div class="field"><label>Instalasi</label><input id="fInstall" type="date" value="${u?.installationDate||""}"></div><div class="field"><label>Garansi</label><input id="fWarranty" type="date" value="${u?.warrantyUntil||""}"></div></div></div><div class="section"><h3>Kondisi</h3><div class="formgrid"><div class="field"><label>Status</label><select id="fStatus">${Object.entries({active:"Aktif",repair:"Dalam Perbaikan",broken:"Rusak",unused:"Tidak Digunakan",moved:"Dipindahkan",disposed:"Disposed"}).map(([k,v])=>`<option value="${k}" ${u?.status===k?"selected":""}>${v}</option>`).join("")}</select></div><div class="field"><label>Catatan</label><textarea id="fNotes">${esc(u?.notes||"")}</textarea></div></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
+const activeLocations=S.locations.filter(x=>x.active!==false);
+const locationOptions=activeLocations.map(x=>`<option value="${esc(x.id)}" ${u?.locationId===x.id?"selected":""}>${esc(loc(x.id))}</option>`).join("");
+const savedLabel=u?.labelPhoto||null;
+const savedLabelUrl=savedLabel?.url||(savedLabel?.fileId?`https://drive.google.com/file/d/${encodeURIComponent(savedLabel.fileId)}/view`:"");
+const savedLabelHtml=savedLabel?.fileId?`<div class="unit-label-current" id="fLabelPhotoSaved">✅ Foto label tersimpan: <b>${esc(savedLabel.name||savedLabel.storedName||"Foto label pabrik")}</b><br><a href="${esc(savedLabelUrl)}" target="_blank" rel="noopener noreferrer">↗ Buka foto di Google Drive</a></div>`:`<div class="unit-label-current" id="fLabelPhotoSaved">Belum ada foto label pabrik tersimpan.</div>`;
+modal(u?"Edit Unit AC":"Tambah Unit AC",`<form id="unitForm"><div class="formgrid"><div class="field"><label>ID Unit</label><input id="fCode" readonly value="${esc(u?.code||nextCode())}"></div><div class="field"><label>Merk *</label><input id="fBrand" required value="${esc(u?.brand||"")}"></div><div class="field"><label>Model / Type</label><input id="fModel" value="${esc(u?.model||"")}"></div><div class="field"><label>Serial Number</label><input id="fSerial" value="${esc(u?.serialNumber||"")}"></div><div class="field"><label>Jenis AC</label><select id="fType"><option>Split Wall</option><option>Cassette</option><option>Floor Standing</option><option>Duct</option><option>VRV / VRF</option><option>Lainnya</option></select></div><div class="field"><label>Kapasitas PK *</label><select id="fPk">${[.5,.75,1,1.5,2,2.5,3,5].map(x=>`<option value="${x}" ${String(u?.capacityPk||1)===String(x)?"selected":""}>${x} PK</option>`).join("")}</select></div><div class="field full"><label>Lokasi *</label><input id="fLocSearch" type="search" placeholder="Cari gedung, lantai, area, atau ruangan..." autocomplete="off" aria-label="Cari lokasi Unit AC"><select id="fLoc" required><option value="">Pilih lokasi</option>${locationOptions}</select><small class="form-help">Ketik sebagian nama lokasi untuk menyaring pilihan. Lokasi yang tersimpan tetap menggunakan ID master yang sama.</small></div></div>
+<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="field"><label>Upload Foto Label Unit AC</label><input id="fLabelPhoto" type="file" accept="image/*"><small class="form-help">Foto akan dikompresi sebelum diunggah ke Google Drive. Maksimal 2,5 MB setelah kompresi. Saat mengedit, foto lama tetap dipakai jika Anda tidak memilih foto baru.</small>${savedLabelHtml}<div id="fLabelPhotoPreview" class="unit-label-preview hidden"></div><div class="unit-label-actions"><button type="button" class="btn hidden" id="fLabelPhotoClear">Batalkan pilihan foto baru</button></div></div></div>
+<div class="section"><h3>Informasi Kelistrikan</h3><div class="formgrid"><div class="field full"><label>MCB Terhubung</label><select id="fMcb"><option value="">Belum ditentukan</option>${mcbOptions}</select><small id="fMcbInfo" class="form-help">Pilih MCB untuk melihat panel, rating, dan titik fisiknya.</small></div><div class="field"><label>Posisi Peta X (%)</label><input id="fMapX" type="number" min="5" max="95" step="0.1" value="${esc(u?.mapX??30)}"><small class="form-help">Posisi relatif Unit AC pada peta.</small></div><div class="field"><label>Posisi Peta Y (%)</label><input id="fMapY" type="number" min="8" max="92" step="0.1" value="${esc(u?.mapY??55)}"><small class="form-help">Posisi relatif Unit AC pada peta.</small></div></div></div>
+<div class="section"><h3>Data Pembelian</h3><div class="form3"><div class="field"><label>Tanggal Pembelian</label><input id="fBuy" type="date" value="${u?.purchaseDate||""}"></div><div class="field"><label>Harga Pembelian</label><input id="fPrice" type="number" min="0" value="${u?.purchasePrice||0}"></div><div class="field"><label>Supplier</label><select id="fSupplier"><option value="">Pilih</option>${S.vendors.map(x=>`<option value="${esc(x.id)}" ${u?.supplierId===x.id?"selected":""}>${esc(x.name)}</option>`).join("")}</select></div><div class="field"><label>Invoice / PO</label><input id="fInvoice" value="${esc(u?.invoiceNumber||"")}"></div><div class="field"><label>Instalasi</label><input id="fInstall" type="date" value="${u?.installationDate||""}"></div><div class="field"><label>Garansi</label><input id="fWarranty" type="date" value="${u?.warrantyUntil||""}"></div></div></div>
+<div class="section"><h3>Kondisi</h3><div class="formgrid"><div class="field"><label>Status</label><select id="fStatus">${Object.entries({active:"Aktif",repair:"Dalam Perbaikan",broken:"Rusak",unused:"Tidak Digunakan",moved:"Dipindahkan",disposed:"Disposed"}).map(([k,v])=>`<option value="${k}" ${u?.status===k?"selected":""}>${v}</option>`).join("")}</select></div><div class="field"><label>Catatan</label><textarea id="fNotes">${esc(u?.notes||"")}</textarea></div></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary" id="saveUnitBtn">💾 Simpan</button></div></form>`);
 if(u)$('fType').value=u.type||"Split Wall";
+const renderLocationOptions=()=>{
+  const select=$("fLoc"),search=$("fLocSearch");
+  if(!select||!search)return;
+  const selectedId=select.value||u?.locationId||"";
+  const query=String(search.value||"").trim().toLocaleLowerCase("id-ID");
+  const matches=activeLocations.filter(x=>loc(x.id).toLocaleLowerCase("id-ID").includes(query));
+  const selectedLocation=activeLocations.find(x=>x.id===selectedId);
+  if(selectedLocation&&!matches.some(x=>x.id===selectedLocation.id))matches.unshift(selectedLocation);
+  select.innerHTML='<option value="">Pilih lokasi</option>'+(matches.length?matches.map(x=>`<option value="${esc(x.id)}">${esc(loc(x.id))}</option>`).join(""):'<option value="" disabled>Tidak ada lokasi yang cocok</option>');
+  if(selectedLocation)select.value=selectedLocation.id;
+};
+$("fLocSearch").addEventListener("input",renderLocationOptions);
 const updateMcbInfo=()=>{const x=mcb($('fMcb').value);const el=$('fMcbInfo');if(!el)return;el.textContent=x?`${x.panelName||"Panel"} • MCB ${x.number||"-"} • ${x.ratingA||0} A • ${x.pole||"-"} • ${x.point||"Titik belum diisi"}`:'Pilih MCB untuk melihat panel, rating, dan titik fisiknya.'};
 $('fMcb').onchange=updateMcbInfo;
 updateMcbInfo();
-$('unitForm').onsubmit=async e=>{e.preventDefault();
-const brand=$('fBrand').value.trim(),serial=$('fSerial').value.trim();
-if(!brand)return toast("Validasi","Merk wajib diisi.","warning");
-if(!$('fLoc').value)return toast("Validasi","Lokasi wajib dipilih.","warning");
-if(S.units.some(x=>x.id!==id&&serial&&String(x.serialNumber||"").toLowerCase()===serial.toLowerCase()))return toast("Duplikat","Serial Number sudah digunakan.","error");
-const mcbId=$('fMcb').value||"";
-const mapX=Math.min(95,Math.max(5,Number($('fMapX').value)||30));
-const mapY=Math.min(92,Math.max(8,Number($('fMapY').value)||55));
-const data={code:$('fCode').value,brand,model:$('fModel').value.trim(),serialNumber:serial,type:$('fType').value,capacityPk:+$('fPk').value,locationId:$('fLoc').value,mcbId,mapX,mapY,purchaseDate:$('fBuy').value,purchasePrice:+$('fPrice').value||0,supplierId:$('fSupplier').value,invoiceNumber:$('fInvoice').value.trim(),installationDate:$('fInstall').value,warrantyUntil:$('fWarranty').value,status:$('fStatus').value,notes:$('fNotes').value.trim()};
-try{loading(true);
-if(u){if(demo)Object.assign(u,data);else await save("ac_units",u.id,data);if(!demo&&!isTechnician())await syncPublicUnit({...u,...data})}else{const newid=$('fCode').value;const full={...data,lastRoutineMaintenanceDate:"",nextRoutineMaintenanceDate:"",maintenanceIntervalMonths:3};if(demo)S.units.push({id:newid,...full});else{await setDoc(doc(db,"ac_units",newid),{...full,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"admin"});await syncPublicUnit({id:newid,...full})}}closeModal(true);renderAll();toast("Berhasil","Unit AC disimpan.","success")}catch(e){console.error(e);toast("Gagal","Unit AC gagal disimpan.","error")}finally{loading(false)}}}
+const labelInput=$("fLabelPhoto"),labelPreview=$("fLabelPhotoPreview"),labelClear=$("fLabelPhotoClear"),labelSaved=$("fLabelPhotoSaved");
+const clearSelectedLabelPhoto=()=>{
+  clearUnitLabelPreviewUrl();
+  pendingUnitLabelUpload=null;
+  pendingUnitLabelUploadKey="";
+  if(labelInput)labelInput.value="";
+  if(labelPreview){labelPreview.innerHTML="";labelPreview.classList.add("hidden");}
+  if(labelClear)labelClear.classList.add("hidden");
+  if(labelSaved)labelSaved.classList.remove("hidden");
+};
+if(labelInput)labelInput.addEventListener("change",()=>{
+  clearUnitLabelPreviewUrl();
+  pendingUnitLabelUpload=null;
+  pendingUnitLabelUploadKey="";
+  const file=labelInput.files?.[0];
+  if(!file){if(labelPreview){labelPreview.innerHTML="";labelPreview.classList.add("hidden");}if(labelClear)labelClear.classList.add("hidden");return;}
+  if(!file.type?.startsWith("image/")){labelInput.value="";toast("Format tidak didukung","Pilih file gambar untuk foto label unit AC.","warning");return;}
+  try{unitLabelPreviewUrl=URL.createObjectURL(file);}catch(err){console.warn("Preview foto label tidak tersedia:",err);toast("Pratinjau tidak tersedia","File tetap dapat dipilih dan diunggah.","warning");return;}
+  if(labelSaved)labelSaved.classList.add("hidden");
+  if(labelPreview){labelPreview.innerHTML=`<img src="${unitLabelPreviewUrl}" alt="Pratinjau foto label pabrik"><div><b>Foto baru dipilih</b><small>${esc(file.name)} • ${(file.size/1024/1024).toFixed(2)} MB sebelum kompresi</small><small>Foto lama baru diganti setelah upload dan penyimpanan berhasil.</small></div>`;labelPreview.classList.remove("hidden");}
+  if(labelClear)labelClear.classList.remove("hidden");
+});
+if(labelClear)labelClear.addEventListener("click",clearSelectedLabelPhoto);
+$('unitForm').onsubmit=async e=>{
+  e.preventDefault();
+  const brand=$('fBrand').value.trim(),serial=$('fSerial').value.trim(),selectedLabelFile=$('fLabelPhoto')?.files?.[0]||null;
+  if(!brand)return toast("Validasi","Merk wajib diisi.","warning");
+  if(!$('fLoc').value)return toast("Validasi","Lokasi wajib dipilih.","warning");
+  if(S.units.some(x=>x.id!==id&&serial&&String(x.serialNumber||"").toLowerCase()===serial.toLowerCase()))return toast("Duplikat","Serial Number sudah digunakan.","error");
+  if(selectedLabelFile&&demo)return toast("Mode demo","Upload foto label ke Google Drive membutuhkan koneksi backend aplikasi. Data Unit AC belum disimpan.","warning");
+  const mcbId=$('fMcb').value||"";
+  const mapX=Math.min(95,Math.max(5,Number($('fMapX').value)||30));
+  const mapY=Math.min(92,Math.max(8,Number($('fMapY').value)||55));
+  const data={code:$('fCode').value,brand,model:$('fModel').value.trim(),serialNumber:serial,type:$('fType').value,capacityPk:+$('fPk').value,locationId:$('fLoc').value,mcbId,mapX,mapY,purchaseDate:$('fBuy').value,purchasePrice:+$('fPrice').value||0,supplierId:$('fSupplier').value,invoiceNumber:$('fInvoice').value.trim(),installationDate:$('fInstall').value,warrantyUntil:$('fWarranty').value,status:$('fStatus').value,notes:$('fNotes').value.trim(),labelPhoto:u?.labelPhoto||null};
+  const saveButton=$("saveUnitBtn");
+  let publicSyncWarning=false;
+  const syncUnitProjection=async unitData=>{
+    if(demo||isTechnician())return;
+    try{await syncPublicUnit(unitData)}
+    catch(syncErr){publicSyncWarning=true;console.error("Unit AC public cache sync error:",syncErr)}
+  };
+  if(saveButton){saveButton.disabled=true;saveButton.dataset.originalText=saveButton.textContent;saveButton.textContent="⏳ Menyimpan...";}
+  try{
+    loading(true,selectedLabelFile?"Mengompres dan mengunggah foto label ke Google Drive...":"Menyimpan Unit AC...");
+    if(selectedLabelFile){
+      const fileKey=unitLabelFileKey(selectedLabelFile);
+      if(pendingUnitLabelUpload&&pendingUnitLabelUploadKey===fileKey){data.labelPhoto=pendingUnitLabelUpload;}
+      else{
+        const uploaded=await uploadUnitLabelPhoto(data.code,selectedLabelFile);
+        pendingUnitLabelUpload=uploaded;pendingUnitLabelUploadKey=fileKey;data.labelPhoto=uploaded;
+      }
+    }
+    if(u){
+      if(demo)Object.assign(u,data);
+      else await save("ac_units",u.id,data);
+      await syncUnitProjection({...u,...data});
+    }else{
+      const newid=$('fCode').value;
+      const full={...data,lastRoutineMaintenanceDate:"",nextRoutineMaintenanceDate:"",maintenanceIntervalMonths:3};
+      if(demo)S.units.push({id:newid,...full});
+      else{
+        await setDoc(doc(db,"ac_units",newid),{...full,createdAt:serverTimestamp(),updatedAt:serverTimestamp(),createdBy:user?.uid||"admin"});
+        await syncUnitProjection({id:newid,...full});
+      }
+    }
+    closeModal(true);renderAll();
+    if(publicSyncWarning)toast("Unit AC tersimpan","Data utama tersimpan, tetapi sinkronisasi data teknisi gagal. Periksa koneksi dan sinkronisasi Firestore.","warning");
+    else toast("Berhasil","Unit AC disimpan.","success");
+  }catch(e){console.error("Unit AC save/upload error:",e);toast("Gagal",e?.message||"Unit AC gagal disimpan. Periksa koneksi dan konfigurasi upload.","error");}
+  finally{loading(false);if(saveButton){saveButton.disabled=false;saveButton.textContent=saveButton.dataset.originalText||"💾 Simpan";delete saveButton.dataset.originalText;}}
+};
+}
 function locModal(id=null){if(!requireAdmin("Master Lokasi hanya dapat diubah Admin."))return;const x=id?S.locations.find(v=>v.id===id):null;
 modal(x?"Edit Lokasi":"Tambah Lokasi",`<form id="locForm"><div class="formgrid"><div class="field"><label>Gedung *</label><input id="lb" required value="${esc(x?.building||"")}"></div><div class="field"><label>Lantai</label><input id="lf" value="${esc(x?.floor||"")}"></div><div class="field"><label>Area</label><input id="la" value="${esc(x?.area||"")}"></div><div class="field"><label>Ruangan</label><input id="lr" value="${esc(x?.room||"")}"></div></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan</button></div></form>`);
 $('locForm').onsubmit=async e=>{e.preventDefault();
@@ -2718,7 +2941,7 @@ else await save("vendors",x.id,d);if(!demo)await syncPublicVendor({...x,...d})}e
 closeModal(true);
 renderAll();
 toast("Berhasil","Vendor disimpan.","success")}catch(e){toast("Gagal","Vendor gagal disimpan.","error")}finally{loading(false)}}}
-function detailUnit(id){if(!userRole)return;const u=unit(id);if(!u)return;const ms=S.maintenance.filter(x=>x.acId===id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),tc=ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0);const tech=isTechnician();const costBlock=tech?"":`<div class="sum"><small>Harga</small><b>${cur(u.purchasePrice)}</b></div>`;const histCost=tech?"":`<th data-admin-only>Biaya</th>`;const histCells=tech?"":`<td>${cur(m.totalCost)}</td>`;const totalCostBlock=tech?"":`<div class="sum"><small>Total Biaya</small><b>${cur(tc)}</b></div>`;modal("Detail Unit AC",`<div class="formgrid"><div><b>${esc(u.code)}</b><div class="muted">${esc(u.brand)} ${esc(u.model||"")} • ${esc(u.capacityPk)} PK</div></div><div>${stBadge(u.status)} ${ssBadge(u.nextRoutineMaintenanceDate)}</div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div>${costBlock}<div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Umur</small><b>${esc(age(u.purchaseDate))}</b></div></div><div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Maintenance Terakhir & Jadwal</h3><div class="summary"><div class="sum"><small>Maintenance Terakhir</small><b>${ms[0]?date(ms[0].date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div>${totalCostBlock}</div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCost}</tr></thead><tbody>${ms.length?ms.map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCells}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori.</td></tr>`}</tbody></table></div></div><div class="ma"><button class="btn" data-close>Tutup</button><button class="btn primary" data-detailmnt="${u.id}">＋ Maintenance</button></div>`)}
+function detailUnit(id){if(!userRole)return;const u=unit(id);if(!u)return;const ms=S.maintenance.filter(x=>x.acId===id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),tc=ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0);const tech=isTechnician();const costBlock=tech?"":`<div class="sum"><small>Harga</small><b>${cur(u.purchasePrice)}</b></div>`;const histCost=tech?"":`<th data-admin-only>Biaya</th>`;const histCells=tech?"":`<td>${cur(m.totalCost)}</td>`;const totalCostBlock=tech?"":`<div class="sum"><small>Total Biaya</small><b>${cur(tc)}</b></div>`;const labelPhotoBlock=u.labelPhoto?.fileId?`<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="unit-label-current">📷 <b>${esc(u.labelPhoto.name||u.labelPhoto.storedName||"Foto label pabrik")}</b><br><a href="${esc(u.labelPhoto.url||`https://drive.google.com/file/d/${encodeURIComponent(u.labelPhoto.fileId)}/view`)}" target="_blank" rel="noopener noreferrer">↗ Buka foto label di Google Drive</a></div></div>`:`<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="empty">Belum ada foto label pabrik.</div></div>`;modal("Detail Unit AC",`<div class="formgrid"><div><b>${esc(u.code)}</b><div class="muted">${esc(u.brand)} ${esc(u.model||"")} • ${esc(u.capacityPk)} PK</div></div><div>${stBadge(u.status)} ${ssBadge(u.nextRoutineMaintenanceDate)}</div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div>${costBlock}<div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Umur</small><b>${esc(age(u.purchaseDate))}</b></div></div>${labelPhotoBlock}<div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Maintenance Terakhir & Jadwal</h3><div class="summary"><div class="sum"><small>Maintenance Terakhir</small><b>${ms[0]?date(ms[0].date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div>${totalCostBlock}</div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCost}</tr></thead><tbody>${ms.length?ms.map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCells}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori.</td></tr>`}</tbody></table></div></div><div class="ma"><button class="btn" data-close>Tutup</button><button class="btn primary" data-detailmnt="${u.id}">＋ Maintenance</button></div>`)}
 function age(v){if(!v)return"-";
 const a=pd(v),b=pd(today());
 let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth();
