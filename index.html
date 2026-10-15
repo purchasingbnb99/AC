@@ -1096,13 +1096,13 @@ button,input,select,textarea{font-size:14px}
 @media(max-width:560px){.mcb-route-editor{grid-template-columns:1fr 1fr}.mcb-route-editor .rs-text,.mcb-route-editor .rs-floor,.mcb-route-editor .rs-remove{grid-column:1/-1;width:100%}}
 @media(prefers-reduced-motion:reduce){.schematic-floor-plan *{animation:none!important}}
 
-/* R12.0 — Admin visual editor for persistent 2D schematic floor layouts */
+/* R12.1 — Editor now has an always-accessible context selector; controls activate after context selection. */
 .schematic-editor-card{margin-top:16px;overflow:hidden}
 .schematic-editor-card>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;font-weight:800}
 .schematic-editor-card>summary::-webkit-details-marker{display:none}
 .schematic-editor-card>summary:after{content:"＋";font-size:20px;color:#2563eb}
 .schematic-editor-card[open]>summary:after{content:"−"}
-.schematic-editor-toolbar{display:grid;grid-template-columns:minmax(220px,1.2fr) minmax(220px,1.2fr) minmax(180px,1fr);gap:10px;align-items:end}
+.schematic-editor-toolbar{display:grid;grid-template-columns:minmax(190px,1fr) minmax(220px,1.15fr) minmax(220px,1.15fr) minmax(180px,1fr);gap:10px;align-items:end}
 .schematic-editor-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .schematic-editor-status{padding:9px 11px;background:#f8fafc;border:1px solid #dbe4ee;border-radius:8px;color:#475569;font-size:11px;line-height:1.45}
 .schematic-editor-status.dirty{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
@@ -1125,7 +1125,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R12.0</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R12.1</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -1545,8 +1545,9 @@ button,input,select,textarea{font-size:14px}
 <div class="two" style="margin-top:17px"><div class="card"><div class="ch"><b>🗺 Peta Titik MCB</b><span id="mcbMapSelected" class="badge info">Pilih MCB / Unit AC</span></div><div class="cb"><div class="mcb-map-toolbar"><div class="field"><label>Gedung / Lokasi Acuan</label><select id="mapLoc"><option value="">Pilih gedung / lokasi acuan</option></select><small class="form-help">Pilih salah satu lokasi di gedung yang ingin dilihat.</small></div><div class="field"><label>Lantai Peta</label><select id="mapFloor"><option value="">Pilih lantai</option></select><small class="form-help">Lantai 1 dan 2 ditampilkan sebagai peta terpisah.</small></div><div class="field"><label>Unit AC</label><select id="mapUnit"><option value="">Pilih Unit AC</option></select></div><div class="field"><label>MCB Tujuan</label><select id="mapMcb"><option value="">Pilih MCB</option></select></div></div><div id="mcbMapWrap" style="margin-top:12px"><svg id="mcbMapSvg" viewBox="0 0 1000 600" role="img" aria-label="Peta MCB indoor"></svg></div><div class="mcb-route-info"><div class="mcb-route-card"><small>Posisi Awal</small><b id="mapYouInfo">Belum ditentukan</b></div><div class="mcb-route-card"><small>Tujuan</small><b id="mapTargetInfo">Belum dipilih</b></div><div class="mcb-route-card"><small>Rute</small><b id="mapDistanceInfo">-</b></div></div><div class="mcb-map-nav-controls"><button type="button" class="btn" id="mapRoutePrev">← Sebelumnya</button><span id="mapRouteProgress" aria-live="polite">Pilih MCB untuk mulai</span><button type="button" class="btn primary" id="mapRouteNext">Berikutnya →</button></div><div class="mcb-map-legend"><span class="mcb-legend-item"><span class="mcb-dot you"></span> Titik awal (manual)</span><span class="mcb-legend-item"><span class="mcb-dot ac"></span> Unit AC</span><span class="mcb-legend-item"><span class="mcb-dot mcb"></span> MCB</span></div><div class="mcb-map-note">Peta ini bersifat skematik. Pilih gedung/lokasi acuan dan lantai untuk melihat titik pada lantai tersebut. Garis rute beranimasi mengikuti titik navigasi yang tersimpan. Tap peta untuk menandai posisi awal secara manual; aplikasi belum melacak posisi teknisi otomatis.</div><div class="section" style="margin-top:14px;padding-top:14px"><h3>Petunjuk Langkah</h3><div id="mapRouteSteps"><div class="empty">Pilih MCB untuk melihat petunjuk rute.</div></div></div></div></div><div class="card"><div class="ch"><b>Petunjuk Navigasi</b></div><div class="cb"><div class="alert"><span class="badge info">1</span><b style="margin-left:6px">Pilih gedung acuan dan lantai.</b><small>Peta menampilkan Unit AC dan MCB pada lantai terpilih. Lantai 1 dan lantai 2 dapat dilihat bergantian.</small></div><div class="alert"><span class="badge info">2</span><b style="margin-left:6px">Pilih Unit AC atau MCB.</b><small>Unit AC akan otomatis mengarahkan ke MCB yang terhubung jika tersedia.</small></div><div class="alert"><span class="badge warning">3</span><b style="margin-left:6px">Tap peta untuk titik awal.</b><small>Penanda posisi awal diatur manual. Posisi teknisi belum dilacak secara otomatis.</small></div><div class="alert"><span class="badge ok">4</span><b style="margin-left:6px">Ikuti petunjuk langkah.</b><small>Petunjuk dapat mencakup belok kanan/kiri, melewati ruangan, naik/turun tangga, lift, hingga tiba di MCB.</small></div></div></div></div><details class="card schematic-editor-card" id="schematicEditorPanel" data-admin-only>
   <summary><span>✏️ Editor Denah 2D — khusus Admin</span><span class="badge info">Layout visual</span></summary>
   <div class="cb">
-    <p class="schematic-editor-help">Atur ruangan langsung di peta: pilih lokasi master untuk menambahkan ruangan, lalu klik posisi penempatannya. Seret kotak untuk memindahkan elemen, atau ubah X/Y/lebar/tinggi melalui kontrol. Perubahan baru berlaku untuk teknisi setelah tombol <b>Simpan Layout</b> berhasil.</p>
+    <p class="schematic-editor-help">Langkah pertama: pilih Gedung / Lokasi Acuan di bawah. Setelah konteks terpilih, dropdown ruangan dan elemen akan aktif. Untuk menambahkan ruangan, pilih lokasi Master, klik Tambah Ruangan, lalu klik posisi penempatannya pada peta. Seret kotak untuk memindahkan elemen, atau ubah X/Y/lebar/tinggi melalui kontrol. Perubahan baru berlaku untuk teknisi setelah tombol <b>Simpan Layout</b> berhasil.</p>
     <div class="schematic-editor-toolbar">
+      <div class="field"><label>Gedung / Lokasi Acuan *</label><select id="schematicEditorLocation"><option value="">Pilih gedung / lokasi acuan</option></select><small class="form-help">Dropdown ini selalu aktif agar Anda dapat menentukan konteks denah dari Editor.</small></div>
       <div class="field"><label>Lokasi Master untuk Ruangan</label><select id="schematicRoomLocation"><option value="">Pilih ruangan yang belum ditempatkan</option></select></div>
       <div class="field"><label>Elemen terpilih</label><select id="schematicElementSelect"><option value="">Belum ada elemen</option></select></div>
       <div class="field"><label>Nama elemen</label><input id="schematicElementName" placeholder="Nama koridor / tangga / panel"></div>
@@ -2860,7 +2861,14 @@ function setSchematicEditorStatus(message,dirty=false){const el=$("schematicEdit
 function renderSchematicEditor(){
   const svg=$("schematicEditorSvg");if(!svg)return;
   const {context,building,floor}=schematicEditorContext();
-  const roomSelect=$("schematicRoomLocation"),elementSelect=$("schematicElementSelect"),nameInput=$("schematicElementName");
+  const editorLocationSelect=$("schematicEditorLocation"),roomSelect=$("schematicRoomLocation"),elementSelect=$("schematicElementSelect"),nameInput=$("schematicElementName");
+  const activeEditorLocations=S.locations.filter(v=>v.active!==false).sort((a,b)=>String(a.building||"").localeCompare(String(b.building||""),"id-ID")||String(a.floor||"").localeCompare(String(b.floor||""),"id-ID")||String(a.area||"").localeCompare(String(b.area||""),"id-ID")||String(a.room||"").localeCompare(String(b.room||""),"id-ID"));
+  if(editorLocationSelect){
+    const selectedContextId=$("mapLoc")?.value||"";
+    editorLocationSelect.innerHTML='<option value="">Pilih gedung / lokasi acuan</option>'+activeEditorLocations.map(v=>`<option value="${esc(v.id)}">${esc(loc(v.id))}</option>`).join("");
+    editorLocationSelect.value=activeEditorLocations.some(v=>v.id===selectedContextId)?selectedContextId:"";
+    editorLocationSelect.disabled=activeEditorLocations.length===0;
+  }
   const valid=!!context&&!!building;
   const panels=["schematicRoomLocation","schematicElementSelect","schematicElementName","schematicAddRoom","schematicAddCorridor","schematicAddStairs","schematicAddElevator","schematicAddDoor","schematicAddPanel","schematicDeleteElement","schematicApplyGeometry","schematicSaveLayout","schematicResetLayout"];
   panels.forEach(id=>{const el=$(id);if(el)el.disabled=!valid;});
@@ -2921,6 +2929,15 @@ async function saveSchematicLayout(){
 function resetSchematicLayout(){const {building,floor}=schematicEditorContext();if(!building)return toast("Pilih gedung","Pilih gedung/lokasi acuan terlebih dahulu.","warning");if(!confirm(`Kembalikan layout ${building} • ${floorText(floor)} ke template otomatis dari Master Lokasi? Perubahan yang belum disimpan pada lantai ini akan diganti.`))return;schematicEditorPendingType="";const base=createDefaultSchematicLayout(building,floor);setSchematicLayoutDraft(building,floor,base.elements);schematicEditorSelectedId=base.elements[0]?.id||"";renderSchematicEditor();drawMcbMap();}
 function setupSchematicEditorControls(){
   const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn;};
+  const editorLocation=$("schematicEditorLocation");
+  if(editorLocation)editorLocation.onchange=()=>{
+    const selectedId=editorLocation.value||"",record=S.locations.find(v=>v.id===selectedId&&v.active!==false)||null,mainLocation=$("mapLoc");
+    if(mainLocation)mainLocation.value=record?record.id:"";
+    mapState.you=null;mapState.youFloor="";mapState.youBuilding="";mapState.activeStep=0;
+    if(record&&$("mapFloor")){ensureMapFloorOptions(floorValue(record));$("mapFloor").value=floorValue(record);}
+    renderMcbPage();
+    renderSchematicEditor();
+  };
   bind("schematicAddRoom",()=>armSchematicPlacement("room"));bind("schematicAddCorridor",()=>armSchematicPlacement("corridor"));bind("schematicAddStairs",()=>armSchematicPlacement("stairs"));bind("schematicAddElevator",()=>armSchematicPlacement("elevator"));bind("schematicAddDoor",()=>armSchematicPlacement("door"));bind("schematicAddPanel",()=>armSchematicPlacement("panel"));
   bind("schematicCancelPlacement",()=>{schematicEditorPendingType="";renderSchematicEditor();setSchematicEditorStatus("Mode penempatan dibatalkan.",schematicLayoutDrafts.has(schematicDraftKey(schematicEditorContext().building,schematicEditorContext().floor)));});
   bind("schematicDeleteElement",()=>{const {building,floor}=schematicEditorContext(),selected=schematicEditorSelectedId,current=schematicEditorElements();if(!selected)return toast("Pilih elemen","Pilih elemen yang ingin dihapus pada dropdown atau peta.","warning");const el=current.find(v=>v.id===selected);if(!el)return;const label=schematicElementLabel(el);if(!confirm(`Hapus ${label} dari denah lantai ini? Data Master Lokasi tidak akan dihapus.`))return;setSchematicLayoutDraft(building,floor,current.filter(v=>v.id!==selected));schematicEditorSelectedId="";renderSchematicEditor();drawMcbMap();});
@@ -3799,6 +3816,7 @@ document.addEventListener("change",e=>{
   if(e.target.id==="mapMcb"&&!mapState.you){const target=mcb(e.target.value),where=locationRecordForAsset(target);if(where&&$("mapFloor"))$("mapFloor").value=floorValue(where);mapState.activeStep=0;}
   if(e.target.id==="mapUnit"&&!mapState.you){const selected=unit(e.target.value),where=locationRecordForAsset(selected);if(where&&$("mapFloor"))$("mapFloor").value=floorValue(where);}
   if(["mcbLoc","mcbStatus","mcbUnit","mapLoc","mapFloor","mapUnit","mapMcb"].includes(e.target.id))renderMcbPage();
+  if(["mapLoc","mapFloor"].includes(e.target.id)&&$("schematicEditorPanel")?.open)renderSchematicEditor();
 });
 document.addEventListener("input",e=>{
   if(["mcbSearch","mcbPanelFilter"].includes(e.target.id))renderMcbPage();
