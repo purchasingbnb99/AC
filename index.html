@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261015-R11.6">
+<meta name="ac-build" content="QT-20261015-R11.7">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -1063,7 +1063,7 @@ button,input,select,textarea{font-size:14px}
 @media(max-width:560px){.mcb-map-nav-controls{flex-wrap:wrap}.mcb-map-nav-controls .btn{flex:1}.mcb-map-nav-controls span{order:-1;flex-basis:100%}}
 
 
-/* R11.6: guide the user to the map after clicking the table's Peta action. */
+/* R11.7: bind MCB Peta clicks directly so navigation does not depend only on delegated events. */
 .mcb-map-jump-highlight{animation:mcbMapJumpHighlight 1.6s ease-out}
 @keyframes mcbMapJumpHighlight{0%{box-shadow:0 0 0 4px #2563eb,0 0 0 8px #93c5fd}100%{box-shadow:0 0 0 0 transparent,0 0 0 0 transparent}}
 @media(prefers-reduced-motion:reduce){.mcb-map-jump-highlight{animation:none;outline:3px solid #93c5fd}}
@@ -1076,7 +1076,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.6</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.7</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -2613,6 +2613,35 @@ function ensureMapFloorOptions(preferred=""){
   const found=floors.find(f=>floorKey(f.value)===floorKey(old))||floors.find(f=>floorKey(f.value)===floorKey(floorValue(context)))||floors[0];
   if(found)el.value=found.value;
 }
+function navigateToMcbMap(mcbId){
+  const mx=mcb(mcbId);
+  if(!mx){toast("MCB tidak ditemukan","Data MCB sudah tidak tersedia.","warning");return false;}
+  nav("mcb");
+  const destination=locationRecordForAsset(mx);
+  if($("mapLoc"))$("mapLoc").value=mx.locationId||"";
+  if($("mapFloor")){
+    ensureMapFloorOptions(floorValue(destination));
+    const matching=[...$("mapFloor").options].find(o=>floorKey(o.value)===floorKey(floorValue(destination)));
+    if(matching)$("mapFloor").value=matching.value;
+  }
+  mapState.you=null;mapState.youFloor="";mapState.youBuilding="";mapState.activeStep=0;
+  renderMcbPage();
+  if($("mapMcb"))$("mapMcb").value=mx.id;
+  const linked=mcbLinkedUnits(mx.id)[0];
+  if(linked&&$("mapUnit"))$("mapUnit").value=linked.id;
+  drawMcbMap();
+  const mapWrap=$("mcbMapWrap");
+  if(mapWrap){
+    requestAnimationFrame(()=>{
+      mapWrap.scrollIntoView({behavior:"smooth",block:"center",inline:"nearest"});
+      mapWrap.classList.remove("mcb-map-jump-highlight");
+      void mapWrap.offsetWidth;
+      mapWrap.classList.add("mcb-map-jump-highlight");
+    });
+  }
+  toast("Tujuan MCB dipilih",`${mx.code} sudah dipilih pada peta.`,"success");
+  return true;
+}
 function renderMcbPage(){
   const l=$("mcbLoc"),u=$("mcbUnit"),ml=$("mapLoc"),mu=$("mapUnit"),mm=$("mapMcb");
   if(l)opts("mcbLoc",S.locations.filter(x=>x.active!==false),"Semua Lokasi",x=>({v:x.id,t:loc(x.id)}));
@@ -2627,6 +2656,16 @@ function renderMcbPage(){
   const rows=mcbRows();
   const tech=isTechnician();
   if($('mcbBody'))$('mcbBody').innerHTML=rows.length?rows.map(x=>{const linked=mcbLinkedUnits(x.id);return`<tr><td><b>${esc(x.code)}</b></td><td>${esc(x.panelName||'-')}</td><td>${esc(x.number||'-')}</td><td>${x.ratingA?esc(x.ratingA)+' A':'-'} ${x.pole?`<small>${esc(x.pole)}</small>`:''}</td><td>${esc(loc(x.locationId))}<br><small>${esc(x.point||'-')}</small></td><td><div class="mcb-link-list">${linked.length?linked.map(v=>`<span class="badge info">${esc(v.code)}</span>`).join(''):'<span class="badge neutral">Belum terhubung</span>'}</div></td><td>${mcbStatusBadge(x.status)}</td><td>${tech?"":`<button class="btn" data-mcb-edit="${esc(x.id)}">Edit</button> `}<button class="btn" data-mcb-navigate="${esc(x.id)}">🧭 Peta</button></td></tr>`}).join(''):`<tr><td colspan="8"><div class="empty">Belum ada data MCB.</div></td></tr>`;
+  // Bind the table's Peta buttons directly. This is intentionally separate from
+  // the document-level click handler to ensure clicks on freshly-rendered rows work.
+  const mcbBodyEl=$("mcbBody");
+  if(mcbBodyEl)mcbBodyEl.querySelectorAll("[data-mcb-navigate]").forEach(button=>{
+    button.addEventListener("click",event=>{
+      event.preventDefault();
+      event.stopPropagation();
+      navigateToMcbMap(button.dataset.mcbNavigate);
+    });
+  });
   drawMcbMap();
 }
 const MCB_ROUTE_TYPES={
@@ -3443,31 +3482,7 @@ if(rr){
   return
 }
 const mn=e.target.closest("[data-mcb-navigate]");
-if(mn){
-  const mx=mcb(mn.dataset.mcbNavigate);
-  if(!mx)return toast("MCB tidak ditemukan","Data MCB sudah tidak tersedia.","warning");
-  nav("mcb");
-  if($('mapLoc'))$('mapLoc').value=mx.locationId||"";
-  const navigateLocation=locationRecordForAsset(mx);if($('mapFloor'))$('mapFloor').value=floorValue(navigateLocation);
-  mapState.you=null;mapState.youFloor="";mapState.youBuilding="";mapState.activeStep=0;
-  renderMcbPage();
-  if($('mapMcb'))$('mapMcb').value=mx.id;
-  const linked=mcbLinkedUnits(mx.id)[0];
-  if(linked&&$('mapUnit'))$('mapUnit').value=linked.id;
-  drawMcbMap();
-  // The selection was working, but the map sits below the filter/table area.
-  // Bring it into view so the selected MCB marker is visible immediately.
-  const mapWrap=$('mcbMapWrap');
-  if(mapWrap){
-    requestAnimationFrame(()=>{
-      mapWrap.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
-      mapWrap.classList.remove('mcb-map-jump-highlight');
-      void mapWrap.offsetWidth;
-      mapWrap.classList.add('mcb-map-jump-highlight');
-    });
-  }
-  return
-}
+if(mn){navigateToMcbMap(mn.dataset.mcbNavigate);return}
 const a=e.target.closest("[data-action]");
 if(a){if(a.dataset.action==="unit")unitModal();
 if(a.dataset.action==="location")locModal();
