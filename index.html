@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261015-R11.5">
+<meta name="ac-build" content="QT-20261015-R11.6">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -1062,6 +1062,12 @@ button,input,select,textarea{font-size:14px}
 @media(prefers-reduced-motion:reduce){.mcb-route,.mcb-map-user-pulse,.mcb-map-target-pulse{animation:none!important}}
 @media(max-width:560px){.mcb-map-nav-controls{flex-wrap:wrap}.mcb-map-nav-controls .btn{flex:1}.mcb-map-nav-controls span{order:-1;flex-basis:100%}}
 
+
+/* R11.6: guide the user to the map after clicking the table's Peta action. */
+.mcb-map-jump-highlight{animation:mcbMapJumpHighlight 1.6s ease-out}
+@keyframes mcbMapJumpHighlight{0%{box-shadow:0 0 0 4px #2563eb,0 0 0 8px #93c5fd}100%{box-shadow:0 0 0 0 transparent,0 0 0 0 transparent}}
+@media(prefers-reduced-motion:reduce){.mcb-map-jump-highlight{animation:none;outline:3px solid #93c5fd}}
+
 </style>
 </head>
 <body>
@@ -1070,7 +1076,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.5</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.6</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -3449,6 +3455,17 @@ if(mn){
   const linked=mcbLinkedUnits(mx.id)[0];
   if(linked&&$('mapUnit'))$('mapUnit').value=linked.id;
   drawMcbMap();
+  // The selection was working, but the map sits below the filter/table area.
+  // Bring it into view so the selected MCB marker is visible immediately.
+  const mapWrap=$('mcbMapWrap');
+  if(mapWrap){
+    requestAnimationFrame(()=>{
+      mapWrap.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'});
+      mapWrap.classList.remove('mcb-map-jump-highlight');
+      void mapWrap.offsetWidth;
+      mapWrap.classList.add('mcb-map-jump-highlight');
+    });
+  }
   return
 }
 const a=e.target.closest("[data-action]");
