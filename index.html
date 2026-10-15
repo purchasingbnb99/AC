@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261015-R12.2">
+<meta name="ac-build" content="QT-20261015-R12.3">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -1102,7 +1102,12 @@ button,input,select,textarea{font-size:14px}
 .schematic-editor-card>summary::-webkit-details-marker{display:none}
 .schematic-editor-card>summary:after{content:"＋";font-size:20px;color:#2563eb}
 .schematic-editor-card[open]>summary:after{content:"−"}
-.schematic-editor-toolbar{display:grid;grid-template-columns:minmax(190px,1fr) minmax(220px,1.15fr) minmax(220px,1.15fr) minmax(180px,1fr);gap:10px;align-items:end}
+/* R12.3: align editor controls uniformly; help text must not push labels/selects down */
+.schematic-editor-toolbar{display:grid;grid-template-columns:minmax(250px,1.15fr) minmax(240px,1fr) minmax(240px,1fr) minmax(240px,1fr);gap:14px;align-items:start}
+.schematic-editor-toolbar>.field{min-width:0;margin:0;align-self:start;display:flex;flex-direction:column}
+.schematic-editor-toolbar>.field>label{display:block;min-height:18px;line-height:18px;margin:0 0 7px}
+.schematic-editor-toolbar>.field>input,.schematic-editor-toolbar>.field>select{width:100%;height:44px;min-height:44px}
+.schematic-editor-toolbar .form-help{display:block;line-height:1.4;margin-top:6px;min-height:0}
 .schematic-editor-actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
 .schematic-editor-status{padding:9px 11px;background:#f8fafc;border:1px solid #dbe4ee;border-radius:8px;color:#475569;font-size:11px;line-height:1.45}
 .schematic-editor-status.dirty{background:#fff7ed;border-color:#fed7aa;color:#9a3412}
@@ -1116,8 +1121,8 @@ button,input,select,textarea{font-size:14px}
 .sf-inline-delete{pointer-events:all}.sf-inline-delete:hover circle,.sf-inline-delete:focus circle{fill:#991b1b;stroke:#fecaca;stroke-width:3}.sf-inline-name-editor{width:100%;height:100%;box-sizing:border-box;border:2px solid #2563eb;border-radius:5px;background:#fff;color:#0f172a;font:700 12px Inter,system-ui,sans-serif;padding:3px 6px;outline:0;box-shadow:0 2px 8px rgba(15,23,42,.18)}
 .schematic-editor-geometry{display:grid;grid-template-columns:repeat(5,minmax(90px,1fr)) auto;gap:9px;align-items:end;margin-top:12px}
 .schematic-editor-help{font-size:11px;color:#64748b;line-height:1.5;margin:9px 0}
-@media(max-width:900px){.schematic-editor-toolbar{grid-template-columns:1fr 1fr}.schematic-editor-geometry{grid-template-columns:repeat(3,minmax(80px,1fr))}}
-@media(max-width:560px){.schematic-editor-toolbar,.schematic-editor-geometry{grid-template-columns:1fr 1fr}.schematic-editor-geometry .btn{grid-column:1/-1;width:100%}.schematic-editor-card>summary{padding:12px}}
+@media(max-width:1100px){.schematic-editor-toolbar{grid-template-columns:1fr 1fr}.schematic-editor-geometry{grid-template-columns:repeat(3,minmax(80px,1fr))}}
+@media(max-width:560px){.schematic-editor-toolbar{grid-template-columns:1fr}.schematic-editor-geometry{grid-template-columns:1fr 1fr}.schematic-editor-geometry .btn{grid-column:1/-1;width:100%}.schematic-editor-card>summary{padding:12px}}
 </style>
 </head>
 <body>
@@ -1126,7 +1131,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R12.2</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R12.3</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
