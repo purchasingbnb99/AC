@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261015-R11.7">
+<meta name="ac-build" content="QT-20261015-R11.8">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -589,6 +589,8 @@ textarea {
 .barcode-preview-compact svg{display:block;width:auto;max-width:100%;height:auto;margin:0 auto}
 .barcode-preview-compact .barcode-code{font-size:17px;font-weight:800;margin-top:6px}
 .barcode-preview-compact .barcode-info{margin-top:3px;color:#64748b;font-size:12px;line-height:1.45}
+@media(max-width:1000px){.mcb-map-toolbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.mcb-map-toolbar{grid-template-columns:minmax(0,1fr)}}
 @media(max-width:800px){.scan-controls{flex-wrap:wrap}.scan-controls input{flex:1 1 100%}.scan-controls .btn{flex:1 1 auto}}
 .modalbg {
   position:fixed;
@@ -831,7 +833,7 @@ textarea {
 /* MCB & INDOOR MAP */
 #mcbMapWrap{position:relative;width:100%;min-height:420px;border:1px solid #d7e2f0;border-radius:14px;overflow:hidden;background:linear-gradient(180deg,#f8fbff 0%,#eef4fa 100%)}
 #mcbMapSvg{display:block;width:100%;height:auto;min-height:420px;touch-action:manipulation}
-.mcb-map-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:end}
+.mcb-map-toolbar{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;align-items:start}.mcb-map-toolbar>.field{align-self:start;min-width:0}.mcb-map-toolbar>.field>label{display:block;min-height:16px}
 .mcb-map-legend{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:11px;color:#475569}.mcb-legend-item{display:inline-flex;align-items:center;gap:6px}
 .mcb-dot{width:11px;height:11px;border-radius:50%;display:inline-block;border:2px solid #fff;box-shadow:0 0 0 1px #94a3b8}.mcb-dot.you{background:#2563eb}.mcb-dot.ac{background:#64748b}.mcb-dot.mcb{background:#f59e0b}
 .mcb-map-note{font-size:11px;color:#64748b;margin-top:8px;line-height:1.5}.mcb-route-info{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
@@ -1076,7 +1078,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.7</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.8</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -2600,6 +2602,8 @@ function sameBuilding(a,b){return String(a||"").trim().toLocaleLowerCase("id-ID"
 function floorValue(record){return String(record?.floor||"").trim()||"__floor_unknown__"}
 function floorText(value){return value==="__floor_unknown__"?"Lantai belum diisi":String(value||"").trim()||"Lantai belum diisi"}
 function getMapContextLocation(){return S.locations.find(v=>v.id===($("mapLoc")?.value||""))||null}
+// Shared interactive map state: declared once for floor selection, start-point clicks, and route steps.
+const mapState={you:null,youFloor:"",youBuilding:"",activeStep:0};
 function getActiveMapFloor(){return $("mapFloor")?.value||floorValue(getMapContextLocation())}
 function ensureMapFloorOptions(preferred=""){
   const el=$("mapFloor");if(!el)return;
@@ -3187,7 +3191,7 @@ else await save("vendors",x.id,d);if(!demo)await syncPublicVendor({...x,...d})}e
 closeModal(true);
 renderAll();
 toast("Berhasil","Vendor disimpan.","success")}catch(e){toast("Gagal","Vendor gagal disimpan.","error")}finally{loading(false)}}}
-function detailUnit(id){if(!userRole)return;const u=unit(id);if(!u)return;const ms=S.maintenance.filter(x=>x.acId===id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),tc=ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0);const tech=isTechnician();const costBlock=tech?"":`<div class="sum"><small>Harga</small><b>${cur(u.purchasePrice)}</b></div>`;const histCost=tech?"":`<th data-admin-only>Biaya</th>`;const histCells=tech?"":`<td>${cur(m.totalCost)}</td>`;const totalCostBlock=tech?"":`<div class="sum"><small>Total Biaya</small><b>${cur(tc)}</b></div>`;const labelPhotoBlock=u.labelPhoto?.fileId?`<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="unit-label-current">📷 <b>${esc(u.labelPhoto.name||u.labelPhoto.storedName||"Foto label pabrik")}</b><br><a href="${esc(u.labelPhoto.url||`https://drive.google.com/file/d/${encodeURIComponent(u.labelPhoto.fileId)}/view`)}" target="_blank" rel="noopener noreferrer">↗ Buka foto label di Google Drive</a></div></div>`:`<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="empty">Belum ada foto label pabrik.</div></div>`;modal("Detail Unit AC",`<div class="formgrid"><div><b>${esc(u.code)}</b><div class="muted">${esc(u.brand)} ${esc(u.model||"")} • ${esc(u.capacityPk)} PK</div></div><div>${stBadge(u.status)} ${ssBadge(u.nextRoutineMaintenanceDate)}</div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div>${costBlock}<div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Umur</small><b>${esc(age(u.purchaseDate))}</b></div></div>${labelPhotoBlock}<div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Maintenance Terakhir & Jadwal</h3><div class="summary"><div class="sum"><small>Maintenance Terakhir</small><b>${ms[0]?date(ms[0].date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div>${totalCostBlock}</div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCost}</tr></thead><tbody>${ms.length?ms.map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCells}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori.</td></tr>`}</tbody></table></div></div><div class="ma"><button class="btn" data-close>Tutup</button><button class="btn primary" data-detailmnt="${u.id}">＋ Maintenance</button></div>`)}
+function detailUnit(id){if(!userRole)return;const u=unit(id);if(!u)return;const ms=S.maintenance.filter(x=>x.acId===id&&x.status!=="void").sort((a,b)=>String(b.date).localeCompare(String(a.date))),tc=ms.reduce((a,x)=>a+(Number(x.totalCost)||0),0);const tech=isTechnician();const costBlock=tech?"":`<div class="sum"><small>Harga</small><b>${cur(u.purchasePrice)}</b></div>`;const histCost=tech?"":`<th data-admin-only>Biaya</th>`;const histCells=m=>tech?"":`<td>${cur(m.totalCost)}</td>`;const totalCostBlock=tech?"":`<div class="sum"><small>Total Biaya</small><b>${cur(tc)}</b></div>`;const labelPhotoBlock=u.labelPhoto?.fileId?`<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="unit-label-current">📷 <b>${esc(u.labelPhoto.name||u.labelPhoto.storedName||"Foto label pabrik")}</b><br><a href="${esc(u.labelPhoto.url||`https://drive.google.com/file/d/${encodeURIComponent(u.labelPhoto.fileId)}/view`)}" target="_blank" rel="noopener noreferrer">↗ Buka foto label di Google Drive</a></div></div>`:`<div class="section"><h3>Foto Label Bawaan Pabrik</h3><div class="empty">Belum ada foto label pabrik.</div></div>`;modal("Detail Unit AC",`<div class="formgrid"><div><b>${esc(u.code)}</b><div class="muted">${esc(u.brand)} ${esc(u.model||"")} • ${esc(u.capacityPk)} PK</div></div><div>${stBadge(u.status)} ${ssBadge(u.nextRoutineMaintenanceDate)}</div><div class="sum"><small>Lokasi</small><b>${esc(loc(u.locationId))}</b></div><div class="sum"><small>Serial</small><b>${esc(u.serialNumber||"-")}</b></div><div class="sum"><small>Pembelian</small><b>${date(u.purchaseDate)}</b></div>${costBlock}<div class="sum"><small>Supplier</small><b>${esc(ven(u.supplierId))}</b></div><div class="sum"><small>Umur</small><b>${esc(age(u.purchaseDate))}</b></div></div>${labelPhotoBlock}<div class="section"><h3>Informasi Kelistrikan</h3>${mcbInfoHtml(u)}</div><div class="section"><h3>Maintenance Terakhir & Jadwal</h3><div class="summary"><div class="sum"><small>Maintenance Terakhir</small><b>${ms[0]?date(ms[0].date):"-"}</b></div><div class="sum"><small>Jadwal Berikutnya</small><b>${date(u.nextRoutineMaintenanceDate)}</b></div><div class="sum"><small>Total Maintenance</small><b>${ms.length}</b></div>${totalCostBlock}</div></div><div class="section"><h3>Histori Maintenance</h3><div class="table"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Teknisi</th><th>Hasil</th>${histCost}</tr></thead><tbody>${ms.length?ms.map(m=>`<tr><td>${date(m.date)}</td><td>${esc(typeName(m.type))}</td><td>${esc(m.technicianName||ven(m.vendorId))}</td><td>${esc(resultName(m.inspectionResult))}</td>${histCells(m)}</tr>`).join(""):`<tr><td colspan="${tech?4:5}">Belum ada histori.</td></tr>`}</tbody></table></div></div><div class="ma"><button class="btn" data-close>Tutup</button><button class="btn primary" data-detailmnt="${u.id}">＋ Maintenance</button></div>`)}
 function age(v){if(!v)return"-";
 const a=pd(v),b=pd(today());
 let y=b.getFullYear()-a.getFullYear(),m=b.getMonth()-a.getMonth();
