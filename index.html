@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261015-R11.8">
+<meta name="ac-build" content="QT-20261015-R11.9">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -845,7 +845,7 @@ textarea {
 .location-search-option{display:block;width:100%;border:0;border-radius:0;background:#fff;color:#172033;padding:9px 10px;text-align:left;font-size:12px;line-height:1.4;white-space:normal;overflow-wrap:anywhere}
 .location-search-option:hover,.location-search-option:focus{background:#eff6ff;color:#1d4ed8;outline:0}
 .location-search-empty{padding:10px;color:#64748b;font-size:11px}.mcb-map-label{font-size:12px;font-weight:800;fill:#0f172a}.mcb-map-sub{font-size:10px;fill:#64748b}.mcb-map-floor{font-size:18px;font-weight:800;fill:#cbd5e1;letter-spacing:2px}.mcb-route{stroke:#2563eb;stroke-width:5;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:12 10;filter:drop-shadow(0 2px 2px rgba(37,99,235,.15))}.mcb-route-step{display:grid;grid-template-columns:32px 1fr;gap:9px;padding:10px 0;border-bottom:1px solid #eef2f7}.mcb-route-step:last-child{border-bottom:0}.mcb-route-num{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#2563eb;color:#fff;font-weight:800;font-size:11px}.mcb-route-step b{font-size:11px}.mcb-route-step small{display:block;color:#64748b;font-size:9.5px;margin-top:3px;line-height:1.45}.mcb-route-editor{display:grid;grid-template-columns:70px 135px 1.4fr 90px 80px 80px auto;gap:7px;align-items:end;padding:9px;border:1px solid #e2e8f0;border-radius:10px;background:#f8fafc;margin-bottom:7px}.mcb-route-editor .field{margin-bottom:0}.mcb-route-editor .btn{min-height:37px}.mcb-route-toolbar{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:9px}.mcb-route-toolbar small{color:#64748b;font-size:10px}.mcb-route-routehint{padding:10px 11px;border:1px solid #bfdbfe;background:#eff6ff;color:#1e40af;border-radius:9px;font-size:10px;line-height:1.45}.mcb-route-map-step{fill:#2563eb;stroke:#fff;stroke-width:2}.mcb-route-map-step-label{font-size:9px;font-weight:800;fill:#fff;text-anchor:middle;dominant-baseline:middle}.mcb-route-floor-pill{fill:#eff6ff;stroke:#bfdbfe;stroke-width:1}.mcb-route-floor-text{font-size:10px;font-weight:800;fill:#1e40af}
-@media(max-width:1000px){.mcb-route-editor{grid-template-columns:1fr 1fr 2fr 1fr 1fr 1fr auto}.mcb-map-toolbar{grid-template-columns:1fr 1fr}}@media(max-width:800px){.mcb-map-toolbar{grid-template-columns:1fr 1fr}.mcb-route-info{grid-template-columns:1fr 1fr}.mcb-route-editor{grid-template-columns:1fr 1fr 1fr 1fr}.mcb-route-editor .rs-text{grid-column:1/-1}}@media(max-width:560px){.mcb-map-toolbar{grid-template-columns:1fr}.mcb-route-info{grid-template-columns:1fr}.mcb-route-editor{grid-template-columns:1fr 1fr}.mcb-route-editor .rs-text{grid-column:1/-1}.mcb-route-editor .rs-floor{grid-column:1/-1}.mcb-route-editor .rs-remove{grid-column:1/-1;width:100%}#mcbMapSvg{min-height:330px}.mcb-map-note{font-size:10px}}
+@media(max-width:1000px){.mcb-route-editor{grid-template-columns:1fr 1fr 2fr 1fr 1fr 1fr auto}.mcb-map-toolbar{grid-template-columns:1fr 1fr}}@media(max-width:800px){.mcb-map-toolbar{grid-template-columns:1fr 1fr}.mcb-route-info{grid-template-columns:1fr 1fr}.mcb-route-editor{grid-template-columns:1fr 1fr 1fr 1fr}.mcb-route-editor .rs-text{grid-column:1/-1}}@media(max-width:560px){.mcb-map-toolbar{grid-template-columns:1fr}.mcb-route-info{grid-template-columns:1fr}.mcb-route-editor{grid-template-columns:1fr 1fr}.mcb-route-editor .rs-text{grid-column:1/-1}.mcb-route-editor .rs-floor-field{grid-column:1/-1}.mcb-route-editor .rs-remove{grid-column:1/-1;width:100%}#mcbMapSvg{min-height:330px}.mcb-map-note{font-size:10px}}
 @media print {
   @page {
     size:A4 landscape;
@@ -1070,6 +1070,31 @@ button,input,select,textarea{font-size:14px}
 @keyframes mcbMapJumpHighlight{0%{box-shadow:0 0 0 4px #2563eb,0 0 0 8px #93c5fd}100%{box-shadow:0 0 0 0 transparent,0 0 0 0 transparent}}
 @media(prefers-reduced-motion:reduce){.mcb-map-jump-highlight{animation:none;outline:3px solid #93c5fd}}
 
+
+/* R11.9: room-based schematic floor plan + robust route-step editing */
+.schematic-floor-plan{font-family:Inter,system-ui,sans-serif}
+.schematic-floor-plan .sf-room{fill:#fff;stroke:#9fb2c9;stroke-width:3}
+.schematic-floor-plan .sf-room-alt{fill:#f0f6fd;stroke:#9fb2c9;stroke-width:3}
+.schematic-floor-plan .sf-room-empty{fill:#f8fafc;stroke:#cbd5e1;stroke-width:2;stroke-dasharray:7 5}
+.schematic-floor-plan .sf-room-name{font-size:13px;font-weight:800;fill:#1e293b;text-anchor:middle}
+.schematic-floor-plan .sf-room-area{font-size:10px;fill:#64748b;text-anchor:middle}
+.schematic-floor-plan .sf-heading{font-size:18px;font-weight:900;fill:#0f172a}
+.schematic-floor-plan .sf-subheading{font-size:11px;fill:#64748b}
+.schematic-floor-plan .sf-corridor{fill:#dcecff;stroke:#94b9e8;stroke-width:2}
+.schematic-floor-plan .sf-corridor-label{font-size:12px;font-weight:900;fill:#1d4ed8;letter-spacing:1.5px}
+.schematic-floor-plan .sf-door{fill:#fff;stroke:#64748b;stroke-width:2}
+.schematic-floor-plan .sf-window{stroke:#7cb7dc;stroke-width:5;stroke-linecap:round}
+.schematic-floor-plan .sf-stairs{fill:#fef3c7;stroke:#d97706;stroke-width:2}
+.schematic-floor-plan .sf-stair-line{stroke:#b45309;stroke-width:2}
+.schematic-floor-plan .sf-room-icon{fill:#dbeafe;stroke:#93c5fd;stroke-width:1}
+.schematic-floor-plan .sf-click-hint{font-size:10px;font-weight:700;fill:#475569}
+#mcbMapSvg{background:#f2f7fd;border-radius:13px}
+#mcbCoordinatePicker{background:#f2f7fd;border-radius:10px}
+.mcb-route-editor{grid-template-columns:44px 140px minmax(180px,1.4fr) 105px 76px 72px 72px auto}
+@media(max-width:1000px){.mcb-route-editor{grid-template-columns:minmax(70px,.6fr) minmax(110px,1fr) minmax(150px,2fr) minmax(80px,.8fr)}}
+@media(max-width:800px){.mcb-route-editor{grid-template-columns:1fr 1fr 1fr 1fr}.mcb-route-editor .rs-text{grid-column:1/-1}}
+@media(max-width:560px){.mcb-route-editor{grid-template-columns:1fr 1fr}.mcb-route-editor .rs-text,.mcb-route-editor .rs-floor,.mcb-route-editor .rs-remove{grid-column:1/-1;width:100%}}
+@media(prefers-reduced-motion:reduce){.schematic-floor-plan *{animation:none!important}}
 </style>
 </head>
 <body>
@@ -1078,7 +1103,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.8</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261015-R11.9</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -2701,36 +2726,102 @@ function updateMcbCoordinateTargetOptions(){
   select.value=[...select.options].some(o=>o.value===old)?old:"target";
   drawMcbCoordinatePicker();
 }
+function schematicTextLines(value,maxChars=23,maxLines=2){
+  const words=String(value||"").trim().split(/\s+/).filter(Boolean),lines=[];let line="";
+  for(const word of words){const next=line?line+" "+word:word;if(next.length>maxChars&&line){lines.push(line);line=word;}else line=next;}
+  if(line)lines.push(line);if(lines.length>maxLines){lines.length=maxLines;lines[maxLines-1]=lines[maxLines-1].replace(/[.…]*$/,'')+"…";}return lines;
+}
+function getSchematicRooms(building,floor){
+  const found=S.locations.filter(v=>v.active!==false&&(!building||sameBuilding(v.building,building))&&floorKey(floorValue(v))===floorKey(floor)).sort((a,b)=>String(a.area||"").localeCompare(String(b.area||""),"id-ID")||String(a.room||"").localeCompare(String(b.room||""),"id-ID")||String(a.id||"").localeCompare(String(b.id||""),"id-ID"));
+  const unique=[],seen=new Set();
+  found.forEach(v=>{const name=String(v.room||v.area||"").trim()||"Lokasi";const key=(String(v.area||"")+"|"+name).toLocaleLowerCase("id-ID");if(!seen.has(key)){seen.add(key);unique.push({id:v.id,name,area:String(v.area||"").trim(),floor:floorText(floorValue(v))});}});
+  return unique.slice(0,8);
+}
+function schematicFloorMarkup(building,floor){
+  const rooms=getSchematicRooms(building,floor),slots=[
+    {x:55,y:150,w:200,h:112},{x:280,y:150,w:200,h:112},{x:505,y:150,w:200,h:112},{x:730,y:150,w:200,h:112},
+    {x:55,y:400,w:200,h:112},{x:280,y:400,w:200,h:112},{x:505,y:400,w:200,h:112},{x:730,y:400,w:200,h:112}
+  ];
+  const roomMarkup=slots.map((slot,i)=>{
+    const room=rooms[i],x=slot.x,y=slot.y,w=slot.w,h=slot.h,klass=room?(i%2?'sf-room-alt':'sf-room'):'sf-room-empty';
+    const name=room?room.name:(rooms.length?"Area belum ditandai":"Ruang skematik"),area=room?(room.area&&room.area.toLowerCase()!==room.name.toLowerCase()?room.area:"Lokasi master"):"Atur melalui Master Lokasi";
+    const lines=schematicTextLines(name,22,2),lineText=lines.map((line,j)=>`<tspan x="${x+w/2}" dy="${j?15:0}">${esc(line)}</tspan>`).join("");
+    return `<g class="sf-room-group" data-schematic-room="${esc(room?.id||'')}" aria-label="${esc(name)}">
+      <rect class="${klass}" x="${x}" y="${y}" width="${w}" height="${h}" rx="8"/>
+      <line class="sf-window" x1="${x+34}" y1="${y+2}" x2="${x+76}" y2="${y+2}"/>
+      <line class="sf-window" x1="${x+w-76}" y1="${y+2}" x2="${x+w-34}" y2="${y+2}"/>
+      <rect class="sf-room-icon" x="${x+w/2-10}" y="${y+15}" width="20" height="15" rx="3"/>
+      <path d="M${x+w/2-5} ${y+25}v-5h10v5" fill="none" stroke="#2563eb" stroke-width="1.5"/>
+      <text class="sf-room-name" x="${x+w/2}" y="${y+49}">${lineText}</text>
+      <text class="sf-room-area" x="${x+w/2}" y="${y+h-13}">${esc(schematicTextLines(area,28,1)[0]||'')}</text>
+      <rect class="sf-door" x="${x+w/2-11}" y="${y+h-3}" width="22" height="6" rx="2"/>
+    </g>`;
+  }).join("");
+  const label=`${building?building+' • ':''}${floorText(floor)}`;
+  return `<g class="schematic-floor-plan">
+    <rect x="0" y="0" width="1000" height="600" fill="#f2f7fd"/>
+    <text class="sf-heading" x="48" y="38">${esc(label)}</text>
+    <text class="sf-subheading" x="48" y="61">PETA SKEMATIK • tata letak ilustratif, sesuaikan titik dengan kondisi gedung</text>
+    <rect x="35" y="95" width="930" height="475" rx="15" fill="#e9f1fa" stroke="#839bb8" stroke-width="5"/>
+    ${roomMarkup}
+    <rect class="sf-corridor" x="45" y="282" width="910" height="78" rx="8"/>
+    <path d="M105 321 H765" stroke="#79a9e0" stroke-width="3" stroke-dasharray="10 9" fill="none"/>
+    <path d="M750 313 L766 321 L750 329" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    <text class="sf-corridor-label" x="120" y="311">KORIDOR UTAMA</text>
+    <text class="sf-subheading" x="120" y="342">Jalur penghubung antar-ruangan</text>
+    <g transform="translate(812 289)">
+      <rect class="sf-stairs" x="0" y="0" width="126" height="64" rx="7"/>
+      ${[0,1,2,3,4,5].map(i=>`<line class="sf-stair-line" x1="12" y1="${12+i*7}" x2="55" y2="${12+i*7}"/>`).join('')}
+      <path d="M62 47 L92 17 M82 17 H92 V27" stroke="#b45309" stroke-width="2.5" fill="none"/>
+      <text x="84" y="58" text-anchor="middle" font-size="9" font-weight="900" fill="#92400e">TANGGA / LIFT</text>
+    </g>
+    <text class="sf-click-hint" x="48" y="589">Klik peta untuk menentukan posisi awal atau titik navigasi yang dipilih.</text>
+  </g>`;
+}
 function drawMcbCoordinatePicker(){
   const svg=$("mcbCoordinatePicker");if(!svg)return;
   const select=$("mcbCoordinateTarget"),targetValue=select?.value||"target",rows=[...document.querySelectorAll("#mcbRouteSteps [data-route-row]")];
   const mcbX=clampMapX($("mMapX")?.value,80),mcbY=clampMapY($("mMapY")?.value,30);
   let selected={x:mcbX,y:mcbY,label:"MCB Tujuan",kind:"target"};
-  if(targetValue.startsWith("step:")){
-    const index=Number(targetValue.slice(5)),row=rows[index];
-    if(row)selected={x:clampMapX(row.querySelector(".rs-x")?.value,50),y:clampMapY(row.querySelector(".rs-y")?.value,50),label:`Langkah ${index+1}`,kind:"step",index};
-  }
-  const context=$("mLoc")?.value?loc($("mLoc").value):"Peta skematik";
-  const routeMarkers=rows.map((row,i)=>{const x=clampMapX(row.querySelector(".rs-x")?.value,50)*10,y=clampMapY(row.querySelector(".rs-y")?.value,50)*6,active=selected.kind==="step"&&selected.index===i;return`<g><circle class="picker-marker" cx="${x}" cy="${y}" r="${active?15:10}" fill="${active?"#1d4ed8":"#0ea5e9"}"/><text x="${x+16}" y="${y+4}" class="picker-label">${i+1}. ${esc((row.querySelector(".rs-instruction")?.value||"Langkah "+(i+1)).slice(0,42))}</text></g>`}).join("");
-  svg.innerHTML=`<defs><pattern id="mcbPickerGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M50 0H0V50" fill="none" stroke="#dbe5ef" stroke-width="1"/></pattern></defs><rect x="0" y="0" width="1000" height="600" fill="url(#mcbPickerGrid)"/><rect x="35" y="35" width="930" height="530" rx="18" fill="none" stroke="#94a3b8" stroke-width="3"/><text x="55" y="75" class="mcb-map-floor">${esc(context)}</text><text x="55" y="96" class="mcb-map-sub">Klik peta untuk menempatkan ${esc(selected.label)}</text>${routeMarkers}<circle class="picker-marker" cx="${mcbX*10}" cy="${mcbY*6}" r="${selected.kind==="target"?16:10}" fill="#f59e0b"/><text x="${mcbX*10+20}" y="${mcbY*6+5}" class="picker-label">MCB Tujuan</text><circle cx="${selected.x*10}" cy="${selected.y*6}" r="24" fill="none" stroke="#1d4ed8" stroke-width="4" stroke-dasharray="5 5"/>`;
+  if(targetValue.startsWith("step:")){const index=Number(targetValue.slice(5)),row=rows[index];if(row)selected={x:clampMapX(row.querySelector(".rs-x")?.value,50),y:clampMapY(row.querySelector(".rs-y")?.value,50),label:`Langkah ${index+1}`,kind:"step",index};}
+  const locRec=S.locations.find(v=>v.id===$("mLoc")?.value)||null,context=locRec?loc(locRec.id):"Peta skematik",building=locRec?.building||"",floor=floorValue(locRec);
+  const routePath=rows.map((row)=>({x:clampMapX(row.querySelector(".rs-x")?.value,50)*10,y:clampMapY(row.querySelector(".rs-y")?.value,50)*6}));
+  const routeD=routePath.length>1?routePath.map((pt,i)=>`${i?'L':'M'} ${pt.x} ${pt.y}`).join(' '):'';
+  const routeMarkers=rows.map((row,i)=>{const x=clampMapX(row.querySelector(".rs-x")?.value,50)*10,y=clampMapY(row.querySelector(".rs-y")?.value,50)*6,active=selected.kind==="step"&&selected.index===i;return `<g><circle class="picker-marker" cx="${x}" cy="${y}" r="${active?16:11}" fill="${active?'#1d4ed8':'#0ea5e9'}"/><text x="${x+16}" y="${y+4}" class="picker-label">${i+1}. ${esc((row.querySelector(".rs-instruction")?.value||"Langkah "+(i+1)).slice(0,42))}</text></g>`}).join('');
+  svg.innerHTML=`<defs><filter id="pickerShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity=".18"/></filter><marker id="pickerArrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#2563eb"/></marker></defs>${schematicFloorMarkup(building,floor)}${routeD?`<path d="${routeD}" class="mcb-route" marker-end="url(#pickerArrow)"/>`:''}${routeMarkers}<circle class="picker-marker" cx="${mcbX*10}" cy="${mcbY*6}" r="${selected.kind==='target'?15:9}" fill="#f59e0b" filter="url(#pickerShadow)"/><text x="${mcbX*10+20}" y="${mcbY*6+5}" class="picker-label">MCB Tujuan</text><circle cx="${selected.x*10}" cy="${selected.y*6}" r="24" fill="none" stroke="#1d4ed8" stroke-width="4" stroke-dasharray="5 5"/>`;
   svg.onclick=e=>{
     const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return;const pos=pt.matrixTransform(ctm.inverse()),x=clampMapX(pos.x/10,50),y=clampMapY(pos.y/6,50);
     if(selected.kind==="target"){
       if($("mMapX")){$("mMapX").value=String(Math.round(x*10)/10);$("mMapX").dispatchEvent(new Event("input",{bubbles:true}));}
       if($("mMapY")){$("mMapY").value=String(Math.round(y*10)/10);$("mMapY").dispatchEvent(new Event("input",{bubbles:true}));}
-      $("mcbCoordinatePickerStatus").textContent=`Posisi MCB tujuan ditetapkan pada X ${Math.round(x)}%, Y ${Math.round(y)}%.`;
+      const status=$("mcbCoordinatePickerStatus");if(status)status.textContent=`Posisi MCB tujuan ditetapkan dengan klik peta pada X ${Math.round(x)}%, Y ${Math.round(y)}%.`;
     }else{
       const row=rows[selected.index];if(!row)return;
-      const inputX=row.querySelector(".rs-x"),inputY=row.querySelector(".rs-y");if(inputX){inputX.value=String(Math.round(x*10)/10);inputX.dispatchEvent(new Event("input",{bubbles:true}));}if(inputY){inputY.value=String(Math.round(y*10)/10);inputY.dispatchEvent(new Event("input",{bubbles:true}));}
-      $("mcbCoordinatePickerStatus").textContent=`Posisi Langkah ${selected.index+1} ditetapkan pada X ${Math.round(x)}%, Y ${Math.round(y)}%.`;
+      const inputX=row.querySelector(".rs-x"),inputY=row.querySelector(".rs-y");if(inputX)inputX.value=String(Math.round(x*10)/10);if(inputY)inputY.value=String(Math.round(y*10)/10);
+      const status=$("mcbCoordinatePickerStatus");if(status)status.textContent=`Posisi Langkah ${selected.index+1} diperbarui ke X ${Math.round(x)}%, Y ${Math.round(y)}%.`;
     }
     drawMcbCoordinatePicker();
   };
   if(select)select.onchange=drawMcbCoordinatePicker;
 }
-function renderMcbRouteEditor(steps=[]){const root=$("mcbRouteSteps");if(!root)return;const rows=normalizeRouteSteps(steps);root.innerHTML=rows.length?rows.map((x,i)=>`<div class="mcb-route-editor" data-route-row><div class="field"><label>No.</label><input class="rs-order" value="${i+1}" readonly></div><div class="field"><label>Jenis</label><select class="rs-type">${mcbRouteTypeOptions(x.type)}</select></div><div class="field rs-text"><label>Petunjuk *</label><input class="rs-instruction" value="${esc(x.text)}" placeholder="Contoh: Keluar Purchasing lalu masuk koridor utama"></div><div class="field rs-floor"><label>Lantai</label><input class="rs-floor" value="${esc(x.floor)}" placeholder="Lantai 1 / Lantai 2"></div><div class="field"><label>Jarak (m)</label><input class="rs-distance" type="number" min="0" step="0.1" value="${x.distanceM||0}"></div><div class="field"><label>Map X %</label><input class="rs-x" type="number" min="5" max="95" step="0.1" value="${x.x}" readonly></div><div class="field"><label>Map Y %</label><input class="rs-y" type="number" min="8" max="92" step="0.1" value="${x.y}" readonly></div><button type="button" class="btn danger rs-remove" data-remove-route-step>× Hapus</button></div>`).join(""):`<div class="empty">Belum ada titik rute. Tambahkan langkah seperti keluar ruangan, belok, tangga, lift, atau tujuan MCB.</div>`;updateMcbCoordinateTargetOptions()}
-function collectMcbRouteSteps(){return[...document.querySelectorAll("#mcbRouteSteps [data-route-row]")].map((row,i)=>({order:i+1,type:row.querySelector(".rs-type")?.value||"straight",text:row.querySelector(".rs-instruction")?.value.trim()||"",floor:row.querySelector(".rs-floor")?.value.trim()||"",distanceM:Number(row.querySelector(".rs-distance")?.value)||0,x:clampMapX(row.querySelector(".rs-x")?.value,50),y:clampMapY(row.querySelector(".rs-y")?.value,50)})).filter(x=>x.text)}
-function addMcbRouteStep(prefill={type:"straight",text:"",floor:"",distanceM:0,x:50,y:50}){const current=collectMcbRouteSteps();renderMcbRouteEditor([...current,prefill]);const rows=document.querySelectorAll("#mcbRouteSteps [data-route-row]");rows[rows.length-1]?.querySelector(".rs-instruction")?.focus()}
+function renderMcbRouteEditor(steps=[]){const root=$("mcbRouteSteps");if(!root)return;const rows=normalizeRouteSteps(steps);root.innerHTML=rows.length?rows.map((x,i)=>`<div class="mcb-route-editor" data-route-row><div class="field"><label>No.</label><input class="rs-order" value="${i+1}" readonly></div><div class="field"><label>Jenis</label><select class="rs-type">${mcbRouteTypeOptions(x.type)}</select></div><div class="field rs-text"><label>Petunjuk *</label><input class="rs-instruction" value="${esc(x.text)}" placeholder="Contoh: Keluar Purchasing lalu masuk koridor utama"></div><div class="field rs-floor-field"><label>Lantai</label><input class="rs-floor" value="${esc(x.floor)}" placeholder="Lantai 1 / Lantai 2"></div><div class="field"><label>Jarak (m)</label><input class="rs-distance" type="number" min="0" step="0.1" value="${x.distanceM||0}"></div><div class="field"><label>Map X %</label><input class="rs-x" type="number" min="5" max="95" step="0.1" value="${x.x}" readonly></div><div class="field"><label>Map Y %</label><input class="rs-y" type="number" min="8" max="92" step="0.1" value="${x.y}" readonly></div><button type="button" class="btn danger rs-remove" data-remove-route-step>× Hapus</button></div>`).join(""):`<div class="empty">Belum ada titik rute. Tambahkan langkah seperti keluar ruangan, belok, tangga, lift, atau tujuan MCB.</div>`;updateMcbCoordinateTargetOptions()}
+function collectMcbRouteEditorRows(){return[...document.querySelectorAll("#mcbRouteSteps [data-route-row]")].map((row,i)=>({order:i+1,type:row.querySelector(".rs-type")?.value||"straight",text:row.querySelector(".rs-instruction")?.value.trim()||"",floor:row.querySelector("input.rs-floor")?.value?.trim()||"",distanceM:Number(row.querySelector(".rs-distance")?.value)||0,x:clampMapX(row.querySelector(".rs-x")?.value,50),y:clampMapY(row.querySelector(".rs-y")?.value,50)}))}
+function collectMcbRouteSteps(){return collectMcbRouteEditorRows().filter(x=>x.text)}
+function addMcbRouteStep(prefill={type:"straight",text:"",floor:"",distanceM:0,x:50,y:50}){
+  // Preserve blank editing rows so repeated clicks always add one row each.
+  const current=collectMcbRouteEditorRows(),last=current[current.length-1];
+  const currentLocation=S.locations.find(v=>v.id===$("mLoc")?.value)||null;
+  const floorDefault=last?.floor||((floorValue(currentLocation)!=="__floor_unknown__")?floorValue(currentLocation):"");
+  const untouchedDefault=!String(prefill.text||"").trim()&&Number(prefill.x)===50&&Number(prefill.y)===50;
+  const next={...prefill,
+    floor:String(prefill.floor||floorDefault||""),
+    x:untouchedDefault?(last?clampMapX(last.x+7,42):42):(prefill.x??(last?clampMapX(last.x+7,42):42)),
+    y:untouchedDefault?(last?clampMapY(last.y+4,50):50):(prefill.y??(last?clampMapY(last.y+4,50):50))
+  };
+  renderMcbRouteEditor([...current,next]);
+  const rows=document.querySelectorAll("#mcbRouteSteps [data-route-row]"),newRow=rows[rows.length-1];
+  newRow?.querySelector(".rs-instruction")?.focus();
+}
 function routeStepsHtml(steps,activeIndex=0){const rows=normalizeRouteSteps(steps);if(!rows.length)return`<div class="empty">Belum ada petunjuk rute. Admin dapat mengisinya melalui Edit MCB.</div>`;return`<div>${rows.map((x,i)=>{const floor=x.floor?` • ${esc(x.floor)}`:"";return`<div class="mcb-route-step ${i===activeIndex?"active":""}" data-map-route-step="${i}" role="button" tabindex="0" aria-label="Lihat langkah ${i+1}"><div class="mcb-route-num">${i+1}</div><div><b>${MCB_ROUTE_ICONS[x.type]||"•"} ${esc(MCB_ROUTE_TYPES[x.type]||"Petunjuk")}${floor}</b><small>${esc(x.text)}${x.distanceM?` • ${x.distanceM} m`:""}</small></div></div>`}).join("")}</div>`}
 function mcbModal(id=null){if(!requireAdmin("Master MCB hanya dapat diubah Admin."))return;
   clearMcbPhotoPreviewUrl();
@@ -2745,7 +2836,7 @@ function mcbModal(id=null){if(!requireAdmin("Master MCB hanya dapat diubah Admin
   const savedMcbPhoto=x?.photoIdentification||null;
   const savedMcbPhotoUrl=savedMcbPhoto?.url||(savedMcbPhoto?.fileId?`https://drive.google.com/file/d/${encodeURIComponent(savedMcbPhoto.fileId)}/view`:"");
   const savedMcbPhotoHtml=savedMcbPhoto?.fileId?`<div class="unit-label-current" id="mPhotoSaved">✅ Foto MCB tersimpan: <b>${esc(savedMcbPhoto.name||savedMcbPhoto.storedName||"Foto identifikasi MCB")}</b><br><a href="${esc(savedMcbPhotoUrl)}" target="_blank" rel="noopener noreferrer">↗ Buka foto di Google Drive</a></div>`:`<div class="unit-label-current" id="mPhotoSaved">Belum ada foto identifikasi MCB tersimpan.</div>`;
-  modal(x?'Edit MCB':'Tambah MCB',`<form id="mcbForm"><div class="formgrid"><div class="field"><label>Kode MCB *</label><input id="mCode" required value="${esc(x?.code||('MCB-'+String(S.mcbs.length+1).padStart(3,'0')))}" ${x?'readonly':''}></div><div class="field"><label>Panel *</label><input id="mPanel" required value="${esc(x?.panelName||'')}"></div><div class="field"><label>Nomor MCB *</label><input id="mNumber" required value="${esc(x?.number||'')}"></div><div class="field"><label>Rating (A)</label><input id="mRating" type="number" min="0" step="1" value="${esc(x?.ratingA||16)}"></div><div class="field"><label>Pole</label><select id="mPole"><option value="1P">1P</option><option value="2P">2P</option><option value="3P">3P</option><option value="4P">4P</option></select></div><div class="field"><label>Lokasi</label><input id="mLocSearch" type="search" value="${esc(x?loc(x.locationId):'')}" placeholder="Cari gedung, lantai, area, atau ruangan..." autocomplete="off" aria-label="Cari lokasi MCB"><div id="mLocResults" class="location-search-results hidden" role="listbox" aria-label="Hasil pencarian lokasi MCB"></div><select id="mLoc" class="location-native-select" aria-hidden="true" tabindex="-1"><option value="">Pilih lokasi</option>${locations}</select><small class="form-help">Ketik sebagian nama lokasi untuk menyaring pilihan. Lokasi yang tersimpan tetap menggunakan ID master yang sama.</small></div><div class="field full"><label>Titik / Posisi Fisik</label><input id="mPoint" value="${esc(x?.point||'')}" placeholder="Contoh: Electrical Room Lt. 2, panel baris 2 kolom 3"></div><div class="field"><label>Sirkuit</label><input id="mCircuit" value="${esc(x?.circuit||'')}" placeholder="Contoh: AC-001"></div><div class="field"><label>Status</label><select id="mStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field full"><label>Unit AC Terhubung</label><select id="mUnits" multiple size="5">${unitOptions}</select><small style="display:block;color:var(--muted);margin-top:5px">Satu MCB dapat dihubungkan ke beberapa Unit AC.</small></div><div class="field"><label>Posisi MCB pada peta X (%)</label><input id="mMapX" type="number" min="5" max="95" step="0.1" value="${esc(x?.mapX??80)}" readonly><small class="form-help">Pilih titik dengan mengeklik peta skematik di bawah.</small></div><div class="field"><label>Posisi MCB pada peta Y (%)</label><input id="mMapY" type="number" min="8" max="92" step="0.1" value="${esc(x?.mapY??30)}" readonly><small class="form-help">Koordinat terisi otomatis berdasarkan klik.</small></div></div><div class="section"><h3>Atur Posisi pada Peta Skematik</h3><div class="field"><label>Titik yang ingin diatur</label><select id="mcbCoordinateTarget"><option value="target">Posisi MCB Tujuan</option></select><small class="form-help">Pilih posisi MCB tujuan atau salah satu langkah rute, lalu klik posisi yang sesuai pada peta.</small></div><div class="mcb-coordinate-picker-wrap"><svg id="mcbCoordinatePicker" viewBox="0 0 1000 600" role="img" aria-label="Peta skematik untuk memilih posisi MCB dan titik rute"><rect x="0" y="0" width="1000" height="600" fill="#f8fbff"/></svg></div><div class="mcb-coordinate-picker-help" id="mcbCoordinatePickerStatus">Klik pada peta untuk mengatur titik terpilih. Ini adalah peta skematik, bukan ukuran jarak nyata.</div></div><div class="section"><h3>Foto Identifikasi MCB</h3><div class="field"><label>Upload Foto MCB (Opsional)</label><input id="mPhotoInput" type="file" accept="image/*"><small class="form-help">Ambil foto yang memperlihatkan MCB tujuan beserta posisi atau MCB di sekitarnya agar teknisi dapat membedakannya dari tipe yang sama. Foto dikompresi dan disimpan di Google Drive; maksimal 2,5 MB setelah kompresi.</small>${savedMcbPhotoHtml}<div id="mPhotoPreview" class="unit-label-preview hidden"></div><div class="unit-label-actions"><button type="button" class="btn hidden" id="mPhotoClear">Batalkan pilihan foto baru</button></div></div></div><div class="section"><h3>Rute Bertitik + Petunjuk Langkah</h3><div class="mcb-route-routehint">Rute disimpan sebagai urutan langkah. Anda dapat memasukkan <b>belok kanan/kiri, koridor, ruangan, tangga naik/turun, lift, pintu</b>, sampai tujuan MCB. Koordinat X/Y dihitung otomatis ketika Anda mengeklik posisi MCB atau langkah rute pada peta skematik di bawah.</div><div id="mcbRouteSteps" style="margin-top:10px"></div><div class="mcb-route-toolbar"><small>Setiap langkah sebaiknya memiliki petunjuk dan lantai yang benar. Pilih langkah di bagian “Atur Posisi pada Peta Skematik”, lalu klik lokasi titiknya. Jarak bersifat opsional.</small><button type="button" class="btn" id="addMcbRouteStep">＋ Tambah Langkah</button></div></div><div class="section"><h3>Catatan</h3><textarea id="mcbNotes">${esc(x?.notes||'')}</textarea></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan MCB</button></div></form>`);
+  modal(x?'Edit MCB':'Tambah MCB',`<form id="mcbForm"><div class="formgrid"><div class="field"><label>Kode MCB *</label><input id="mCode" required value="${esc(x?.code||('MCB-'+String(S.mcbs.length+1).padStart(3,'0')))}" ${x?'readonly':''}></div><div class="field"><label>Panel *</label><input id="mPanel" required value="${esc(x?.panelName||'')}"></div><div class="field"><label>Nomor MCB *</label><input id="mNumber" required value="${esc(x?.number||'')}"></div><div class="field"><label>Rating (A)</label><input id="mRating" type="number" min="0" step="1" value="${esc(x?.ratingA||16)}"></div><div class="field"><label>Pole</label><select id="mPole"><option value="1P">1P</option><option value="2P">2P</option><option value="3P">3P</option><option value="4P">4P</option></select></div><div class="field"><label>Lokasi</label><input id="mLocSearch" type="search" value="${esc(x?loc(x.locationId):'')}" placeholder="Cari gedung, lantai, area, atau ruangan..." autocomplete="off" aria-label="Cari lokasi MCB"><div id="mLocResults" class="location-search-results hidden" role="listbox" aria-label="Hasil pencarian lokasi MCB"></div><select id="mLoc" class="location-native-select" aria-hidden="true" tabindex="-1"><option value="">Pilih lokasi</option>${locations}</select><small class="form-help">Ketik sebagian nama lokasi untuk menyaring pilihan. Lokasi yang tersimpan tetap menggunakan ID master yang sama.</small></div><div class="field full"><label>Titik / Posisi Fisik</label><input id="mPoint" value="${esc(x?.point||'')}" placeholder="Contoh: Electrical Room Lt. 2, panel baris 2 kolom 3"></div><div class="field"><label>Sirkuit</label><input id="mCircuit" value="${esc(x?.circuit||'')}" placeholder="Contoh: AC-001"></div><div class="field"><label>Status</label><select id="mStatus"><option value="active">Aktif</option><option value="inactive">Nonaktif</option><option value="spare">Cadangan</option></select></div><div class="field full"><label>Unit AC Terhubung</label><select id="mUnits" multiple size="5">${unitOptions}</select><small style="display:block;color:var(--muted);margin-top:5px">Satu MCB dapat dihubungkan ke beberapa Unit AC.</small></div><div class="field"><label>Posisi MCB pada peta X (%)</label><input id="mMapX" type="number" min="5" max="95" step="0.1" value="${esc(x?.mapX??80)}" readonly><small class="form-help">Pilih titik dengan mengeklik peta skematik di bawah.</small></div><div class="field"><label>Posisi MCB pada peta Y (%)</label><input id="mMapY" type="number" min="8" max="92" step="0.1" value="${esc(x?.mapY??30)}" readonly><small class="form-help">Koordinat terisi otomatis berdasarkan klik.</small></div></div><div class="section"><h3>Atur Posisi pada Peta Skematik</h3><div class="field"><label>Titik yang ingin diatur</label><select id="mcbCoordinateTarget"><option value="target">Posisi MCB Tujuan</option></select><small class="form-help">Pilih posisi MCB tujuan atau salah satu langkah rute, lalu klik posisi yang sesuai pada peta.</small></div><div class="mcb-coordinate-picker-wrap"><svg id="mcbCoordinatePicker" viewBox="0 0 1000 600" role="img" aria-label="Peta skematik untuk memilih posisi MCB dan titik rute"><rect x="0" y="0" width="1000" height="600" fill="#f8fbff"/></svg></div><div class="mcb-coordinate-picker-help" id="mcbCoordinatePickerStatus">Peta ini ilustratif, bukan denah ukur. Koordinat lama tetap dipertahankan; sesuaikan ulang posisi MCB dan langkah rute pada peta baru sebelum dipakai operasional. Klik peta untuk mengatur titik terpilih.</div></div><div class="section"><h3>Foto Identifikasi MCB</h3><div class="field"><label>Upload Foto MCB (Opsional)</label><input id="mPhotoInput" type="file" accept="image/*"><small class="form-help">Ambil foto yang memperlihatkan MCB tujuan beserta posisi atau MCB di sekitarnya agar teknisi dapat membedakannya dari tipe yang sama. Foto dikompresi dan disimpan di Google Drive; maksimal 2,5 MB setelah kompresi.</small>${savedMcbPhotoHtml}<div id="mPhotoPreview" class="unit-label-preview hidden"></div><div class="unit-label-actions"><button type="button" class="btn hidden" id="mPhotoClear">Batalkan pilihan foto baru</button></div></div></div><div class="section"><h3>Rute Bertitik + Petunjuk Langkah</h3><div class="mcb-route-routehint">Rute disimpan sebagai urutan langkah. Anda dapat memasukkan <b>belok kanan/kiri, koridor, ruangan, tangga naik/turun, lift, pintu</b>, sampai tujuan MCB. Koordinat X/Y dihitung otomatis ketika Anda mengeklik posisi MCB atau langkah rute pada peta skematik di bawah.</div><div id="mcbRouteSteps" style="margin-top:10px"></div><div class="mcb-route-toolbar"><small>Setiap langkah sebaiknya memiliki petunjuk dan lantai yang benar. Pilih langkah di bagian “Atur Posisi pada Peta Skematik”, lalu klik lokasi titiknya. Jarak bersifat opsional.</small><button type="button" class="btn" id="addMcbRouteStep">＋ Tambah Langkah</button></div></div><div class="section"><h3>Catatan</h3><textarea id="mcbNotes">${esc(x?.notes||'')}</textarea></div><div class="ma"><button type="button" class="btn" data-close>Batal</button><button class="btn primary">💾 Simpan MCB</button></div></form>`);
   if(x){$('mPole').value=x.pole||'1P';$('mStatus').value=x.status||'active'}
   const mLocSelect=$("mLoc"),mLocSearch=$("mLocSearch"),mLocResults=$("mLocResults");
   const renderMcbLocationOptions=(showAll=false)=>{
@@ -2776,6 +2867,8 @@ function mcbModal(id=null){if(!requireAdmin("Master MCB hanya dapat diubah Admin
     const found=activeMcbLocations.find(v=>v.id===mLocSelect.value);
     if(found&&mLocSearch)mLocSearch.value=loc(found.id);
     if(mLocResults)mLocResults.classList.add("hidden");
+    // Refresh room labels immediately when the Admin picks a different location.
+    drawMcbCoordinatePicker();
   });
   renderMcbRouteEditor(existingRoute);
   drawMcbCoordinatePicker();
@@ -2803,6 +2896,13 @@ function mcbModal(id=null){if(!requireAdmin("Master MCB hanya dapat diubah Admin
     e.preventDefault();
     const code=$('mCode').value.trim().toUpperCase(),panel=$('mPanel').value.trim(),number=$('mNumber').value.trim(),locationId=$('mLoc').value,selectedPhotoFile=$('mPhotoInput')?.files?.[0]||null;
     if(!code||!panel||!number||!locationId)return toast('Validasi','Kode, Panel, Nomor MCB, dan Lokasi wajib diisi.','warning');
+    const routeEditorRows=collectMcbRouteEditorRows();
+    const incompleteRouteIndex=routeEditorRows.findIndex(row=>!row.text);
+    if(incompleteRouteIndex>=0){
+      const missingRow=document.querySelectorAll('#mcbRouteSteps [data-route-row]')[incompleteRouteIndex];
+      missingRow?.querySelector('.rs-instruction')?.focus();
+      return toast('Petunjuk belum lengkap',`Isi petunjuk pada langkah ${incompleteRouteIndex+1} atau hapus langkah yang belum digunakan. Data belum disimpan.`,'warning');
+    }
     if(!x&&S.mcbs.some(v=>String(v.code).toUpperCase()===code))return toast('Duplikat','Kode MCB sudah digunakan.','error');
     if(selectedPhotoFile&&demo)return toast('Mode demo','Upload foto MCB ke Google Drive membutuhkan koneksi backend. Data MCB belum disimpan.','warning');
     const selected=[...$('mUnits').selectedOptions].map(o=>o.value),mapX=clampMapX($('mMapX').value,80),mapY=clampMapY($('mMapY').value,30),routeSteps=collectMcbRouteSteps();
@@ -2835,7 +2935,7 @@ function routeDistanceLabel(steps){const rows=normalizeRouteSteps(steps),total=r
 function drawMcbMap(){
   const svg=$("mcbMapSvg");if(!svg)return;
   const context=getMapContextLocation(),building=context?.building||"",activeFloor=getActiveMapFloor(),activeKey=floorKey(activeFloor);
-  const unitId=$("mapUnit")?.value||"",targetId=$("mapMcb")?.value||"",selectedMcb=targetId?mcb(targetId):null,selectedUnit=unitId?unit(unitId):null;
+  const unitId=$("mapUnit")?.value||"",targetId=$("mapMcb")?.value||"",selectedMcb=targetId?mcb(targetId):null,selectedUnit=unit(unitId);
   const targetLocation=locationRecordForAsset(selectedMcb),targetFloor=targetLocation?floorValue(targetLocation):activeFloor,targetFloorKey=floorKey(targetFloor);
   const onBuilding=record=>!building||sameBuilding(record?.building,building);
   const onFloor=record=>onBuilding(record)&&floorKey(floorValue(record))===activeKey;
@@ -2846,37 +2946,32 @@ function drawMcbMap(){
   const allSteps=normalizeRouteSteps(selectedMcb?.routeSteps||[]);
   const floorSteps=allSteps.filter(step=>floorKey(step.floor||targetFloor)===activeKey);
   mapState.activeStep=Math.max(0,Math.min(mapState.activeStep,Math.max(0,allSteps.length-1)));
-  const routeYou=youOnFloor?mapState.you:null;
-  const routeTarget=targetOnFloor?getMcbTarget(selectedMcb):null;
-  const route=getRoutePolyline(routeYou,routeTarget,floorSteps);
-  const arrowId="mcbArrow";
+  const routeYou=youOnFloor?mapState.you:null,routeTarget=targetOnFloor?getMcbTarget(selectedMcb):null;
+  const route=getRoutePolyline(routeYou,routeTarget,floorSteps),arrowId="mcbArrow";
   const routeMarkup=route?`<path d="${route}" class="mcb-route" marker-end="url(#${arrowId})"/>`:"";
-  const floorCaption=building?`${building} • ${floorText(activeFloor)}`:`${floorText(activeFloor)}`;
-  const routeCaption=selectedMcb?(targetOnFloor?(floorSteps.length?"Rute lantai ini ditampilkan dengan animasi arah.":(youOnFloor?"Pilih / tambahkan titik rute untuk lantai ini.":"Belum ada titik rute pada lantai ini.")):(floorSteps.length?`Bagian rute lantai ini: ${floorSteps.length} titik. Tujuan ${selectedMcb.code} berada di ${floorText(targetFloor)}.`:`Tujuan ${selectedMcb.code} berada di ${floorText(targetFloor)}. Pilih lantai tujuan untuk melihat titik MCB.`)):"Pilih MCB untuk menampilkan rute.";
+  const routeCaption=selectedMcb?(targetOnFloor?(floorSteps.length?"Rute lantai ini ditampilkan dengan animasi arah.":(youOnFloor?"Tambahkan titik rute untuk lantai ini.":"Belum ada titik rute pada lantai ini.")):(floorSteps.length?`Bagian rute lantai ini: ${floorSteps.length} titik. Tujuan ${selectedMcb.code} berada di ${floorText(targetFloor)}.`:`Tujuan ${selectedMcb.code} berada di ${floorText(targetFloor)}. Pilih lantai tujuan untuk melihat titik MCB.`)):"Pilih MCB untuk menampilkan rute.";
+  const visibleSteps=floorSteps.map(step=>{const originalIndex=allSteps.findIndex(x=>x.order===step.order);return {...step,originalIndex:originalIndex>=0?originalIndex:0}});
   svg.innerHTML=`<defs>
-    <pattern id="mcbGrid" width="50" height="50" patternUnits="userSpaceOnUse"><path d="M 50 0 L 0 0 0 50" fill="none" stroke="#dbe5ef" stroke-width="1"/></pattern>
     <filter id="mcbShadow"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#64748b" flood-opacity=".18"/></filter>
     <marker id="${arrowId}" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto" markerUnits="strokeWidth"><path d="M0,0 L0,6 L6,3 z" fill="#2563eb"/></marker>
   </defs>
-  <rect x="0" y="0" width="1000" height="600" fill="url(#mcbGrid)"/>
-  <rect x="35" y="35" width="930" height="530" rx="18" fill="none" stroke="#cbd5e1" stroke-width="2"/>
-  <text x="55" y="75" class="mcb-map-floor">${esc(floorCaption)}</text>
-  <text x="55" y="96" class="mcb-map-sub">${esc(routeCaption)}</text>
+  ${schematicFloorMarkup(building,activeFloor)}
+  <text x="48" y="80" class="mcb-map-sub">${esc(routeCaption)}</text>
   ${routeMarkup}
-  ${floorSteps.map((step)=>{const originalIndex=allSteps.findIndex(x=>x.order===step.order),i=originalIndex>=0?originalIndex:0,x=step.x*10,y=step.y*6,active=i===mapState.activeStep;return`<g class="mcb-route-map-step ${active?"active":""}" data-map-route-step="${i}"><circle class="mcb-route-map-step-circle" cx="${x}" cy="${y}" r="12" fill="${active?"#1d4ed8":"#2563eb"}" stroke="#fff" stroke-width="2"/><text x="${x}" y="${y+1}" class="mcb-route-map-step-label">${i+1}</text><text x="${x+16}" y="${y-6}" class="mcb-map-label">${esc(MCB_ROUTE_TYPES[step.type]||"Petunjuk")}</text><text x="${x+16}" y="${y+10}" class="mcb-map-sub">${esc(step.text)}</text></g>`}).join("")}
-  ${sameLocUnits.map(u=>{const x=clampMapX(u.mapX,30)*10,y=clampMapY(u.mapY,55)*6,active=selectedUnit?.id===u.id;return`<g class="mcb-map-unit" data-map-unit="${esc(u.id)}" role="button" tabindex="0"><circle cx="${x}" cy="${y}" r="${active?12:8}" fill="#64748b" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${x+14}" y="${y-7}" class="mcb-map-label">${esc(u.code)}</text><text x="${x+14}" y="${y+9}" class="mcb-map-sub">${esc(u.brand||"")}</text></g>`}).join("")}
-  ${sameLocMcbs.map(m=>{const t=getMcbTarget(m),active=selectedMcb?.id===m.id;return`<g class="mcb-map-point ${active?"active":""}" data-map-mcb="${esc(m.id)}" role="button" tabindex="0">${active?`<circle class="mcb-map-target-pulse" cx="${t.x}" cy="${t.y}" r="23"/>`:""}<rect x="${t.x-12}" y="${t.y-12}" width="24" height="24" rx="7" fill="#f59e0b" stroke="#fff" stroke-width="${active?4:3}" filter="url(#mcbShadow)"/><text x="${t.x+18}" y="${t.y-7}" class="mcb-map-label">${esc(m.code)}</text><text x="${t.x+18}" y="${t.y+9}" class="mcb-map-sub">${esc(m.panelName||"Panel")} / ${esc(m.number||"-")}</text></g>`}).join("")}
+  ${visibleSteps.map(step=>{const i=step.originalIndex,x=step.x*10,y=step.y*6,active=i===mapState.activeStep;return`<g class="mcb-route-map-step ${active?"active":""}" data-map-route-step="${i}" role="button" tabindex="0" aria-label="Pilih langkah ${i+1}"><circle class="mcb-route-map-step-circle" cx="${x}" cy="${y}" r="12" fill="${active?"#1d4ed8":"#2563eb"}" stroke="#fff" stroke-width="2"/><text x="${x}" y="${y+1}" class="mcb-route-map-step-label">${i+1}</text><text x="${x+16}" y="${y-6}" class="mcb-map-label">${esc(MCB_ROUTE_TYPES[step.type]||"Petunjuk")}</text><text x="${x+16}" y="${y+10}" class="mcb-map-sub">${esc(step.text)}</text></g>`}).join("")}
+  ${sameLocUnits.map(u=>{const x=clampMapX(u.mapX,30)*10,y=clampMapY(u.mapY,55)*6,active=selectedUnit?.id===u.id;return`<g class="mcb-map-unit" data-map-unit="${esc(u.id)}" role="button" tabindex="0" aria-label="Pilih Unit ${esc(u.code)}"><circle cx="${x}" cy="${y}" r="${active?12:8}" fill="#64748b" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${x+14}" y="${y-7}" class="mcb-map-label">${esc(u.code)}</text><text x="${x+14}" y="${y+9}" class="mcb-map-sub">${esc(u.brand||"")}</text></g>`}).join("")}
+  ${sameLocMcbs.map(m=>{const t=getMcbTarget(m),active=selectedMcb?.id===m.id;return`<g class="mcb-map-point ${active?"active":""}" data-map-mcb="${esc(m.id)}" role="button" tabindex="0" aria-label="Pilih MCB ${esc(m.code)}">${active?`<circle class="mcb-map-target-pulse" cx="${t.x}" cy="${t.y}" r="23"/>`:""}<rect x="${t.x-12}" y="${t.y-12}" width="24" height="24" rx="7" fill="#f59e0b" stroke="#fff" stroke-width="${active?4:3}" filter="url(#mcbShadow)"/><text x="${t.x+18}" y="${t.y-7}" class="mcb-map-label">${esc(m.code)}</text><text x="${t.x+18}" y="${t.y+9}" class="mcb-map-sub">${esc(m.panelName||"Panel")} / ${esc(m.number||"-")}</text></g>`}).join("")}
   ${youOnFloor?`<g><circle class="mcb-map-user-pulse" cx="${mapState.you.x}" cy="${mapState.you.y}" r="13"/><circle cx="${mapState.you.x}" cy="${mapState.you.y}" r="10" fill="#2563eb" stroke="#fff" stroke-width="3" filter="url(#mcbShadow)"/><text x="${mapState.you.x+16}" y="${mapState.you.y+5}" class="mcb-map-label">Posisi awal</text></g>`:""}`;
   svg.onclick=e=>{
     if(e.target.closest("[data-map-mcb],[data-map-unit],[data-map-route-step]"))return;
     const pt=svg.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;const ctm=svg.getScreenCTM();if(!ctm)return;const sp=pt.matrixTransform(ctm.inverse());
     mapState.you={x:Math.max(45,Math.min(955,sp.x)),y:Math.max(45,Math.min(555,sp.y))};mapState.youFloor=activeFloor;mapState.youBuilding=building;drawMcbMap();
   };
-  svg.querySelectorAll("[data-map-mcb]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();if($("mapMcb"))$("mapMcb").value=el.dataset.mapMcb;mapState.activeStep=0;drawMcbMap()}));
-  svg.querySelectorAll("[data-map-unit]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();const id=el.dataset.mapUnit;if($("mapUnit"))$("mapUnit").value=id;const linked=unit(id)?.mcbId;if(linked&&mcb(linked)&&$("mapMcb"))$("mapMcb").value=linked;mapState.activeStep=0;drawMcbMap()}));
-  svg.querySelectorAll("[data-map-route-step]").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();mapState.activeStep=Number(el.dataset.mapRouteStep)||0;drawMcbMap()}));
+  svg.querySelectorAll("[data-map-mcb]").forEach(el=>{const activate=e=>{e.stopPropagation();if($("mapMcb"))$("mapMcb").value=el.dataset.mapMcb;mapState.activeStep=0;drawMcbMap()};el.addEventListener("click",activate);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate(e)}})});
+  svg.querySelectorAll("[data-map-unit]").forEach(el=>{const activate=e=>{e.stopPropagation();const id=el.dataset.mapUnit;if($("mapUnit"))$("mapUnit").value=id;const linked=unit(id)?.mcbId;if(linked&&mcb(linked)&&$("mapMcb"))$("mapMcb").value=linked;mapState.activeStep=0;drawMcbMap()};el.addEventListener("click",activate);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate(e)}})});
+  svg.querySelectorAll("[data-map-route-step]").forEach(el=>{const activate=e=>{e.stopPropagation();mapState.activeStep=Number(el.dataset.mapRouteStep)||0;drawMcbMap()};el.addEventListener("click",activate);el.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();activate(e)}})});
   if($("mcbMapSelected"))$("mcbMapSelected").textContent=selectedMcb?`${selectedMcb.code} • ${selectedMcb.panelName||"Panel"}${selectedUnit?" • "+selectedUnit.code:""}`:"Pilih MCB / Unit AC";
-  if($("mapYouInfo"))$("mapYouInfo").textContent=mapState.you?`${floorText(mapState.youFloor)}${mapState.youBuilding?" • "+mapState.youBuilding:""}${youOnFloor?" • titik awal ditandai":" • pilih lantai untuk melihat titik awal"}`:"Tap peta untuk menentukan titik awal";
+  if($("mapYouInfo"))$("mapYouInfo").textContent=mapState.you?`${floorText(mapState.youFloor)}${mapState.youBuilding?" • "+mapState.youBuilding:""}${youOnFloor?" • titik awal ditandai":" • pilih lantai untuk melihat titik awal"}`:"Klik peta untuk menentukan posisi awal";
   if($("mapTargetInfo"))$("mapTargetInfo").textContent=selectedMcb?`${selectedMcb.code} • ${selectedMcb.panelName||"Panel"} • ${floorText(targetFloor)}${selectedMcb.point?" • "+selectedMcb.point:""}`:"Pilih MCB";
   if($("mapDistanceInfo"))$("mapDistanceInfo").textContent=selectedMcb?(allSteps.length?routeDistanceLabel(allSteps):"Belum ada rute"):"-";
   const progress=$("mapRouteProgress");if(progress){progress.textContent=allSteps.length?`Langkah ${mapState.activeStep+1} dari ${allSteps.length} • ${allSteps[mapState.activeStep]?.text||""}`:"Pilih MCB untuk mulai"}
