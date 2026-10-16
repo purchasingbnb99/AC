@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#2563eb">
-<meta name="ac-build" content="QT-20261016-R12.5">
+<meta name="ac-build" content="QT-20261016-R12.6">
 <title>AC Maintenance & Logbook System</title>
 <style>
 :root {
@@ -1119,11 +1119,15 @@ button,input,select,textarea{font-size:14px}
 #schematicEditorSvg .sf-editor-selected .sf-editor-handle{display:block}
 .sf-editor-handle{display:none;fill:#fff;stroke:#2563eb;stroke-width:3;cursor:nwse-resize;touch-action:none}.sf-editor-selected .sf-editor-handle{pointer-events:all}
 .sf-inline-delete{pointer-events:all}.sf-inline-delete:hover circle,.sf-inline-delete:focus circle{fill:#991b1b;stroke:#fecaca;stroke-width:3}.sf-inline-name-editor{width:100%;height:100%;box-sizing:border-box;border:2px solid #2563eb;border-radius:5px;background:#fff;color:#0f172a;font:700 12px Inter,system-ui,sans-serif;padding:3px 6px;outline:0;box-shadow:0 2px 8px rgba(15,23,42,.18)}
-/* R12.4: orderly geometry controls; four fields align, apply action gets its own row */
-.schematic-editor-geometry{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;align-items:start;margin-top:14px;padding:14px;border:1px solid #dbe4ee;border-radius:12px;background:#f8fafc}
+/* R12.6: aligned geometry + 360-degree direction rotation controls */
+.schematic-editor-geometry{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:start;margin-top:14px;padding:14px;border:1px solid #dbe4ee;border-radius:12px;background:#f8fafc}
 .schematic-editor-geometry>.field{display:flex;flex-direction:column;min-width:0;margin:0;align-self:start}
 .schematic-editor-geometry>.field>label{display:block;min-height:18px;line-height:18px;margin:0 0 7px;font-weight:700;color:#334155}
-.schematic-editor-geometry>.field>input{width:100%;height:44px;min-height:44px;box-sizing:border-box}
+.schematic-editor-geometry>.field>input:not([type=range]){width:100%;height:44px;min-height:44px;box-sizing:border-box}
+.schematic-rotation-controls{display:grid;grid-template-columns:70px minmax(0,1fr);gap:7px;align-items:center;min-height:44px}
+.schematic-rotation-controls input[type=number]{width:70px;height:40px;min-height:40px;padding:7px 6px;text-align:center}
+.schematic-rotation-controls input[type=range]{width:100%;min-width:0;margin:0;padding:0;height:24px;min-height:24px;border:0;box-shadow:none;background:transparent;accent-color:#2563eb}
+.schematic-rotation-help{font-size:10px;line-height:1.35;color:#64748b;margin-top:5px}
 .schematic-editor-geometry>#schematicApplyGeometry{grid-column:1/-1;justify-self:end;min-width:220px;min-height:42px}
 .schematic-editor-help{font-size:11px;color:#64748b;line-height:1.5;margin:9px 0}
 .sf-turn-marker-box{fill:#eff6ff;stroke:#60a5fa;stroke-width:2;stroke-dasharray:5 4}
@@ -1138,7 +1142,8 @@ button,input,select,textarea{font-size:14px}
 .sf-junction-edge{fill:none;stroke:#93c5fd;stroke-width:24;stroke-linecap:round;stroke-linejoin:round}
 .sf-junction-road{fill:none;stroke:#2563eb;stroke-width:14;stroke-linecap:round;stroke-linejoin:round}
 .sf-junction-label{font-size:11px;font-weight:900;fill:#1d4ed8;text-anchor:middle}
-@media(max-width:1100px){.schematic-editor-toolbar{grid-template-columns:1fr 1fr}.schematic-editor-geometry{grid-template-columns:repeat(2,minmax(0,1fr))}.schematic-editor-geometry>#schematicApplyGeometry{grid-column:1/-1;justify-self:stretch;width:100%}}
+@media(max-width:1150px){.schematic-editor-toolbar{grid-template-columns:1fr 1fr}.schematic-editor-geometry{grid-template-columns:repeat(3,minmax(0,1fr))}.schematic-editor-geometry>#schematicApplyGeometry{grid-column:1/-1;justify-self:stretch;width:100%}}
+@media(max-width:760px){.schematic-editor-geometry{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.schematic-editor-toolbar{grid-template-columns:1fr}.schematic-editor-geometry{grid-template-columns:1fr}.schematic-editor-geometry>#schematicApplyGeometry{grid-column:1;width:100%}.schematic-editor-card>summary{padding:12px}}
 </style>
 </head>
@@ -1148,7 +1153,7 @@ button,input,select,textarea{font-size:14px}
 <div class="logo">❄</div>
 <h1>AC Maintenance System</h1>
 <p>Logbook & Asset Management</p>
-<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261016-R12.5</div>
+<div style="text-align:center;color:#94a3b8;font-size:9px;margin:-14px 0 16px;letter-spacing:.4px">Build QT-20261016-R12.6</div>
 <div class="login-access" id="loginAccessChooser">
 <button type="button" data-login-role="technician"><b>👨‍🔧 Teknisi</b><span>Operasional maintenance</span></button>
 <button type="button" data-login-role="admin"><b>👑 Admin</b><span>Pengelolaan sistem</span></button>
@@ -1597,7 +1602,7 @@ button,input,select,textarea{font-size:14px}
       <div class="field"><label>Posisi X</label><input id="schematicElementX" type="number" min="20" max="940" step="1"></div>
       <div class="field"><label>Posisi Y</label><input id="schematicElementY" type="number" min="100" max="540" step="1"></div>
       <div class="field"><label>Lebar</label><input id="schematicElementW" type="number" min="45" max="900" step="1"></div>
-      <div class="field"><label>Tinggi</label><input id="schematicElementH" type="number" min="12" max="420" step="1"></div>
+      <div class="field"><label for="schematicElementRotation">Rotasi elemen (°)</label><div class="schematic-rotation-controls"><input id="schematicElementRotation" type="number" min="0" max="360" step="5" value="0" disabled aria-label="Sudut rotasi elemen dalam derajat"><input id="schematicElementRotationRange" type="range" min="0" max="360" step="5" value="0" disabled aria-label="Geser untuk memutar elemen dari 0 sampai 360 derajat"></div><small class="schematic-rotation-help">0°–360° untuk koridor, pintu, tangga/lift, panel, belokan, dan persimpangan.</small></div>
       <button type="button" class="btn" id="schematicApplyGeometry">Terapkan Ukuran</button>
     </div>
     <div class="schematic-editor-actions" style="margin-bottom:0">
@@ -2830,12 +2835,15 @@ function getSchematicRooms(building,floor){
 function schematicFloorStorageKey(floor){return floorKey(floor).replace(/[^a-z0-9]+/gi,"_").replace(/^_+|_+$/g,"")||"floor_unknown"}
 function schematicDraftKey(building,floor){return `${String(building||"").trim().toLocaleLowerCase("id-ID")}::${schematicFloorStorageKey(floor)}`}
 function getSchematicLayoutOwner(building){return S.locations.filter(v=>sameBuilding(v.building,building)).slice().sort((a,b)=>String(a.id||"").localeCompare(String(b.id||"")))[0]||null}
+const ROTATABLE_SCHEMATIC_TYPES=new Set(["corridor","stairs","elevator","door","panel","turn_right","turn_left","junction_t","junction_cross","junction_y"]);
+function isRotatableSchematicElement(el){return !!el&&ROTATABLE_SCHEMATIC_TYPES.has(el.type)}
 function normalizeSchematicElements(elements){
   const allowed=new Set(["room","corridor","stairs","elevator","door","panel","turn_right","turn_left","area_office","area_mess","junction_t","junction_cross","junction_y"]);
   return (Array.isArray(elements)?elements:[]).filter(v=>v&&allowed.has(v.type)).map((v,i)=>{
     const x=Math.max(20,Math.min(925,Number(v.x)||40)),y=Math.max(100,Math.min(563,Number(v.y)||120));
     const w=Math.max(45,Math.min(970-x,Number(v.w)||150)),h=Math.max(12,Math.min(575-y,Number(v.h)||90));
-    return {id:String(v.id||`scheme-${v.type}-${i+1}`),type:v.type,locationId:String(v.locationId||""),name:String(v.name||""),displayName:String(v.displayName||""),x,y,w,h};
+    const rotationRaw=Number(v.rotation??0),rotation=Math.max(0,Math.min(360,Number.isFinite(rotationRaw)?rotationRaw:0));
+    return {id:String(v.id||`scheme-${v.type}-${i+1}`),type:v.type,locationId:String(v.locationId||""),name:String(v.name||""),displayName:String(v.displayName||""),x,y,w,h,rotation};
   });
 }
 function createDefaultSchematicLayout(building,floor){
@@ -2858,6 +2866,26 @@ function updateSchematicUndoButton(){const {building,floor}=schematicEditorConte
 function pushSchematicUndoSnapshot(building,floor,elements){const key=schematicDraftKey(building,floor),stack=schematicUndoStacks.get(key)||[];stack.push(normalizeSchematicElements(elements).map(el=>({...el})));while(stack.length>30)stack.shift();schematicUndoStacks.set(key,stack);updateSchematicUndoButton();}
 function pushSchematicUndo(building,floor){pushSchematicUndoSnapshot(building,floor,schematicEditorElements());}
 function undoSchematicLayout(){const {building,floor}=schematicEditorContext(),key=schematicDraftKey(building,floor),stack=schematicUndoStacks.get(key)||[];if(!stack.length)return toast("Tidak ada perubahan","Belum ada perubahan yang bisa diurungkan.","info");const previous=stack.pop();setSchematicLayoutDraft(building,floor,previous);schematicEditorPendingType="";schematicEditorSelectedId=previous.some(el=>el.id===schematicEditorSelectedId)?schematicEditorSelectedId:(previous[0]?.id||"");renderSchematicEditor();drawMcbMap();updateSchematicUndoButton();setSchematicEditorStatus("Perubahan terakhir diurungkan. Klik Simpan Layout untuk menerapkan perubahan yang tersisa.",true);}
+let schematicRotationBefore=null;
+function beginSchematicRotationEdit(){if(schematicRotationBefore)return;const {building,floor}=schematicEditorContext();schematicRotationBefore=schematicEditorElements().map(el=>({...el}));}
+function previewSchematicRotation(rawValue){
+  const {building,floor}=schematicEditorContext(),current=schematicEditorElements(),idx=current.findIndex(el=>el.id===schematicEditorSelectedId);
+  if(idx<0||!isRotatableSchematicElement(current[idx]))return;
+  if(!schematicRotationBefore)schematicRotationBefore=current.map(el=>({...el}));
+  const parsed=Number(rawValue),angle=Math.max(0,Math.min(360,Number.isFinite(parsed)?parsed:0)),target=current[idx];target.rotation=angle;setSchematicLayoutDraft(building,floor,current);
+  const number=$("schematicElementRotation"),range=$("schematicElementRotationRange");if(number)number.value=String(angle);if(range)range.value=String(angle);
+  const svg=$("schematicEditorSvg"),group=svg&&Array.from(svg.querySelectorAll("[data-schematic-element]")).find(node=>node.dataset.schematicElement===target.id);
+  if(group){if(angle===0)group.removeAttribute("transform");else group.setAttribute("transform",`rotate(${angle} ${target.x+target.w/2} ${target.y+target.h/2})`);}
+  setSchematicEditorStatus(`Rotasi ${schematicElementLabel(target)}: ${angle}°. Perubahan belum disimpan.`,true);
+}
+function finishSchematicRotationEdit(){
+  if(!schematicRotationBefore)return;
+  const before=schematicRotationBefore;schematicRotationBefore=null;const {building,floor}=schematicEditorContext(),current=schematicEditorElements();
+  const beforeSelected=before.find(el=>el.id===schematicEditorSelectedId),nowSelected=current.find(el=>el.id===schematicEditorSelectedId);
+  if(beforeSelected&&nowSelected&&Number(beforeSelected.rotation||0)!==Number(nowSelected.rotation||0))pushSchematicUndoSnapshot(building,floor,before);
+  renderSchematicEditor();drawMcbMap();updateSchematicUndoButton();
+  if(nowSelected)setSchematicEditorStatus(`Rotasi ${schematicElementLabel(nowSelected)}: ${Math.round(Number(nowSelected.rotation)||0)}°. Klik Simpan Layout untuk menerapkan perubahan.`,schematicLayoutDrafts.has(schematicDraftKey(building,floor)));
+}
 function getSchematicLayout(building,floor){
   const draftKey=schematicDraftKey(building,floor);
   if(schematicLayoutDrafts.has(draftKey))return {version:1,elements:normalizeSchematicElements(schematicLayoutDrafts.get(draftKey).elements||[])};
@@ -2877,11 +2905,14 @@ function schematicElementLabel(el){
 function schematicElementArea(el){if(el.type==="room"&&el.locationId){const locRec=S.locations.find(v=>v.id===el.locationId);if(locRec&&locRec.area&&locRec.area.toLowerCase()!==String(locRec.room||"").toLowerCase())return locRec.area}return ({corridor:"Jalur penghubung",stairs:"Akses antar-lantai",elevator:"Akses lift",door:"Akses ruangan",panel:"Area panel listrik",turn_right:"Titik belok ke kanan",turn_left:"Titik belok ke kiri",area_office:"Zona pengelompokan ruangan kantor",area_mess:"Zona pengelompokan area mess",junction_t:"Jalur bercabang tiga arah",junction_cross:"Jalur bersilang empat arah",junction_y:"Jalur bercabang bentuk Y"})[el.type]||"";}
 function schematicElementMarkup(el,index,editor=false,selectedId=""){
   const {x,y,w,h}=el,label=schematicElementLabel(el),area=schematicElementArea(el),selected=editor&&el.id===selectedId,groupClass=`sf-element sf-element-${el.type}${selected?" sf-editor-selected":""}`;
-  const data=editor?`data-schematic-element="${esc(el.id)}" role="button" tabindex="0" aria-label="Pilih ${esc(label)}"`:"";
+  const rotation=Math.max(0,Math.min(360,Number(el.rotation)||0));
+  const rotationAttr=isRotatableSchematicElement(el)&&rotation!==0?` transform="rotate(${rotation} ${x+w/2} ${y+h/2})"`:"";
+  const data=(editor?`data-schematic-element="${esc(el.id)}" role="button" tabindex="0" aria-label="Pilih ${esc(label)}"`:"")+rotationAttr;
   const deleteHandle=selected?`<g class="sf-inline-delete" data-schematic-delete-element="${esc(el.id)}" role="button" tabindex="0" aria-label="Hapus ${esc(label)}" style="cursor:pointer"><circle cx="${x+w-1}" cy="${y+1}" r="12" fill="#dc2626" stroke="#fff" stroke-width="2"/><text x="${x+w-1}" y="${y+5}" text-anchor="middle" font-size="15" font-weight="900" fill="#fff">×</text></g>`:"";
   if(el.type==="area_office"||el.type==="area_mess"){
-    const office=el.type==="area_office",zoneClass=office?"sf-area-office":"sf-area-mess",accent=office?"#2563eb":"#c2410c";
-    return `<g class="${groupClass}" ${data}><rect class="${zoneClass}" x="${x}" y="${y}" width="${w}" height="${h}" rx="14"/><rect x="${x+10}" y="${y+10}" width="${Math.max(90,Math.min(w-20,schematicTextLines(label,22,1)[0].length*8+24))}" height="28" rx="7" fill="${office?"#dbeafe":"#ffedd5"}" stroke="${accent}" stroke-width="1.5"/><text class="sf-zone-label" x="${x+20}" y="${y+29}" fill="${accent}">${esc(label)}</text><text class="sf-zone-sub" x="${x+16}" y="${y+h-14}">${office?"AREA OFFICE":"AREA MESS"} • pengelompokan visual</text>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
+    const office=el.type==="area_office",zoneClass=office?"sf-area-office":"sf-area-mess";
+    // Keep the grouping-zone shape only; redundant text overlays are intentionally hidden.
+    return `<g class="${groupClass}" ${data}><rect class="${zoneClass}" x="${x}" y="${y}" width="${w}" height="${h}" rx="14"/>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
   }
   if(el.type==="junction_t"||el.type==="junction_cross"||el.type==="junction_y"){
     const cx=x+w/2,cy=y+h/2;
@@ -2889,14 +2920,13 @@ function schematicElementMarkup(el,index,editor=false,selectedId=""){
     if(el.type==="junction_t")d=`M${x+8} ${y+Math.min(28,h*.3)} H${x+w-8} M${cx} ${y+Math.min(28,h*.3)} V${y+h-8}`;
     else if(el.type==="junction_cross")d=`M${cx} ${y+8} V${y+h-8} M${x+8} ${cy} H${x+w-8}`;
     else d=`M${cx} ${y+h-8} L${x+10} ${y+10} M${cx} ${y+h-8} L${x+w-10} ${y+10} M${cx} ${y+h-8} V${cy+4}`;
-    const symbol=el.type==="junction_t"?"T":el.type==="junction_cross"?"+":"Y";
-    return `<g class="${groupClass}" ${data}><rect class="sf-junction-bg" x="${x}" y="${y}" width="${w}" height="${h}" rx="12"/><path class="sf-junction-edge" d="${d}"/><path class="sf-junction-road" d="${d}"/><text class="sf-junction-label" x="${x+w/2}" y="${y+h-2}">${symbol} • ${esc(label)}</text>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
+    return `<g class="${groupClass}" ${data}><rect class="sf-junction-bg" x="${x}" y="${y}" width="${w}" height="${h}" rx="12"/><path class="sf-junction-edge" d="${d}"/><path class="sf-junction-road" d="${d}"/>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
   }
   if(el.type==="turn_right"||el.type==="turn_left"){
     const right=el.type==="turn_right",startX=right?x+12:x+w-12,endX=right?x+w-12:x+12,cornerX=right?x+w-24:x+24,topY=y+15,bottomY=y+h-20;
     const d=`M ${startX} ${topY} H ${cornerX} Q ${right?x+w-12:x+12} ${topY} ${right?x+w-12:x+12} ${y+27} V ${bottomY}`;
     const arrow=right?`M${x+w-20} ${bottomY-10} L${x+w-12} ${bottomY} L${x+w-4} ${bottomY-10}`:`M${x+4} ${bottomY-10} L${x+12} ${bottomY} L${x+20} ${bottomY-10}`;
-    return `<g class="${groupClass}" ${data}><rect class="sf-turn-marker-box" x="${x}" y="${y}" width="${w}" height="${h}" rx="9"/><path class="sf-turn-marker-path" d="${d}"/><path class="sf-turn-marker-path" d="${arrow}"/><text class="sf-turn-marker-label" x="${x+w/2}" y="${y+h-4}" data-schematic-inline-label="true">${right?"↱":"↰"} ${esc(label)}</text>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
+    return `<g class="${groupClass}" ${data}><rect class="sf-turn-marker-box" x="${x}" y="${y}" width="${w}" height="${h}" rx="9"/><path class="sf-turn-marker-path" d="${d}"/><path class="sf-turn-marker-path" d="${arrow}"/>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
   }
   if(el.type==="corridor")return `<g class="${groupClass}" ${data}><rect class="sf-corridor" x="${x}" y="${y}" width="${w}" height="${h}" rx="8"/><path d="M${x+25} ${y+h/2} H${x+w-35}" stroke="#79a9e0" stroke-width="3" stroke-dasharray="10 9" fill="none"/><path d="M${x+w-50} ${y+h/2-8} L${x+w-34} ${y+h/2} L${x+w-50} ${y+h/2+8}" stroke="#2563eb" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text class="sf-corridor-label" data-schematic-inline-label="true" x="${x+18}" y="${y+24}">${esc(label)}</text><text class="sf-subheading" x="${x+18}" y="${y+h-14}">${esc(area)}</text>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
   if(el.type==="stairs")return `<g class="${groupClass}" ${data}><rect class="sf-stairs" x="${x}" y="${y}" width="${w}" height="${h}" rx="7"/>${[0,1,2,3,4,5].map(i=>`<line class="sf-stair-line" x1="${x+12}" y1="${y+12+i*((h-28)/5)}" x2="${x+w*.42}" y2="${y+12+i*((h-28)/5)}"/>`).join("")}<path d="M${x+w*.48} ${y+h*.72} L${x+w*.75} ${y+h*.28} M${x+w*.65} ${y+h*.28} H${x+w*.75} V${y+h*.4}" stroke="#b45309" stroke-width="2.5" fill="none"/><text data-schematic-inline-label="true" x="${x+w*.69}" y="${y+h-8}" text-anchor="middle" font-size="${Math.min(11,w/10)}" font-weight="900" fill="#92400e">${esc(label)}</text>${selected?`<circle class="sf-editor-handle" cx="${x+w}" cy="${y+h}" r="7"/>`:""}${deleteHandle}</g>`;
@@ -2937,6 +2967,8 @@ function renderSchematicEditor(){
   const selected=layout.elements.find(el=>el.id===schematicEditorSelectedId)||null;
   if(nameInput){nameInput.value=selected?schematicElementLabel(selected):"";nameInput.disabled=!selected;nameInput.placeholder=selected?.type==="room"&&selected.locationId?"Nama tampilan khusus (opsional)":"Nama elemen";}
   for(const [id,key] of [["schematicElementX","x"],["schematicElementY","y"],["schematicElementW","w"],["schematicElementH","h"]]){const el=$(id);if(el){el.value=selected?Math.round(selected[key]):"";el.disabled=!selected;}}
+  const rotationEnabled=isRotatableSchematicElement(selected),rotationValue=selected?Math.round(Number(selected.rotation)||0):0;
+  for(const id of ["schematicElementRotation","schematicElementRotationRange"]){const control=$(id);if(control){control.value=String(rotationValue);control.disabled=!rotationEnabled;}}
   const {elements}=layout;svg.innerHTML=`<defs><pattern id="schematicEditorGrid" width="25" height="25" patternUnits="userSpaceOnUse"><path d="M25 0H0V25" fill="none" stroke="#e1eaf4" stroke-width="1"/></pattern></defs><rect width="1000" height="600" fill="url(#schematicEditorGrid)"/>${schematicFloorMarkup(building||"Pilih gedung",floor,{editor:true,selectedId:schematicEditorSelectedId})}`;
   const key=schematicDraftKey(building,floor),dirty=schematicLayoutDrafts.has(key);
   if(!valid)setSchematicEditorStatus("Pilih gedung / lokasi acuan pada bagian Peta MCB di atas. Lokasi Master menjadi sumber nama ruangan.",false);
@@ -2993,6 +3025,8 @@ function syncSchematicSelectionControls(svg){
   const select=$("schematicElementSelect");if(select)select.value=selected?.id||"";
   const name=$("schematicElementName");if(name){name.value=selected?schematicElementLabel(selected):"";name.disabled=!selected;name.placeholder=selected?.type==="room"&&selected.locationId?"Nama tampilan khusus (opsional)":"Nama elemen";}
   for(const [id,key] of [["schematicElementX","x"],["schematicElementY","y"],["schematicElementW","w"],["schematicElementH","h"]]){const input=$(id);if(input){input.value=selected?Math.round(selected[key]):"";input.disabled=!selected;}}
+  const rotationEnabled=isRotatableSchematicElement(selected),rotationValue=selected?Math.round(Number(selected.rotation)||0):0;
+  for(const id of ["schematicElementRotation","schematicElementRotationRange"]){const control=$(id);if(control){control.value=String(rotationValue);control.disabled=!rotationEnabled;}}
   svg?.querySelectorAll("[data-schematic-element]").forEach(group=>{
     const isSelected=group.dataset.schematicElement===schematicEditorSelectedId;
     group.classList.toggle("sf-editor-selected",isSelected);
@@ -3050,10 +3084,13 @@ function setupSchematicEditorControls(){
   bind("schematicAddRoom",()=>armSchematicPlacement("room"));bind("schematicAddCorridor",()=>armSchematicPlacement("corridor"));bind("schematicAddStairs",()=>armSchematicPlacement("stairs"));bind("schematicAddElevator",()=>armSchematicPlacement("elevator"));bind("schematicAddDoor",()=>armSchematicPlacement("door"));bind("schematicAddPanel",()=>armSchematicPlacement("panel"));bind("schematicAddAreaOffice",()=>armSchematicPlacement("area_office"));bind("schematicAddAreaMess",()=>armSchematicPlacement("area_mess"));bind("schematicAddTurnRight",()=>armSchematicPlacement("turn_right"));bind("schematicAddTurnLeft",()=>armSchematicPlacement("turn_left"));bind("schematicAddJunctionT",()=>armSchematicPlacement("junction_t"));bind("schematicAddJunctionCross",()=>armSchematicPlacement("junction_cross"));bind("schematicAddJunctionY",()=>armSchematicPlacement("junction_y"));
   bind("schematicCancelPlacement",()=>{schematicEditorPendingType="";renderSchematicEditor();setSchematicEditorStatus("Mode penempatan dibatalkan.",schematicLayoutDrafts.has(schematicDraftKey(schematicEditorContext().building,schematicEditorContext().floor)));});
   bind("schematicDeleteElement",()=>{if(!schematicEditorSelectedId)return toast("Pilih elemen","Pilih elemen yang ingin dihapus pada dropdown atau peta.","warning");deleteSchematicElement(schematicEditorSelectedId);});
-  bind("schematicApplyGeometry",()=>{const {building,floor}=schematicEditorContext(),current=schematicEditorElements(),idx=current.findIndex(v=>v.id===schematicEditorSelectedId);if(idx<0)return toast("Pilih elemen","Pilih elemen pada peta terlebih dahulu.","warning");const el=current[idx];const values={x:Number($("schematicElementX")?.value),y:Number($("schematicElementY")?.value),w:Number($("schematicElementW")?.value),h:Number($("schematicElementH")?.value)};if(!Object.values(values).every(Number.isFinite)||values.w<45||values.h<12||values.x<20||values.y<100||values.x+values.w>970||values.y+values.h>575)return toast("Ukuran tidak valid","Pastikan X/Y dan ukuran berada di dalam batas peta.","warning");pushSchematicUndoSnapshot(building,floor,current);Object.assign(el,values);const value=String($("schematicElementName")?.value||"").trim();if(el.type==="room"&&el.locationId){const master=S.locations.find(v=>v.id===el.locationId),masterName=String(master?.room||master?.area||el.name||"Ruangan");el.displayName=value===masterName?"":value;}else if(value)el.name=value;setSchematicLayoutDraft(building,floor,current);renderSchematicEditor();drawMcbMap();});
+  bind("schematicApplyGeometry",()=>{const {building,floor}=schematicEditorContext(),current=schematicEditorElements(),idx=current.findIndex(v=>v.id===schematicEditorSelectedId);if(idx<0)return toast("Pilih elemen","Pilih elemen pada peta terlebih dahulu.","warning");const el=current[idx];const values={x:Number($("schematicElementX")?.value),y:Number($("schematicElementY")?.value),w:Number($("schematicElementW")?.value),h:Number($("schematicElementH")?.value)};if(!Object.values(values).every(Number.isFinite)||values.w<45||values.h<12||values.x<20||values.y<100||values.x+values.w>970||values.y+values.h>575)return toast("Ukuran tidak valid","Pastikan X/Y dan ukuran berada di dalam batas peta.","warning");pushSchematicUndoSnapshot(building,floor,current);Object.assign(el,values);if(isRotatableSchematicElement(el)){const angle=Number($("schematicElementRotation")?.value);el.rotation=Math.max(0,Math.min(360,Number.isFinite(angle)?angle:Number(el.rotation)||0));}const value=String($("schematicElementName")?.value||"").trim();if(el.type==="room"&&el.locationId){const master=S.locations.find(v=>v.id===el.locationId),masterName=String(master?.room||master?.area||el.name||"Ruangan");el.displayName=value===masterName?"":value;}else if(value)el.name=value;setSchematicLayoutDraft(building,floor,current);renderSchematicEditor();drawMcbMap();});
   bind("schematicUndo",undoSchematicLayout);bind("schematicSaveLayout",saveSchematicLayout);bind("schematicResetLayout",resetSchematicLayout);
   const sel=$("schematicElementSelect");if(sel)sel.onchange=()=>{schematicEditorSelectedId=sel.value||"";renderSchematicEditor();};
   const nameInput=$("schematicElementName");if(nameInput)nameInput.addEventListener("keydown",event=>{if(event.key==="Enter"){event.preventDefault();$("schematicApplyGeometry")?.click();}});
+  const rotationNumber=$("schematicElementRotation"),rotationRange=$("schematicElementRotationRange");
+  if(rotationRange){rotationRange.onpointerdown=beginSchematicRotationEdit;rotationRange.onkeydown=beginSchematicRotationEdit;rotationRange.oninput=()=>{if(rotationNumber)rotationNumber.value=rotationRange.value;previewSchematicRotation(rotationRange.value);};rotationRange.onchange=finishSchematicRotationEdit;}
+  if(rotationNumber){rotationNumber.onfocus=beginSchematicRotationEdit;rotationNumber.oninput=()=>{if(rotationRange)rotationRange.value=rotationNumber.value;};rotationNumber.onchange=()=>{previewSchematicRotation(rotationNumber.value);finishSchematicRotationEdit();};rotationNumber.onkeydown=event=>{if(event.key==="Enter"){event.preventDefault();rotationNumber.blur();}else if(event.key==="Escape"){event.preventDefault();if(schematicRotationBefore){const before=schematicRotationBefore;schematicRotationBefore=null;const {building,floor}=schematicEditorContext();setSchematicLayoutDraft(building,floor,before);renderSchematicEditor();drawMcbMap();}}};}
   const details=$("schematicEditorPanel");if(details)details.addEventListener("toggle",()=>{if(details.open)renderSchematicEditor()});
 }
 function drawMcbCoordinatePicker(){
